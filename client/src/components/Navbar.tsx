@@ -361,12 +361,12 @@ function Navbar({}: NavbarProps) {
               </div>
 
               <div className="flex justify-start mt-4">
-                <button
-                  onClick={() => setMenuOpen(false)}
-                  className="bg-[#1c2b21] text-[#D4AF37] text-base px-6 py-2 rounded-md  transition font-medium flex items-center gap-2"
+                <Link
+                  to="/login"
+                  className="bg-[#1c2b21] text-[#D4AF37] text-base px-6 py-2 rounded-md transition font-medium flex items-center gap-2"
                 >
                   <FaLock size={16} /> Sign In
-                </button>
+                </Link>
               </div>
             </nav>
           </div>

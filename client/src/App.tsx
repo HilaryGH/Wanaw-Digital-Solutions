@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import LoginForm from "./components/Auth/LoginForm";
 import RegisterForm from "./components/Auth/RegisterForm";
+import GiftingOptions from "./components/GiftingOptions";
 
 // Wrapper to conditionally render Navbar
 const AppWrapper = () => {
@@ -18,6 +19,7 @@ const AppWrapper = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
+        <Route path="/gifting-options" element={<GiftingOptions />} />
       </Routes>
     </>
   );

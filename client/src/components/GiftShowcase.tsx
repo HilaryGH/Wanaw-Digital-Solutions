@@ -1,11 +1,22 @@
 import { useEffect, useState } from "react";
-
+import { useNavigate } from "react-router-dom";
+import confetti from "canvas-confetti"; // 🎉 Import confetti
 const GiftShowcase = () => {
   const [animate, setAnimate] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setAnimate(true);
   }, []);
+
+  const handleEnjoyGift = () => {
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ["#d4af37", "#ff69b4", "#1c2b21", "#ffffff"],
+    });
+  };
 
   const cardData = [
     {
@@ -22,30 +33,7 @@ const GiftShowcase = () => {
         "Corporate: Employees, Clients, Partners",
         "Individuals: Family, Friends, Loved Ones",
       ],
-      buttonText: "Send a Surprise",
-    },
-  ];
-
-  const occasionData = [
-    {
-      title: "Corporate Gifting",
-      items: [
-        "Festivals (Ashenda, Irreechaa, Enkutatash, Timket, etc.)",
-        "Milestones & Celebrations",
-        "Chocolate gifting & gender-specific options",
-        "Welcome kits for new employees",
-      ],
-      buttonText: "Explore Corporate Gifts",
-    },
-    {
-      title: "Individual Gifting",
-      items: [
-        "Birthdays, Anniversaries, Weddings, Graduations",
-        "Festivals (Valentine’s, Mother's Day, Eid, etc.)",
-        "Thank-you, Sympathy & Congratulations",
-        "Friendship & Relationship Gifts",
-      ],
-      buttonText: "Find the Perfect Gift",
+      buttonText: "Enjoy Your Gift 🎁",
     },
   ];
 
@@ -77,11 +65,9 @@ const GiftShowcase = () => {
           }`}
         >
           Wanaw Health and Wellness is your one-stop destination for meaningful
-          corporate and individual gifting. From branded corporate packages to
-          heartfelt personal gestures — discover a thoughtful way to give.
+          corporate and individual gifting.
         </p>
 
-        {/* Clip path definition */}
         <svg width="0" height="0" className="absolute">
           <defs>
             <clipPath
@@ -93,7 +79,6 @@ const GiftShowcase = () => {
           </defs>
         </svg>
 
-        {/* Gift Givers & Receivers */}
         <div className="grid md:grid-cols-2 gap-10 mb-16">
           {cardData.map((card, idx) => (
             <div
@@ -114,44 +99,16 @@ const GiftShowcase = () => {
                 ))}
               </ul>
               <div className="text-center mt-6">
-                <button className="bg-[#d4af37] text-[#1c2b21] py-2 px-5 rounded-full shadow-md transition duration-300 hover:rounded-md text-sm md:text-base">
-                  {card.buttonText}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Gifting Occasions */}
-        <h3
-          className={`text-2xl font-bold text-center text-[#1c2b21] mb-10 ${
-            animate ? "animate-fadeSlideUp animate-fadeSlideUp-delay-4" : ""
-          }`}
-        >
-          Gifting Occasions
-        </h3>
-
-        <div className="grid md:grid-cols-2 gap-10">
-          {occasionData.map((card, idx) => (
-            <div
-              key={idx}
-              className={`bg-green text-gold shadow-md p-6 md:p-8 rounded-2xl relative overflow-hidden hover-scale ${
-                animate
-                  ? `animate-fadeSlideUp animate-fadeSlideUp-delay-${idx + 2}`
-                  : ""
-              }`}
-              style={{ clipPath: "url(#clipRightCcurveInverted)" }}
-            >
-              <h4 className="text-lg font-semibold mb-4 text-center">
-                {card.title}
-              </h4>
-              <ul className="list-disc list-inside space-y-2">
-                {card.items.map((item, i) => (
-                  <li key={i}>{item}</li>
-                ))}
-              </ul>
-              <div className="text-center mt-6">
-                <button className="bg-[#d4af37] text-[#1c2b21] py-2 px-5 rounded-full shadow-md transition duration-300 hover:rounded-md text-sm md:text-base">
+                <button
+                  onClick={() => {
+                    if (card.title === "Gift Givers") {
+                      navigate("/gifting-options");
+                    } else {
+                      handleEnjoyGift(); // 🎉 Trigger confetti for receivers
+                    }
+                  }}
+                  className="bg-[#d4af37] text-[#1c2b21] py-2 px-5 rounded-full shadow-md transition duration-300 hover:rounded-md text-sm md:text-base"
+                >
                   {card.buttonText}
                 </button>
               </div>
