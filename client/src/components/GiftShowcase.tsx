@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import confetti from "canvas-confetti"; // 🎉 Import confetti
+import confetti from "canvas-confetti";
+
 const GiftShowcase = () => {
   const [animate, setAnimate] = useState(false);
   const navigate = useNavigate();

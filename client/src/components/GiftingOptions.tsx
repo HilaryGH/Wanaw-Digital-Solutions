@@ -13,6 +13,9 @@ const GiftingOptions = () => {
     "Gifting for Her",
     "Gifting for Him",
     "Festival Hampers",
+    "Milestone Awards",
+    "Client Appreciation Gifts",
+    "Holiday Gift Boxes",
   ];
 
   const individualGifts = [
@@ -22,6 +25,10 @@ const GiftingOptions = () => {
     "Graduation Frame",
     "Valentine’s Flowers",
     "Traditional Basket",
+    "Mother’s Day Gift",
+    "Father’s Day Gift",
+    "Thank You Gift",
+    "Friendship Token",
   ];
 
   const slugify = (text: string) =>
@@ -43,11 +50,11 @@ const GiftingOptions = () => {
 
         <div className="grid md:grid-cols-2 gap-14">
           {/* Corporate Gifting */}
-          <div className="bg-[#1c2b21] text-white p-10 rounded-3xl shadow-xl hover:shadow-2xl transition duration-300 transform hover:scale-[1.015] relative z-10">
+          <div className="bg-[#1c2b21] text-gold p-10 rounded-3xl shadow-xl hover:shadow-2xl transition duration-300 transform hover:scale-[1.015] relative z-10">
             <h3 className="text-2xl font-semibold mb-3 text-center">
-              🎯 Corporate Gifting
+              Corporate Gifting
             </h3>
-            <p className="text-gray-300 text-sm mb-6 text-center">
+            <p className="text-gold text-sm mb-6 text-center">
               Thoughtful gifts that strengthen business relationships — perfect
               for teams, partners, and clients.
             </p>
@@ -82,7 +89,7 @@ const GiftingOptions = () => {
                   onClick={() =>
                     navigate(`/gift-details/${slugify(selectedCorporateGift)}`)
                   }
-                  className="mt-5 w-full bg-[#d4af37] text-[#1c2b21] py-2.5 rounded-full shadow-md hover:bg-[#cfae34] font-semibold transition duration-300"
+                  className="mt-5 w-full bg-[#d4af37] text-[#1c2b21] py-2.5 rounded-full shadow-md hover:rounded-md font-semibold transition duration-300"
                 >
                   Continue to Details
                 </button>
@@ -91,9 +98,9 @@ const GiftingOptions = () => {
           </div>
 
           {/* Individual Gifting */}
-          <div className="bg-[#fff5f5] text-[#1c2b21] p-10 rounded-3xl shadow-xl hover:shadow-2xl transition duration-300 transform hover:scale-[1.015] relative z-10">
+          <div className="bg-[#D4AF37] text-[#1c2b21] p-10 rounded-3xl shadow-xl hover:shadow-2xl transition duration-300 transform hover:scale-[1.015] relative z-10">
             <h3 className="text-2xl font-semibold mb-3 text-center">
-              🎉 Individual Gifting
+              Individual Gifting
             </h3>
             <p className="text-gray-600 text-sm mb-6 text-center">
               Celebrate birthdays, anniversaries, and every little win with
@@ -123,14 +130,14 @@ const GiftingOptions = () => {
 
             {selectedIndividualGift && (
               <>
-                <p className="mt-2 text-pink-600 font-medium text-sm">
-                  💖 Selected: {selectedIndividualGift}
+                <p className="mt-2 text-black font-medium text-sm">
+                  Selected: {selectedIndividualGift}
                 </p>
                 <button
                   onClick={() =>
                     navigate(`/gift-details/${slugify(selectedIndividualGift)}`)
                   }
-                  className="mt-5 w-full bg-pink-600 text-white py-2.5 rounded-full shadow-md hover:bg-pink-700 font-semibold transition duration-300"
+                  className="mt-5 w-full bg-[#1c2b21] text-gold py-2.5 rounded-full shadow-md hover:rounded-md font-semibold transition duration-300"
                 >
                   Continue to Details
                 </button>

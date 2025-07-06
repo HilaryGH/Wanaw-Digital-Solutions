@@ -6,6 +6,7 @@ import GiftShowcase from "./GiftShowcase";
 import MembershipPreview from "./MembershipPreview";
 
 import Footer from "./Footer";
+import FestivitiesT from "./FestivitiesT";
 
 const Home = () => {
   return (
@@ -132,6 +133,7 @@ const Home = () => {
       <HomeHighlights />
       <MembershipPreview />
       <GiftShowcase />
+      <FestivitiesT />
       <Footer />
     </>
   );
