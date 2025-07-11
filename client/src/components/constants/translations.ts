@@ -3,7 +3,7 @@
 export const translations = {
   en: {
     services: "Services",
-   programs: "Programs", // ✅ Make sure this is here
+    programs: "Programs",
     giftOptions: "Gift Options",
     corporate: "Corporate",
     about: "About",
@@ -11,16 +11,31 @@ export const translations = {
     location: "Addis Ababa, Ethiopia",
     email: "g.fikre2@gmail.com",
     hours: "Mon–Sat: 8:30 AM – 11:30 PM",
+    signIn: "Sign In",
+    company: "Company",
+    support: "Support",
+    searchPlaceholder: "Search...",
+    language: "Language",
+    english: "English",
+    amharic: "Amharic"
   },
   am: {
     services: "አገልግሎቶች",
-     programs: "ፕሮግራሞች", // ✅ And here too
+    programs: "ፕሮግራሞች",
     giftOptions: "የስጦታ አማራጮች",
     corporate: "ድርጅቶች",
     about: "ስለ እኛ",
     login: "ግባ",
     location: "አዲስ አበባ፣ ኢትዮጵያ",
     email: "g.fikre2@gmail.com",
-    hours: "ሰኞ–ቅዳሜ፡ 2:30 እና – 5:30 ማታ",
-  },
+    hours: "ሰኞ–ቅዳሜ፡ 2:30 – 5:30 ማታ",
+    signIn: "ግባ",
+    company: "ኩባንያ",
+    support: "ድጋፍ",
+    searchPlaceholder: "ፈልግ...",
+    language: "ቋንቋ",
+    english: "እንግሊዝኛ",
+    amharic: "አማርኛ"
+  }
 };
+

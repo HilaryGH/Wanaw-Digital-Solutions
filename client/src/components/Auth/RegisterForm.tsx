@@ -1,50 +1,58 @@
-import { useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import BASE_URL from "../../api/api";
 
 const RegisterForm = () => {
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
-    businessName: "",
     email: "",
     password: "",
     confirmPassword: "",
-    referralCode: "",
   });
 
   const [consent, setConsent] = useState(false);
-  const [marketingOptIn, setMarketingOptIn] = useState(false);
-  const [licenseFile, setLicenseFile] = useState<File | null>(null);
-  const [otherDocs, setOtherDocs] = useState<FileList | null>(null);
-
-  const licenseInputRef = useRef<HTMLInputElement | null>(null);
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (form.password !== form.confirmPassword) {
       alert("Passwords do not match");
       return;
     }
+
     if (!consent) {
       alert("You must agree to the data processing terms.");
       return;
     }
-    if (!licenseFile) {
-      alert("Please upload your business license.");
-      return;
-    }
 
-    console.log("Registering:", {
-      ...form,
-      consent,
-      marketingOptIn,
-      licenseFileName: licenseFile.name,
-      otherDocsCount: otherDocs?.length ?? 0,
-    });
+    try {
+      const payload = {
+        fullName: `${form.firstName} ${form.lastName}`,
+        email: form.email,
+        password: form.password,
+      };
+
+      const res = await fetch(`${BASE_URL}/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error("Registration failed");
+
+      await res.json();
+      alert("Account created successfully!");
+      navigate("/login");
+    } catch (error) {
+      console.error(error);
+      alert("An error occurred while registering. Please try again.");
+    }
   };
 
   return (
@@ -86,16 +94,6 @@ const RegisterForm = () => {
             </div>
 
             <input
-              type="text"
-              name="businessName"
-              placeholder="Business Name"
-              required
-              value={form.businessName}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded text-sm"
-            />
-
-            <input
               type="email"
               name="email"
               placeholder="Email"
@@ -133,60 +131,9 @@ const RegisterForm = () => {
               className="w-full p-2 border rounded text-sm border-gray-300 cursor-not-allowed"
             />
 
-            <input
-              type="text"
-              name="referralCode"
-              placeholder="Referral Code (optional)"
-              value={form.referralCode}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded text-sm"
-            />
-
-            {/* Upload License */}
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700">
-                Upload Business License <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="file"
-                required
-                accept=".pdf,.jpg,.jpeg,.png"
-                onChange={(e) => setLicenseFile(e.target.files?.[0] ?? null)}
-                ref={licenseInputRef}
-                className="w-full text-sm border border-gray-300 rounded p-2 file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-sm file:bg-[#D4AF37] file:text-[#1c2b21]"
-              />
-              {licenseFile && (
-                <p className="text-xs mt-1 text-green-700">
-                  ✔️ {licenseFile.name}
-                </p>
-              )}
-            </div>
-
-            {/* Upload Additional Docs */}
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700">
-                Additional Documents (Optional)
-              </label>
-              <input
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
-                multiple
-                onChange={(e) => setOtherDocs(e.target.files)}
-                className="w-full text-sm border border-gray-300 rounded p-2 file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-sm file:bg-gray-100"
-              />
-              {otherDocs && (
-                <p className="text-xs mt-1 text-blue-600">
-                  {Array.from(otherDocs)
-                    .map((f) => f.name)
-                    .join(", ")}
-                </p>
-              )}
-            </div>
-
             <div className="flex items-start gap-2 text-sm">
               <input
                 type="checkbox"
-                required
                 checked={consent}
                 onChange={(e) => setConsent(e.target.checked)}
               />
@@ -201,18 +148,6 @@ const RegisterForm = () => {
                   Merchant Service Agreement
                 </a>
                 .
-              </label>
-            </div>
-
-            <div className="flex items-start gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={marketingOptIn}
-                onChange={(e) => setMarketingOptIn(e.target.checked)}
-              />
-              <label>
-                I would like to receive marketing emails about promotions, new
-                features, and events from Wanaw.
               </label>
             </div>
 
@@ -259,7 +194,7 @@ const RegisterForm = () => {
         </svg>
       </div>
 
-      {/* Right: Info */}
+      {/* Right: Info Section */}
       <div className="w-full md:w-1/2 hidden md:flex justify-center bg-green relative overflow-hidden z-0">
         <div
           className="absolute inset-0 opacity-20"

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaFacebook, FaInstagram, FaLinkedin, FaTiktok } from "react-icons/fa";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const [showMore, setShowMore] = useState(false);
@@ -112,9 +113,15 @@ const Footer = () => {
 
           {showMore && (
             <div className="mt-4 text-gray-400 space-y-2">
-              <p>Terms & Conditions</p>
-              <p>Privacy Policy</p>
-              <p>Partner With Us</p>
+              <Link to="/terms" className="block hover:underline">
+                Terms & Conditions
+              </Link>
+              <Link to="/privacy" className="block hover:underline">
+                Privacy Policy
+              </Link>
+              <Link to="/partner" className="block hover:underline">
+                Partner With Us
+              </Link>
             </div>
           )}
         </div>

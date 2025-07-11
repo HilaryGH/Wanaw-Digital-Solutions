@@ -1,13 +1,42 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import GoogleLoginButton from "./GoogleLoginButton";
+import BASE_URL from "../../api/api";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Logging in:", { email, password });
+
+    try {
+      const response = await fetch(`${BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.msg || "Login failed");
+        return;
+      }
+
+      // Store token in localStorage (or cookie if preferred)
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Redirect to dashboard or homepage
+      navigate("/dashboard");
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -39,6 +68,7 @@ const LoginForm = () => {
         <h2 className="text-3xl font-bold mb-6 text-center text-[#1c2b21]">
           Welcome Back
         </h2>
+        {error && <p className="text-red-600 mb-4">{error}</p>}
 
         <p className="text-center text-gray-600 text-sm mb-6">
           Login to explore wellness & gifting at your fingertips
@@ -79,6 +109,7 @@ const LoginForm = () => {
           >
             Sign In
           </button>
+          <GoogleLoginButton />
         </form>
 
         <p className="text-center text-sm mt-6">

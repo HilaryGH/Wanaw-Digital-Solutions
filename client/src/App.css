@@ -9,6 +9,7 @@
 .bg-green {
   background-color: #1c2b21;
 }
+
 .text-gold {
   color: #D4AF37;
 }
@@ -21,6 +22,7 @@
     opacity: 0;
     transform: translateX(-50px);
   }
+
   100% {
     opacity: 1;
     transform: translateX(0);
@@ -36,6 +38,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -45,10 +48,22 @@
 .animate-fadeSlideUp {
   animation: fadeSlideUp 0.6s ease forwards;
 }
-.animate-fadeSlideUp-delay-1 { animation-delay: 0.2s; }
-.animate-fadeSlideUp-delay-2 { animation-delay: 0.4s; }
-.animate-fadeSlideUp-delay-3 { animation-delay: 0.6s; }
-.animate-fadeSlideUp-delay-4 { animation-delay: 0.8s; }
+
+.animate-fadeSlideUp-delay-1 {
+  animation-delay: 0.2s;
+}
+
+.animate-fadeSlideUp-delay-2 {
+  animation-delay: 0.4s;
+}
+
+.animate-fadeSlideUp-delay-3 {
+  animation-delay: 0.6s;
+}
+
+.animate-fadeSlideUp-delay-4 {
+  animation-delay: 0.8s;
+}
 
 /* =======================
    Hover Effects
@@ -56,6 +71,7 @@
 .hover-scale {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
 .hover-scale:hover {
   transform: scale(1.03);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
@@ -65,9 +81,17 @@
    Bouncing Animation
 ========================== */
 @keyframes bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
 }
+
 .animate-bob {
   animation: bob 4s ease-in-out infinite;
 }
@@ -79,6 +103,7 @@
   position: relative;
   overflow: hidden;
 }
+
 .bubbles::before,
 .bubbles::after {
   content: "";
@@ -88,12 +113,14 @@
   animation: float 6s ease-in-out infinite alternate;
   z-index: 0;
 }
+
 .bubbles::before {
   width: 120px;
   height: 120px;
   bottom: 10%;
   left: 5%;
 }
+
 .bubbles::after {
   width: 100px;
   height: 100px;
@@ -106,6 +133,7 @@
     transform: translateY(0px) scale(1);
     opacity: 0.3;
   }
+
   100% {
     transform: translateY(-20px) scale(1.2);
     opacity: 0.6;
@@ -150,6 +178,7 @@
   0% {
     transform: translateX(0%);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -184,11 +213,17 @@
   font-size: 1.25rem;
   transition: color 0.3s ease;
 }
+
 .scrolling-icons svg:hover {
   color: #D4AF37;
 }
 
 @keyframes scrollLeft {
-  0% { transform: translateX(0%); }
-  100% { transform: translateX(-100%); }
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
 }

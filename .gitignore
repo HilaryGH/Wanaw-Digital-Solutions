@@ -1,0 +1,11 @@
+# Ignore environment files
+/server/.env
+/client/.env
+
+# Optional: node_modules for both sides
+/server/node_modules/
+/client/node_modules/
+
+# Optional: build/dist folders if any
+/client/dist/
+/server/build/

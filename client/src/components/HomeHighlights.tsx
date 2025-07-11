@@ -4,41 +4,40 @@ import { Link } from "react-router-dom";
 
 const HomeHighlights = () => {
   const highlights = [
-    {
-      icon: <FaSpa className="text-pink-500 text-3xl sm:text-4xl" />,
-      title: "Wellness & Spa",
-      description:
-        "Book massages, yoga sessions, steam baths, and spa treatments with ease.",
-      link: "/services",
-      action: "Explore Spa",
-    },
-    {
-      icon: (
-        <MdMedicalServices className="text-cyan-500 text-3xl sm:text-4xl" />
-      ),
-      title: "Medical Services",
-      description:
-        "Access verified physiotherapy, labs, and online doctor consultations.",
-      link: "/services",
-      action: "View Medical",
-    },
-    {
-      icon: <FaGift className="text-yellow-500 text-3xl sm:text-4xl" />,
-      title: "Gift Options",
-      description:
-        "Send health & wellness gifts to family, friends, or corporate partners.",
-      link: "/gifts",
-      action: "Send a Gift",
-    },
-    {
-      icon: <FaBriefcase className="text-green-500 text-3xl sm:text-4xl" />,
-      title: "Corporate Wellness",
-      description:
-        "Tailored health packages, hotel rooms, and event gifting for institutions.",
-      link: "/corporate",
-      action: "See Options",
-    },
-  ];
+  {
+    icon: <FaSpa className="text-pink-500 text-3xl sm:text-4xl" />,
+    title: "Wellness & Spa",
+    description:
+      "Book massages, yoga sessions, steam baths, and spa treatments with ease.",
+    link: "/services?category=spa", // ✅ query param
+    action: "Explore Spa",
+  },
+  {
+    icon: <MdMedicalServices className="text-cyan-500 text-3xl sm:text-4xl" />,
+    title: "Medical Services",
+    description:
+      "Access verified physiotherapy, labs, and online doctor consultations.",
+    link: "/services?category=medical", // ✅ query param
+    action: "View Medical",
+  },
+  {
+    icon: <FaGift className="text-yellow-500 text-3xl sm:text-4xl" />,
+    title: "Gift Options",
+    description:
+      "Send health & wellness gifts to family, friends, or corporate partners.",
+    link: "/gifting-options", // ✅ query param
+    action: "Send a Gift",
+  },
+  {
+    icon: <FaBriefcase className="text-green-500 text-3xl sm:text-4xl" />,
+    title: "Corporate Wellness",
+    description:
+      "Tailored health packages, hotel rooms, and event gifting for institutions.",
+    link: "/services?category=corporate", // ✅ query param
+    action: "See Options",
+  },
+];
+
 
   return (
     <section className="relative bg-green pt-20 pb-24 px-6 sm:px-10 md:px-20 overflow-hidden">

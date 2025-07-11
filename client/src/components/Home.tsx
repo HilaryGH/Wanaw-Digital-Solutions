@@ -8,6 +8,8 @@ import MembershipPreview from "./MembershipPreview";
 import Footer from "./Footer";
 import FestivitiesT from "./FestivitiesT";
 
+
+
 const Home = () => {
   return (
     <>
@@ -16,39 +18,10 @@ const Home = () => {
 
         {/* 🔗 Partners Logo Scroll Bar */}
         <div className=" social-bar bg-green  py-6 overflow-hidden ">
-          <div className=" scrolling-icons ">
-            <img
-              src="/EthioTel.png"
-              alt="Ethio Telecom"
-              className="h-10 sm:h-12  object-contain"
-            />
-            <img
-              src="/Capital.png"
-              alt="Capital Bank"
-              className="h-10 sm:h-12 object-contain"
-            />
-            <img
-              src="/Crowdfunding.png"
-              alt="Crowdfunding"
-              className="h-10 sm:h-12 object-contain"
-            />
-            {/* Repeat for continuous scroll effect */}
-            <img
-              src="/EthioTel.png"
-              alt="Ethio Telecom"
-              className="h-10 sm:h-12 object-contain"
-            />
-            <img
-              src="/Capital.png"
-              alt="Capital Bank"
-              className="h-10 sm:h-12 object-contain"
-            />
-            <img
-              src="/Crowdfunding.png"
-              alt="Crowdfunding"
-              className="h-10 sm:h-12 object-contain"
-            />
-          </div>
+         <div className="bg-green py-6 overflow-x-auto">
+  
+</div>
+
         </div>
 
         {/* 🌟 Main Hero Content */}
@@ -71,7 +44,7 @@ const Home = () => {
                 Explore Services
               </Link>
               <Link
-                to="/gift-options"
+                to="/gifting-options"
                 className="w-full sm:w-auto text-center bg-[#1c2b21] text-[#D4AF37] font-semibold px-6 py-2.5 rounded-full shadow hover:rounded transition"
               >
                 Send a Gift
@@ -134,6 +107,7 @@ const Home = () => {
       <MembershipPreview />
       <GiftShowcase />
       <FestivitiesT />
+     
       <Footer />
     </>
   );
