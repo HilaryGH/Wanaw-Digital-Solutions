@@ -7,10 +7,22 @@ dotenv.config();
 const app = express();
 connectDB();
 
+const allowedOrigins = [
+  "http://localhost:5173", // for local development
+  "https://wanawhealthandwellness.netlify.app", // for production
+];
+
 app.use(cors({
-  origin: "http://localhost:5173",  // your frontend dev origin
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
 }));
+
 
 app.use(express.json());
 
