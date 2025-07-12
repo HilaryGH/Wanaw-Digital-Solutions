@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import GoogleLoginButton from "./GoogleLoginButton";
+import GoogleRedirectButton from "./GoogleRedirectButton";
 import BASE_URL from "../../api/api";
 
 const LoginForm = () => {
@@ -109,7 +109,7 @@ const LoginForm = () => {
           >
             Sign In
           </button>
-          <GoogleLoginButton />
+          <GoogleRedirectButton />
         </form>
 
         <p className="text-center text-sm mt-6">
