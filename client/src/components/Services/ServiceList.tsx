@@ -1,5 +1,6 @@
 import  { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import BASE_URL from "../../api/api";
 
 const ServiceList = () => {
   const [services, setServices] = useState<any[]>([]); // you can replace any with your service type
@@ -14,7 +15,7 @@ const ServiceList = () => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/services");
+        const res = await fetch(`${BASE_URL}/services`);
         const data = await res.json();
 
         // Filter if category param exists

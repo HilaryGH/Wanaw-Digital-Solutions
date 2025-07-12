@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../api/api";
 
 type Gift = {
   _id: string;
@@ -18,7 +19,7 @@ const GiftingOptions = () => {
   useEffect(() => {
   const fetchGifts = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/gift");
+      const res = await fetch(`${BASE_URL}/gift`);
       if (!res.ok) throw new Error("Failed to fetch gifts");
       const data: Gift[] = await res.json();
 

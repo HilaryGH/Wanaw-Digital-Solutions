@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import BASE_URL from "../api/api";
 
 type Gift = {
   _id: string;
@@ -22,7 +23,7 @@ const GiftDetails = () => {
   useEffect(() => {
     const fetchGiftDetails = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/gift");
+        const res = await fetch(`${BASE_URL}/gift`);
         const data: Gift[] = await res.json();
 
         const matchedGift = data.find(
@@ -61,7 +62,7 @@ const GiftDetails = () => {
       <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-8 mb-12">
         {gift.imageUrl && (
           <img
-            src={`http://localhost:5000${gift.imageUrl}`}
+            src={`${BASE_URL.replace("/api", "")}${gift.imageUrl}`}
             alt={gift.title}
             className="w-full h-64 object-cover rounded-lg mb-6"
           />
@@ -94,7 +95,7 @@ const GiftDetails = () => {
           >
             {item.imageUrl && (
               <img
-                src={`http://localhost:5000${item.imageUrl}`}
+               src={`${BASE_URL.replace("/api", "")}${item.imageUrl}`}
                 alt={item.title}
                 className="w-full h-40 object-cover rounded mb-3"
               />
