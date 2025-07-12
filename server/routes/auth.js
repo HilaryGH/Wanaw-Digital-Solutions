@@ -7,7 +7,19 @@ router.post("/register", register);
 router.post("/login", login);
 
 // ✅ Google login route
-router.post("/google", googleLogin);
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    successRedirect: "https://wanawhealthandwellness.netlify.app/dashboard",
+    failureRedirect: "https://wanawhealthandwellness.netlify.app/login",
+    session: true, // or false if you’ll issue JWT manually
+  })
+);
 
 module.exports = router;
 

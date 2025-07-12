@@ -50,8 +50,10 @@ const programsRouter = require("./routes/programs");
 app.use("/api/programs", programsRouter);
 
 
-
 app.use("/api/auth", require("./routes/auth"));
+app.use(passport.initialize());
+app.use(passport.session());     // only if you use express‑session
+
 const membershipRoutes = require("./routes/membership");
 app.use("/api/membership", membershipRoutes);
 // Mount user-management routes (for admin dashboard)
