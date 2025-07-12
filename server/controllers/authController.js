@@ -55,35 +55,10 @@ exports.login = async (req, res) => {
   }
 };
 
-// ✅ Google Login
-exports.googleLogin = async (req, res) => {
-  try {
-    const { credential } = req.body;
-    const ticket = await client.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
 
-    const payload = ticket.getPayload();
-    const { email, name, sub: googleId } = payload;
 
-    let user = await User.findOne({ email });
-    if (!user) {
-      user = await User.create({
-        fullName: name,
-        email,
-        googleId,
-        password: "", // no password for Google users
-      });
-    }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
-    res.status(200).json({ user, token });
-  } catch (err) {
-    console.error("Google Login Error:", err);
-    res.status(401).json({ msg: "Google authentication failed" });
-  }
-};
+
 
 exports.createService = async (req, res) => {
   const user = req.user; // assuming you attach user via middleware
