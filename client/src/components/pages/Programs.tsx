@@ -11,7 +11,7 @@ const categories = [
   "Medical",
   "Lifestyle",
   "Hotel Rooms",
-  "Products",
+  
 ];
 
 interface Program {
