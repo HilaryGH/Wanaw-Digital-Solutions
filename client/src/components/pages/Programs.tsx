@@ -115,7 +115,7 @@ export default function Programs() {
                 <div>
                {program.image && (
   <img
-    src={`http://localhost:5000${program.image}`}
+     src={`${BASE_URL.replace("/api", "")}${program.image}`}
     alt={program.title}
     className="w-full h-48 object-contain rounded-3xl mb-4"
   />

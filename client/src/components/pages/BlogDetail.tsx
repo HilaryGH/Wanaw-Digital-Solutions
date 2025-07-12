@@ -33,7 +33,7 @@ const BlogDetail = () => {
       <h1 className="text-3xl font-bold mb-4 text-[#1c2b21]">{post.title}</h1>
       {post.coverImage && (
         <img
-          src={`http://localhost:5000${post.coverImage}`}
+          src={`${BASE_URL.replace("/api", "")}${post.coverImage}`}
           alt={post.title}
           className="w-full h-64 object-cover rounded mb-6"
         />

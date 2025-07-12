@@ -44,7 +44,7 @@ const ManageMemberships = () => {
 
       const token = localStorage.getItem("token");
 
-      const res = await fetch(`http://localhost:5000/api/users/${id}/membership`, {
+      const res = await fetch(`${BASE_URL}/users/${id}/membership`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

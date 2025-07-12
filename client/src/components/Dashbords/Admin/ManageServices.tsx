@@ -14,7 +14,7 @@ const ManageServices = () => {
     const confirm = window.confirm("Delete this service?");
     if (!confirm) return;
 
-    await fetch(`http://localhost:5000/api/services/${id}`, {
+    await fetch(`${BASE_URL}/services/${id}`, {
       method: "DELETE",
     });
     fetchServices(); // Refresh
@@ -24,7 +24,7 @@ const ManageServices = () => {
     const confirm = window.confirm(`Set status to '${status}'?`);
     if (!confirm) return;
 
-    await fetch(`http://localhost:5000/api/services/${id}/status`, {
+    await fetch(`${BASE_URL}/services/${id}/status`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),

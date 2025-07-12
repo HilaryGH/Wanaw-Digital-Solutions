@@ -78,7 +78,7 @@ const CartPage = () => {
           >
             {item.imageUrl && (
               <img
-                src={`http://localhost:5000${item.imageUrl}`}
+                src={`${BASE_URL.replace("/api", "")}${item.imageUrl}`}
                 alt={item.title}
                 className="w-full h-48 object-cover mb-3 rounded-md"
               />
