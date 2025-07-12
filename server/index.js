@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const passport = require("passport");
+const session = require("express-session");
 
 
 dotenv.config();
@@ -53,6 +54,17 @@ const programsRouter = require("./routes/programs");
 
 app.use("/api/programs", programsRouter);
 
+// ✅ Add this BEFORE passport setup
+app.use(session({
+  secret: process.env.SESSION_SECRET || "keyboard cat",
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === "production", // true in production with HTTPS
+    httpOnly: true,
+    sameSite: "lax",
+  },
+}));
 
 app.use("/api/auth", require("./routes/auth"));
 app.use(passport.initialize());
