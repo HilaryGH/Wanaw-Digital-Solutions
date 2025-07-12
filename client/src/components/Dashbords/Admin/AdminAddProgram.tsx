@@ -1,4 +1,5 @@
 import { useState } from "react";
+import BASE_URL from "../../../api/api";
 
 const categories = [
   "Wellness",
@@ -51,7 +52,7 @@ export default function AdminAddProgram() {
 );
 
     try {
-      const res = await fetch("http://localhost:5000/api/programs", {
+      const res = await fetch(`${BASE_URL}/programs`, {
         method: "POST",
         headers: {
           Authorization: "Bearer your-admin-secret", // secure properly

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import BASE_URL from "../../../api/api";
 
 type SupportRequest = {
   _id: string;
@@ -14,7 +15,7 @@ const AdminSupportRequests = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/support")
+    fetch(`${BASE_URL}/support`)
       .then((res) => res.json())
       .then((data) => setRequests(data))
       .catch((err) => console.error("Error fetching support requests", err))

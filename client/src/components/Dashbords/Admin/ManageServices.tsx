@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
+import BASE_URL from "../../../api/api";
 
 const ManageServices = () => {
   const [services, setServices] = useState([]);
 
   const fetchServices = async () => {
-    const res = await fetch("http://localhost:5000/api/services");
+    const res = await fetch(`${BASE_URL}/services`);
     const data = await res.json();
     setServices(data);
   };

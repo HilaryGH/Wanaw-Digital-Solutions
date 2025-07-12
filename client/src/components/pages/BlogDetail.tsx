@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import BASE_URL from "../../api/api";
 
 const BlogDetail = () => {
   const { slug } = useParams();
@@ -8,7 +9,7 @@ const BlogDetail = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/blog/${slug}`)
+    fetch(`${BASE_URL}/blog/${slug}`)
       .then(async (res) => {
         if (!res.ok) {
           const errText = await res.text();

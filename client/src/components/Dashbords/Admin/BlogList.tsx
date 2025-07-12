@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import BASE_URL from "../../../api/api";
 
 type BlogPost = {
   title: string;
@@ -14,7 +15,7 @@ const BlogList = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/posts")
+    fetch(`${BASE_URL}/posts`)
       .then(async (res) => {
         if (!res.ok) {
           const errText = await res.text();

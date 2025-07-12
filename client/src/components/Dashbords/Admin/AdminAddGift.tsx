@@ -1,5 +1,6 @@
 import { useState,} from "react";
 import type { ChangeEvent, FormEvent } from "react";
+import BASE_URL from "../../../api/api";
 
 const AdminAddGift = () => {
   const [gift, setGift] = useState({
@@ -41,7 +42,7 @@ const AdminAddGift = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/gift", {
+      const res = await fetch(`${BASE_URL}/gift`, {
         method: "POST",
         body: formData,
       });

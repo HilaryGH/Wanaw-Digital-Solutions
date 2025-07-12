@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import BASE_URL from "../../../api/api";
 
 // Define User type
 interface User {
@@ -19,7 +20,7 @@ const ManageMemberships = () => {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch("http://localhost:5000/api/users", {
+      const res = await fetch(`${BASE_URL}/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
