@@ -9,7 +9,7 @@ const GoogleRedirectButton = () => {
   return (
     <button
       onClick={handleGoogleLogin}
-      className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+      className="w-full mt-1 p-2 bg-green text-white rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
     >
       Sign in with Google
     </button>
