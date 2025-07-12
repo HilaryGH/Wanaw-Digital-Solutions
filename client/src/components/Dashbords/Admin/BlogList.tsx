@@ -42,7 +42,7 @@ const BlogList = () => {
             <div key={post.slug} className="bg-white rounded-lg shadow-lg overflow-hidden">
               {post.coverImage && (
                 <img
-                  src={`http://localhost:5000${post.coverImage}`}
+                   src={`${BASE_URL.replace("/api", "")}${post.coverImage}`}
                   alt={post.title}
                   className="w-full h-48 object-cover"
                 />
