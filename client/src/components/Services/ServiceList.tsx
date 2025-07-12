@@ -69,7 +69,7 @@ const ServiceList = () => {
           >
             {service.imageUrl && (
               <img
-                src={`http://localhost:5000${service.imageUrl}`}
+                 src={`${BASE_URL.replace("/api", "")}${service.imageUrl}`}
                 alt={service.title}
                 className="w-full h-48 object-cover rounded-xl mb-4"
               />
