@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import BASE_URL from "../api/api";
 import {
   IoIosArrowDown,
   IoIosArrowForward,
@@ -84,7 +85,7 @@ const Navbar = () => {
 
   /* fetch blog title once */
   useEffect(() => {
-    fetch("http://localhost:5000/api/posts")
+    fetch(`${BASE_URL}/posts`)
       .then(r => r.json())
       .then(d => d && d.length && setLatestBlog(d[0]))
       .catch(console.error);
@@ -108,9 +109,9 @@ const Navbar = () => {
     const fetchAll = async () => {
       try {
         const [services, programs, gifts] = await Promise.all([
-          fetch("http://localhost:5000/api/services").then(r => r.json()),
-          fetch("http://localhost:5000/api/programs").then(r => r.json()),
-          fetch("http://localhost:5000/api/gifts").then(r => r.json()),
+          fetch(`${BASE_URL}/services`).then(r => r.json()),
+          fetch(`${BASE_URL}/programs`).then(r => r.json()),
+          fetch(`${BASE_URL}/gifts`).then(r => r.json()),
         ]);
         setAllItems([
           ...services.map((s: any) => ({ ...s, type: "Service" })),
