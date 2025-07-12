@@ -4,83 +4,75 @@ const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const passport = require("passport");
 const session = require("express-session");
-
+const path = require("path");
 
 dotenv.config();
+
 const app = express();
 connectDB();
 
+// ✅ Allowed frontend origins (local + Netlify)
 const allowedOrigins = [
-  "http://localhost:5173", // for local development
-  "https://wanawhealthandwellness.netlify.app", // for production
+  "http://localhost:5173",
+  "https://wanawhealthandwellness.netlify.app",
 ];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-}));
+// ✅ CORS middleware
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
-require("./config/passport");
-app.use(passport.initialize());
-
+// ✅ Parse JSON request bodies
 app.use(express.json());
 
-const giftRoutes = require("./routes/gift");
-app.use("/api/gift", giftRoutes);
+// ✅ Session middleware (must come BEFORE passport)
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "keyboard cat",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === "production", // true in production
+      httpOnly: true,
+      sameSite: "lax",
+    },
+  })
+);
 
-const adminBlogRoutes = require("./routes/admin.blog");
-app.use("/api/admin/posts", adminBlogRoutes);
+// ✅ Passport setup (initialize and session)
+require("./config/passport");
+app.use(passport.initialize());
+app.use(passport.session());
 
-const blogRoutes = require("./routes/blog");   // <-- this file
-app.use("/api/posts", blogRoutes);             // path matches front‑end
-
-app.use("/api/blog", blogRoutes);
-
-const supportRoutes = require("./routes/support");
-app.use("/api/support", supportRoutes);
-
-
-
-const path = require("path");
+// ✅ Serve uploaded images
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-const programsRouter = require("./routes/programs");
-
-app.use("/api/programs", programsRouter);
-
-// ✅ Add this BEFORE passport setup
-app.use(session({
-  secret: process.env.SESSION_SECRET || "keyboard cat",
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === "production", // true in production with HTTPS
-    httpOnly: true,
-    sameSite: "lax",
-  },
-}));
-
+// ✅ Route mounting
 app.use("/api/auth", require("./routes/auth"));
-app.use(passport.initialize());
-app.use(passport.session());     // only if you use express‑session
-
-const membershipRoutes = require("./routes/membership");
-app.use("/api/membership", membershipRoutes);
-// Mount user-management routes (for admin dashboard)
-app.use("/api/users", require("./routes/users"));  // or "./routes/users" if you renamed the file
-const serviceRoutes = require("./routes/service");
-app.use("/api/services", serviceRoutes);
+app.use("/api/gift", require("./routes/gift"));
+app.use("/api/admin/posts", require("./routes/admin.blog"));
+app.use("/api/posts", require("./routes/blog"));
+app.use("/api/blog", require("./routes/blog"));
+app.use("/api/support", require("./routes/support"));
+app.use("/api/programs", require("./routes/programs"));
+app.use("/api/membership", require("./routes/membership"));
+app.use("/api/users", require("./routes/users"));
+app.use("/api/services", require("./routes/service"));
 app.use("/api/payment", require("./routes/payment"));
 
-
+// ✅ Start the server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
 
 
 
