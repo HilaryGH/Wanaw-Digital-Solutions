@@ -9,3 +9,5 @@
 # Optional: build/dist folders if any
 /client/dist/
 /server/build/
+# Ignore uploaded files
+server/uploads/
