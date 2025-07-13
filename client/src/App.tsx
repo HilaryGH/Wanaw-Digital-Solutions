@@ -32,7 +32,7 @@ import AdminSupportRequests from "./components/Dashbords/Admin/AdminSupportReque
 // Wrapper to conditionally render Navbar
 const AppWrapper = () => {
   const location = useLocation();
-  const hideNavbarPaths = ["/login", "/register"];
+  const hideNavbarPaths = ["/login", "/register","/dashboard"];
 
   return (
     <>

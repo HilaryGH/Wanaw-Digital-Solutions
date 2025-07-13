@@ -24,10 +24,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Serve uploads folder statically (should be done in main app.js or server.js, not here)
-const app = express();
-app.use("/uploads", express.static("uploads"));
-
 // Routes
 router.get("/", getAllServices);
 router.get("/:id", getServiceById);
