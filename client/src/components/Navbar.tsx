@@ -136,7 +136,7 @@ const Navbar = () => {
       { label: "Aesthetician",    path: "/services?category=aesthetician" },
       { label: "Hotel Rooms",     path: "/services?category=hotel" },        // ➕ NEW
       { label: "Lifestyle",       path: "/services?category=lifestyle" },    // ➕ NEW
-      { label: "Personal / Self Care", path: "/services?category=personal" },// ➕ NEW
+
    
     ],
       

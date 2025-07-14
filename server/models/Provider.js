@@ -1,4 +1,3 @@
-// models/Provider.js
 const mongoose = require("mongoose");
 
 const providerSchema = new mongoose.Schema({
@@ -18,6 +17,15 @@ const providerSchema = new mongoose.Schema({
   videoUrl: String,
   membership: { type: String, default: "basic" },
   role: { type: String, default: "provider" },
+
+  // New category field for provider classification
+  category: {
+    type: String,
+    required: true,
+    enum: ["Diaspora", "Corporate", "Individual"], // add more if needed
+    default: "Individual",
+  },
 });
 
 module.exports = mongoose.model("Provider", providerSchema);
+

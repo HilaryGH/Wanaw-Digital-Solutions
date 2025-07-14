@@ -8,34 +8,38 @@ const RegisterForm = () => {
   /** ----------------------------------
    * 1️⃣  STATE
    * ----------------------------------*/
-  const [role, setRole] = useState<"user" | "provider">("user");
+const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">("user");
+
 
   // ── Individual user form fields
-  const [userForm, setUserForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+ const [userForm, setUserForm] = useState({
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  password: "",
+  confirmPassword: "",
+});
+
 
   // ── Service‑provider form fields (+ file objects)
   const [providerForm, setProviderForm] = useState({
-    companyName: "",
-    serviceType: "", // dropdown
-    email: "",
-    phone: "",
-    whatsapp: "",
-    telegram: "",
-    city: "",
-    location: "",
-    password: "", // still needed for dashboard login
-    confirmPassword: "",
-    license: null as File | null,
-    tradeRegistration: null as File | null,
-    servicePhotos: [] as File[],
-    video: null as File | null, // optional
-  });
+  companyName: "",
+  serviceType: "",
+  category: role, // ← use the selected role directly
+  email: "",
+  phone: "",
+  whatsapp: "",
+  telegram: "",
+  city: "",
+  location: "",
+  password: "",
+  confirmPassword: "",
+  license: null as File | null,
+  tradeRegistration: null as File | null,
+  servicePhotos: [] as File[],
+  video: null as File | null,
+});
 
   const [consent, setConsent] = useState(false);
   const navigate = useNavigate();
@@ -44,7 +48,7 @@ const RegisterForm = () => {
    * 2️⃣  HANDLERS
    * ----------------------------------*/
   const handleRoleChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    setRole(e.target.value as "user" | "provider");
+    setRole(e.target.value as "user" | "provider" | "corporate" | "diaspora");
   };
 
   const handleUserChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -83,10 +87,12 @@ const RegisterForm = () => {
         }
 
         const payload = {
-          fullName: `${userForm.firstName} ${userForm.lastName}`.trim(),
-          email: userForm.email,
-          password: userForm.password,
-        };
+  fullName: `${userForm.firstName} ${userForm.lastName}`.trim(),
+  email: userForm.email,
+  phone: userForm.phone,
+  password: userForm.password,
+};
+
 
         const res = await fetch(`${BASE_URL}/auth/register`, {
           method: "POST",
@@ -103,7 +109,8 @@ const RegisterForm = () => {
       /****************************
        * SERVICE‑PROVIDER REGISTRATION
        ***************************/
-      if (role === "provider") {
+      if (role === "provider" || role === "corporate" || role === "diaspora") {
+ 
         if (providerForm.password !== providerForm.confirmPassword) {
           alert("Passwords do not match");
           return;
@@ -112,6 +119,7 @@ const RegisterForm = () => {
         const fd = new FormData();
         fd.append("companyName", providerForm.companyName);
         fd.append("serviceType", providerForm.serviceType);
+        fd.append("category", role); // ✅ Append role as category
         fd.append("email", providerForm.email);
         fd.append("phone", providerForm.phone);
         fd.append("whatsapp", providerForm.whatsapp);
@@ -165,15 +173,18 @@ const RegisterForm = () => {
             <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
               Registering as
             </label>
-            <select
-              id="role"
-              className="w-full p-2 border border-gray-300 rounded text-sm"
-              value={role}
-              onChange={handleRoleChange}
-            >
-              <option value="user">Individual User</option>
-              <option value="provider">Service Provider</option>
-            </select>
+          <select
+  id="role"
+  className="w-full p-2 border border-gray-300 rounded text-sm"
+  value={role}
+  onChange={handleRoleChange}
+>
+  <option value="user">Individual User</option>
+  <option value="provider">Service Provider</option>
+  <option value="corporate">Corporate</option>
+  <option value="diaspora">Ethiopian Diaspora</option>
+</select>
+
           </div>
 
           {/* Form */}
@@ -210,6 +221,16 @@ const RegisterForm = () => {
                   onChange={handleUserChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
+                <input
+  type="tel"
+  name="phone"
+  placeholder="Phone"
+  required
+  value={userForm.phone || ""}
+  onChange={handleUserChange}
+  className="w-full p-2 border border-gray-300 rounded text-sm"
+/>
+
 
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input
@@ -233,8 +254,7 @@ const RegisterForm = () => {
                 </div>
               </>
             )}
-
-            {role === "provider" && (
+{(role === "provider" || role === "corporate" || role === "diaspora") && (
               <>
                 <input
                   type="text"
@@ -256,11 +276,11 @@ const RegisterForm = () => {
                   <option value="" disabled>
                     Select Service Type
                   </option>
-                  <option value="Spa">Spa</option>
-                  <option value="Gym">Gym</option>
-                  <option value="Wellness Center">Wellness Center</option>
-                  <option value="Health Coach">Health Coach</option>
-                  <option value="Nutritionist">Nutritionist</option>
+                  <option value="Wellness Services">Wellness Services</option>
+                  <option value=" Aesthetician"> Aesthetician</option>
+                  <option value="Medical">Medical</option>
+                  <option value="Health Coach">Hotel Rooms </option>
+                  <option value="Nutritionist">Lifestyle</option>
                   {/* TODO: pull list dynamically from backend */}
                 </select>
 

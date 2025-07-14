@@ -47,7 +47,14 @@ router.post(
         city,
         location,
         password,
+        category, // Added category here
       } = req.body;
+
+      // Validate required category field and check allowed values
+      const allowedCategories = ["Diaspora", "Corporate", "Individual"]; // update as per your needs
+      if (!category || !allowedCategories.includes(category)) {
+        return res.status(400).json({ msg: "Invalid or missing provider category." });
+      }
 
       // Prevent duplicates
       const exists = await Provider.findOne({ email });
@@ -65,7 +72,7 @@ router.post(
       const photoUrls = (servicePhotos || []).map(getUrl);
       const videoUrl = getUrl(video?.[0]);
 
-      // Create provider
+      // Create provider with category included
       const provider = await Provider.create({
         companyName,
         serviceType,
@@ -80,6 +87,7 @@ router.post(
         tradeRegUrl,
         photoUrls,
         videoUrl,
+        category, // Include category here
       });
 
       // JWT Token

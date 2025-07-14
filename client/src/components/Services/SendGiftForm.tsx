@@ -1,13 +1,23 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Gift as GiftIcon } from "lucide-react";
+import { Gift as GiftIcon, ChevronDown, ChevronUp } from "lucide-react";
 import BASE_URL from "../../api/api";
+
+/* ──────────────── Type Definitions ──────────────── */
+
+type ProviderContact = {
+  name: string;
+  email?: string;
+  phone?: string;
+  whatsapp?: string;
+};
 
 type Service = {
   _id: string;
   title: string;
   price?: number;
   description?: string;
+  provider?: ProviderContact;
 };
 
 type Occasion = {
@@ -15,6 +25,8 @@ type Occasion = {
   title: string;
   category: string;
 };
+
+/* ──────────────── Component ──────────────── */
 
 const SendGiftForm = () => {
   const location = useLocation();
@@ -44,31 +56,44 @@ const SendGiftForm = () => {
   const [recipientWhatsApp, setRecipientWhatsApp] = useState("");
   const [message, setMessage] = useState("");
 
+  const [notifyProvider, setNotifyProvider] = useState(false);
+  const [providerMessage, setProviderMessage] = useState("");
+
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
   const senderName = user?.fullName || "Anonymous";
 
   const handlePayAndSend = async () => {
     if (!recipientEmail && !recipientPhone && !recipientWhatsApp) {
-      alert("Please enter at least one recipient contact: Email, Phone or WhatsApp.");
+      alert(
+        "Please enter at least one recipient contact: Email, Phone or WhatsApp."
+      );
       return;
     }
 
-    const pending = {
-      recipientEmail,
-      recipientPhone,
-      recipientWhatsApp,
-      message,
-      senderName,
-      occasion,
-      service,
-    };
-    localStorage.setItem("pendingGift", JSON.stringify(pending));
+    localStorage.setItem(
+      "pendingGift",
+      JSON.stringify({
+        recipientEmail,
+        recipientPhone,
+        recipientWhatsApp,
+        message,
+        senderName,
+        occasion,
+        service,
+        notifyProvider,
+        providerMessage,
+      })
+    );
 
     try {
+      const token = localStorage.getItem("token"); // Get your auth token here
       const res = await fetch(`${BASE_URL}/payment/pay`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
         body: JSON.stringify({
           amount: service.price ?? 0,
           email: recipientEmail,
@@ -78,10 +103,26 @@ const SendGiftForm = () => {
           last_name: "Receiver",
           serviceId: service._id,
           occasionId: occasion?._id,
+
+          notifyProvider,
+          providerMessage,
+          providerContact: service.provider,
         }),
       });
 
+      if (!res.ok) {
+        // Handle HTTP errors gracefully
+        if (res.status === 401) {
+          alert("Unauthorized. Please log in again.");
+          navigate("/login"); // or your login route
+          return;
+        }
+        alert(`Payment initiation failed with status ${res.status}.`);
+        return;
+      }
+
       const data = await res.json();
+
       if (data.checkout_url) {
         window.location.href = data.checkout_url;
       } else {
@@ -100,9 +141,11 @@ const SendGiftForm = () => {
           <GiftIcon className="w-6 h-6 mr-2 text-[#D4AF37]" />
           Send “{service.title}”
         </h2>
+
         {occasion && (
           <p className="text-sm text-gray-600 mb-6">
-            Occasion:&nbsp;<span className="font-medium">{occasion.title}</span>
+            Occasion:&nbsp;
+            <span className="font-medium">{occasion.title}</span>
           </p>
         )}
 
@@ -137,6 +180,33 @@ const SendGiftForm = () => {
           className="w-full p-3 border border-gray-300 rounded-lg mb-6 h-32 resize-none focus:ring-2 focus:ring-[#D4AF37] outline-none"
         />
 
+        {service.provider && (
+          <div className="mb-6 border-t pt-4">
+            <button
+              type="button"
+              onClick={() => setNotifyProvider((v) => !v)}
+              className="flex items-center text-sm font-medium text-[#1c2b21] mb-2"
+            >
+              {notifyProvider ? (
+                <ChevronUp className="w-4 h-4 mr-1" />
+              ) : (
+                <ChevronDown className="w-4 h-4 mr-1" />
+              )}
+              Notify {service.provider.name}
+            </button>
+
+            {notifyProvider && (
+              <textarea
+                placeholder="Message to the service provider (optional)"
+                value={providerMessage}
+                onChange={(e) => setProviderMessage(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                rows={4}
+              />
+            )}
+          </div>
+        )}
+
         {service.price !== undefined && (
           <p className="text-right text-gray-700 mb-4">
             <span className="font-semibold">Total:</span>{" "}
@@ -148,7 +218,7 @@ const SendGiftForm = () => {
           onClick={handlePayAndSend}
           className="w-full bg-[#1c2b21] text-white py-2 rounded hover:bg-[#151e18] transition"
         >
-          Pay &amp; Send Gift
+          Pay&nbsp;&amp;&nbsp;Send Gift
         </button>
       </div>
     </div>
@@ -156,6 +226,8 @@ const SendGiftForm = () => {
 };
 
 export default SendGiftForm;
+
+
 
 
 
