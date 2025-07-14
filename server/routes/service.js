@@ -8,28 +8,38 @@ const {
   getAllServices,
   getServiceById,
   deleteService,
-  updateServiceStatus
+  updateServiceStatus,
 } = require("../controllers/serviceController");
 
 const verifyToken = require("../middleware/verifyToken");
 
-// Configure multer
+// Multer config
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
+  destination(req, file, cb) {
     cb(null, "uploads/");
   },
-  filename: function (req, file, cb) {
+  filename(req, file, cb) {
     cb(null, Date.now() + path.extname(file.originalname));
   },
 });
 const upload = multer({ storage });
 
 // Routes
+
+// GET all services
 router.get("/", getAllServices);
+
+// GET service by id
 router.get("/:id", getServiceById);
+
+// POST create service (with image upload and token verification)
 router.post("/", verifyToken, upload.single("image"), createService);
-router.delete("/:id", deleteService);
-router.put("/:id/status", updateServiceStatus);
+
+// DELETE service by id
+router.delete("/:id", verifyToken, deleteService); // Add verifyToken here for safety
+
+// PUT update service status
+router.put("/:id/status", verifyToken, updateServiceStatus); // Add verifyToken here as well
 
 module.exports = router;
 

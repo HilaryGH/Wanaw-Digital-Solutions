@@ -27,6 +27,12 @@ export default function AdminDashboardCards() {
       color: "bg-purple-100",
     },
     {
+      title: "Add Service",
+      description: "Manually add a new service as admin.",
+      route: "/admin/add-service",
+      color: "bg-teal-100",
+    },
+    {
       title: "Create Blog Post",
       description: "Write and publish blog articles for the platform.",
       route: "/admin/blog-create",

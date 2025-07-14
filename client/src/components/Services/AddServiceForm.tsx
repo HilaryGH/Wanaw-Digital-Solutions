@@ -15,12 +15,16 @@ const AddServiceForm = () => {
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  useEffect(() => {
-    if (!user || user.role !== "provider") {
-      alert("Only providers can add services.");
-      navigate("/membership");
-    }
-  }, [navigate, user]);
+useEffect(() => {
+  const allowedRoles = ["provider", "admin"];
+
+  // If there's no logged‑in user OR the role isn't allowed → redirect
+  if (!user || !allowedRoles.includes(user.role)) {
+    alert("Only providers or admins can add services.");
+    navigate("/membership");
+  }
+}, [navigate, user]);
+
 
   const handleSubmit = async () => {
     if (!title || !category || !price || !image) {

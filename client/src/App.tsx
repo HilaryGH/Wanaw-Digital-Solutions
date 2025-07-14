@@ -46,7 +46,7 @@ const AppWrapper = () => {
         <Route path="/services" element={<ServiceList />} />
         <Route path="/membership" element={<SelectMembership />} />
         <Route path="/provider/dashboard" element={<ProviderDashboard />} />
-        <Route path="/provider/add-service" element={<AddService />} />
+        <Route path="/admin/add-service" element={<AddService />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/send-gift" element={<SendGiftForm />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />

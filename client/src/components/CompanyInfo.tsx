@@ -1,3 +1,5 @@
+import { Section } from "lucide-react";
+import ServiceCatalog from "./ServiceCatalog";
 
 
 const CompanyInfo = () => {
@@ -117,73 +119,8 @@ const CompanyInfo = () => {
 
 </section>
 
-     {/* Service Providers */}
-<section
-  className="w-full m-auto relative bg-cover bg-center bg-no-repeat rounded-xl overflow-hidden"
-  style={{ backgroundImage: "url('/hero.jpg')" }}
->
-  {/* Overlay */}
-  <div className="absolute inset-0 bg-black opacity-50 pointer-events-none"></div>
+  <ServiceCatalog/>
 
-  {/* Content wrapper */}
-  <div className="max-w-3xl m-auto relative z-10 p-6 text-white">
-    <h2 className="text-2xl font-semibold text-gold mb-4">Service Providers</h2>
-    <div className="space-y-4">
-      <details className="group border rounded-xl border-gray-300 p-4 cursor-pointer ">
-        <summary className="font-semibold text-lg group-open:text-gold">
-          A. Wellness Services
-        </summary>
-        <ul className="pl-4 list-disc">
-          <li>Gym & Fitness (GYM, Swimming Pool)</li>
-          <li>Spa (Morocco Bath, Massage Therapy, Steam, etc.)</li>
-          <li>Beauty Salon (Hair, Nail, Eye Lash for Women and Men)</li>
-          <li>Yoga & Meditation</li>
-          <li>Travel & Hiking, Wellness Camps (e.g. Wenchi Crater Lake)</li>
-        </ul>
-      </details>
-
-      <details className="group border border-gray-300 rounded-xl p-4 cursor-pointer ">
-        <summary className="font-semibold text-lg group-open:text-gold">B. Aesthetician</summary>
-        <ul className="pl-4 list-disc">
-          <li>Skin: Tattoo & Scar Removal</li>
-          <li>Hair: Laser Hair Removal, Hair Transplant</li>
-          <li>Nail Treatments</li>
-        </ul>
-      </details>
-
-      <details className="group border border-gray-300 rounded-xl p-4 cursor-pointer ">
-        <summary className="font-semibold text-lg group-open:text-gold">C. Medical</summary>
-        <ul className="pl-4 list-disc">
-          <li>Physiotherapy, Pharmacy</li>
-          <li>Diagnostic Imaging, Laboratory Center</li>
-          <li>Doctor Consultation, Nutritionist</li>
-          <li>Psychologist & Counselling, Recovery Centers, Support Groups</li>
-        </ul>
-      </details>
-
-      <details className="group border border-gray-300 rounded-xl p-4 cursor-pointer ">
-        <summary className="font-semibold text-lg group-open:text-gold">D. Personal / Self Care</summary>
-        <p className="pl-4 mt-2">Various grooming and personal care services</p>
-      </details>
-
-      <details className="group border border-gray-300 rounded-xl p-4 cursor-pointer ">
-        <summary className="font-semibold text-lg group-open:text-gold">E. Lifestyle</summary>
-        <ul className="pl-4 list-disc">
-          <li>Traditional Clothes (Sheffon)</li>
-          <li>Flower & Chocolate Shops</li>
-        </ul>
-      </details>
-
-      <details className="group border border-gray-300 rounded-xl p-4 cursor-pointer ">
-        <summary className="font-semibold text-lg group-open:text-gold">F. Hotel Room</summary>
-        <ul className="pl-4 list-disc">
-          <li>3 to 5 Star Hotels: Standard to Presidential Rooms</li>
-          <li>Pensions</li>
-        </ul>
-      </details>
-    </div>
-  </div>
-</section>
 
      </div>
      </>

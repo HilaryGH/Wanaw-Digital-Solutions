@@ -130,11 +130,16 @@ const Navbar = () => {
     {
       key: "services",
       translationKey: "services",
-      items: [
-        { label: "Wellness", path: "/services?category=wellness" },
-        { label: "Medical", path: "/services?category=medical" },
-        { label: "Aesthetician", path: "/services?category=aesthetician" },
-      ],
+    items: [
+      { label: "Wellness",        path: "/services?category=wellness" },
+      { label: "Medical",         path: "/services?category=medical" },
+      { label: "Aesthetician",    path: "/services?category=aesthetician" },
+      { label: "Hotel Rooms",     path: "/services?category=hotel" },        // ➕ NEW
+      { label: "Lifestyle",       path: "/services?category=lifestyle" },    // ➕ NEW
+      { label: "Personal / Self Care", path: "/services?category=personal" },// ➕ NEW
+   
+    ],
+      
     },
     {
       key: "programs",
@@ -147,6 +152,9 @@ const Navbar = () => {
       items: [
         { label: "Individual Gifts", path: "/gifting-options" },
         { label: "Corporate Gifts", path: "/gifting-options" },
+        { label: "Ethiopian Diaspora", path: "/gifting-options" },
+
+        
       ],
     },
   ];
