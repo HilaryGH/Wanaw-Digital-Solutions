@@ -1,4 +1,4 @@
-import { Section } from "lucide-react";
+
 import ServiceCatalog from "./ServiceCatalog";
 
 
