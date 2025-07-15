@@ -1,7 +1,10 @@
 import { useState } from "react";
-import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
+import { FaPhoneAlt, FaEnvelope,FaWhatsapp, } from "react-icons/fa";
 import DeliveryInfo from "./pages/DeliveryInfo";
 import BASE_URL from "../api/api";
+
+import { SiTelegram } from "react-icons/si";
+
 
 const SupportPage = () => {
   const [form, setForm] = useState({
@@ -74,21 +77,43 @@ const handleSubmit = async (e: React.FormEvent) => {
         <h1 className="text-3xl font-bold text-center mb-6 text-gold">Support & Help Center</h1>
 
         {/* Contact Info */}
-        <div className="grid md:grid-cols-3 gap-4 mb-8 text-center">
-          <div>
-            <FaPhoneAlt className="text-gold text-2xl mx-auto mb-2" />
-            <p className="text-gray-300">+251 912 345 678</p>
+         {/* Contact Info */}
+          <div className="grid md:grid-cols-4 gap-2 mb-8 text-center">
+            <div>
+              <FaPhoneAlt className="text-gold text-xl mx-auto mb-2" />
+              <a href="tel:+251989177777" className="text-gray-300">
+                +251 989 177 777
+              </a>
+            </div>
+            <div>
+              <FaEnvelope className="text-gold text-xl mx-auto mb-2" />
+              <a href="mailto:support@wanaw.com" className="text-gray-300">
+                support@wanaw.com
+              </a>
+            </div>
+            <div>
+              <FaWhatsapp className="text-gold text-xl mx-auto mb-2" />
+              <a
+                href="https://wa.me/251989177777"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300"
+              >
+                WhatsApp Support
+              </a>
+            </div>
+            <div>
+              <SiTelegram className="text-gold text-xl mx-auto mb-2" />
+              <a
+                href="https://t.me/+251989177777"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300"
+              >
+                Telegram Support
+              </a>
+            </div>
           </div>
-          <div>
-            <FaEnvelope className="text-gold text-2xl mx-auto mb-2" />
-            <p className="text-gray-300">support@wanaw.com</p>
-          </div>
-          <div>
-            <FaMapMarkerAlt className="text-gold text-2xl mx-auto mb-2" />
-            <p className="text-gray-300">Addis Ababa, Ethiopia</p>
-          </div>
-        </div>
-
         {/* Support Form */}
         <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-4 mb-10">
           <input

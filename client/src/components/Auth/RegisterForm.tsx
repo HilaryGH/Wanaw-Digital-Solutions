@@ -3,10 +3,6 @@ import type { ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import BASE_URL from "../../api/api";
 
-/**
- * RegisterForm – handles registration for all user roles
- * Roles: "individual" | "provider" | "corporate" | "diaspora"
- */
 const RegisterForm = () => {
   /* ──────────────────── 1️⃣ STATE ──────────────────── */
   const [role, setRole] = useState<
@@ -14,13 +10,14 @@ const RegisterForm = () => {
   >("individual");
 
   // Individual user form fields
-  const [userForm, setUserForm] = useState({
+   const [userForm, setUserForm] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
     password: "",
     confirmPassword: "",
+    idFile: null as File | null, // ✅ Add file
   });
 
   // Service‑provider style form fields (shared by provider | corporate | diaspora)
@@ -70,7 +67,6 @@ const RegisterForm = () => {
     }
   };
 
-  /* ──────────────────── 3️⃣ SUBMIT ──────────────────── */
  /* ──────────────────── 3️⃣ SUBMIT ──────────────────── */
 const handleSubmit = async (e: FormEvent) => {
   e.preventDefault();
@@ -81,42 +77,60 @@ const handleSubmit = async (e: FormEvent) => {
   }
 
   /* ===== INDIVIDUAL  &  DIASPORA  (JSON) ===== */
-  if (role === "individual" || role === "diaspora") {
-    if (userForm.password !== userForm.confirmPassword) {
-      alert("Passwords do not match");
+   if (role === "individual" || role === "diaspora") {
+      if (userForm.password !== userForm.confirmPassword) {
+        alert("Passwords do not match");
+        return;
+      }
+
+      if (userForm.idFile) {
+        const fd = new FormData();
+        fd.append("fullName", `${userForm.firstName} ${userForm.lastName}`.trim());
+        fd.append("email", userForm.email);
+        fd.append("phone", userForm.phone);
+        fd.append("password", userForm.password);
+        fd.append("role", role);
+        fd.append("idFile", userForm.idFile);
+
+        const res = await fetch(`${BASE_URL}/auth/register`, {
+          method: "POST",
+          body: fd,
+        });
+
+        if (!res.ok) {
+          const { msg } = await res.json().catch(() => ({}));
+          alert(msg || "Registration failed");
+          return;
+        }
+
+        alert("Account created successfully!");
+        navigate("/login");
+      } else {
+        const payload = {
+          fullName: `${userForm.firstName} ${userForm.lastName}`.trim(),
+          email: userForm.email,
+          phone: userForm.phone,
+          password: userForm.password,
+          role,
+        };
+
+        const res = await fetch(`${BASE_URL}/auth/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          const { msg } = await res.json().catch(() => ({}));
+          alert(msg || "Registration failed");
+          return;
+        }
+
+        alert("Account created successfully!");
+        navigate("/login");
+      }
       return;
     }
-
-    const payload = {
-      fullName: `${userForm.firstName} ${userForm.lastName}`.trim(),
-      email: userForm.email,
-      phone: userForm.phone,
-      password: userForm.password,
-      role, // "individual" or "diaspora"
-    };
-
-    const res = await fetch(`${BASE_URL}/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const { msg } = await res.json().catch(() => ({}));
-      alert(msg || "Registration failed");
-      return;
-    }
-
-    alert("Account created successfully!");
-    navigate("/login");
-    return;
-  }
-
-  /* ===== PROVIDER / CORPORATE  (multipart) ===== */
-  if (providerForm.password !== providerForm.confirmPassword) {
-    alert("Passwords do not match");
-    return;
-  }
   if (!providerForm.companyName || !providerForm.serviceType) {
     alert("Company name and service type are required.");
     return;
@@ -193,7 +207,7 @@ const handleSubmit = async (e: FormEvent) => {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* INDIVIDUAL FORM FIELDS */}
-            {role === "individual" && (
+            {(role === "individual"|| role === "diaspora") && (
               <>
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input
@@ -233,6 +247,18 @@ const handleSubmit = async (e: FormEvent) => {
                   onChange={handleUserChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
+                <label className="block text-sm font-medium text-gray-700 mt-2">
+      Government ID (Passport / Yellow Card / Driving License)
+    </label>
+    <input
+            type="file"
+            name="idFile"
+            accept="image/*,application/pdf"
+            onChange={handleUserChange}
+            required
+          
+      className="w-full p-2 border border-gray-300 rounded text-sm"
+    />
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="password"
@@ -257,7 +283,7 @@ const handleSubmit = async (e: FormEvent) => {
             )}
 
             {/* PROVIDER / CORPORATE / DIASPORA FORM FIELDS */}
-            {(role === "provider" || role === "corporate" || role === "diaspora") && (
+            {(role === "provider" || role === "corporate" ) && (
               <>
                 <input
                   type="text"
