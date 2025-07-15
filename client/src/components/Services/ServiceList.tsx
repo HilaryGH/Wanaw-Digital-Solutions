@@ -88,6 +88,12 @@ const ServiceList = () => {
               <p className="text-lg font-semibold text-[#D4AF37] mb-2">
                 ${service.price}
               </p>
+              {service.location && (
+  <p className="text-sm text-gray-600 mb-1">
+    Location: {service.location}
+  </p>
+)}
+
               <p className="text-xs text-gray-400 mb-4">
                 Posted by: {service?.providerId?.fullName || "Unknown"}
               </p>

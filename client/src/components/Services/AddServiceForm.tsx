@@ -11,6 +11,7 @@ const AddServiceForm = () => {
   const [duration, setDuration] = useState("");
   const [tags, setTags] = useState("");
   const [image, setImage] = useState<File | null>(null);
+  const [location, setLocation] = useState("");
 
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -40,6 +41,8 @@ useEffect(() => {
     formData.append("duration", duration);
     formData.append("tags", tags); // e.g. "birthday,gift"
     formData.append("image", image); // the uploaded image file
+    formData.append("location", location);
+
 
     try {
       const res = await fetch(`${BASE_URL}/services`, {
@@ -84,14 +87,21 @@ useEffect(() => {
         className="w-full border border-gray-300 rounded-xl p-2 border mb-4"
       />
 
-      <input
-        type="text"
-        placeholder="Category *"
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-        className="w-full border border-gray-300 rounded-xl p-2 border mb-4"
-        required
-      />
+     <select
+  value={category}
+  onChange={(e) => setCategory(e.target.value)}
+  className="w-full border border-gray-300 rounded-xl p-2 border mb-4"
+  required
+>
+  <option value="">Select Category *</option>
+  <option value="Wellness">Wellness</option>
+  <option value="Medical">Medical</option>
+  <option value="Aesthetician">Aesthetician</option>
+  <option value="Personal">Personal</option>
+  <option value="Lifestyle">Lifestyle</option>
+  <option value="Hotel">Hotel</option>
+</select>
+
 
       <input
         type="number"
@@ -109,6 +119,13 @@ useEffect(() => {
         onChange={(e) => setDuration(e.target.value)}
         className="w-full border border-gray-300 rounded-xl p-2 border mb-4"
       />
+      <input
+  type="text"
+  placeholder="Location"
+  value={location}
+  onChange={(e) => setLocation(e.target.value)}
+  className="w-full border border-gray-300 rounded-xl p-2 border mb-4"
+/>
 
       <input
         type="text"

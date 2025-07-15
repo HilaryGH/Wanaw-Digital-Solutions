@@ -3,13 +3,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Gift as GiftIcon, ChevronDown, ChevronUp } from "lucide-react";
 import BASE_URL from "../../api/api";
 
-/* ──────────────── Type Definitions ──────────────── */
-
+/* ───────────── Type Definitions ───────────── */
 type ProviderContact = {
   name: string;
   email?: string;
   phone?: string;
   whatsapp?: string;
+  telegram?: string;
 };
 
 type Service = {
@@ -26,13 +26,12 @@ type Occasion = {
   category: string;
 };
 
-/* ──────────────── Component ──────────────── */
-
+/* ───────────── Component ───────────── */
 const SendGiftForm = () => {
-  const location = useLocation();
+  const { state } = useLocation();
   const navigate = useNavigate();
 
-  const { occasion, service } = (location.state || {}) as {
+  const { occasion, service } = (state || {}) as {
     occasion?: Occasion;
     service?: Service;
   };
@@ -51,32 +50,69 @@ const SendGiftForm = () => {
     );
   }
 
+  /* —— Form State —— */
   const [recipientEmail, setRecipientEmail] = useState("");
   const [recipientPhone, setRecipientPhone] = useState("");
   const [recipientWhatsApp, setRecipientWhatsApp] = useState("");
+  const [recipientTelegram, setRecipientTelegram] = useState("");
   const [message, setMessage] = useState("");
 
   const [notifyProvider, setNotifyProvider] = useState(false);
   const [providerMessage, setProviderMessage] = useState("");
 
-  const storedUser = localStorage.getItem("user");
-  const user = storedUser ? JSON.parse(storedUser) : null;
-  const senderName = user?.fullName || "Anonymous";
+  const senderName =
+    JSON.parse(localStorage.getItem("user") || "null")?.fullName ||
+    "Anonymous";
 
+  /* —— Notify helper —— */
+  const fireNotifications = async () => {
+    const payload = {
+      recipientEmail,
+      recipientPhone,
+      recipientWhatsApp,
+      recipientTelegram,
+      message,
+      senderName,
+      occasion,
+      service,
+      notifyProvider,
+      providerMessage,
+    };
+
+    try {
+      const res = await fetch(`${BASE_URL}/notifications/send`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) console.warn("Notification failure", await res.text());
+    } catch (e) {
+      console.error("Notification error:", e);
+    }
+  };
+
+  /* —— Main submit —— */
   const handlePayAndSend = async () => {
-    if (!recipientEmail && !recipientPhone && !recipientWhatsApp) {
+    if (
+      !recipientEmail &&
+      !recipientPhone &&
+      !recipientWhatsApp &&
+      !recipientTelegram
+    ) {
       alert(
-        "Please enter at least one recipient contact: Email, Phone or WhatsApp."
+        "Please enter at least one recipient contact: Email, Phone, WhatsApp or Telegram."
       );
       return;
     }
 
+    /* Save to localStorage in case user refreshes during payment */
     localStorage.setItem(
       "pendingGift",
       JSON.stringify({
         recipientEmail,
         recipientPhone,
         recipientWhatsApp,
+        recipientTelegram,
         message,
         senderName,
         occasion,
@@ -86,54 +122,70 @@ const SendGiftForm = () => {
       })
     );
 
-    try {
-      const token = localStorage.getItem("token"); // Get your auth token here
-      const res = await fetch(`${BASE_URL}/payment/pay`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify({
-          amount: service.price ?? 0,
-          email: recipientEmail,
-          phone_number: recipientPhone,
-          whatsapp_number: recipientWhatsApp,
-          first_name: "Gift",
-          last_name: "Receiver",
-          serviceId: service._id,
-          occasionId: occasion?._id,
+    /* Kick off notifications (don’t block on them) */
+    const notifyPromise = fireNotifications();
 
-          notifyProvider,
-          providerMessage,
-          providerContact: service.provider,
-        }),
-      });
+try {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${BASE_URL}/payment/pay`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token ? `Bearer ${token}` : "",
+    },
+    body: JSON.stringify({
+      amount: service.price ?? 0,
+      email: recipientEmail,
+      phone_number: recipientPhone,
+      whatsapp_number: recipientWhatsApp,
+      telegram: recipientTelegram,
+      first_name: "Gift",
+      last_name: "Receiver",
+      serviceId: service._id,
+      occasionId: occasion?._id,
+      notifyProvider,
+      providerMessage,
+      providerContact: service.provider,
+    }),
+  });
 
-      if (!res.ok) {
-        // Handle HTTP errors gracefully
-        if (res.status === 401) {
-          alert("Unauthorized. Please log in again.");
-          navigate("/login"); // or your login route
-          return;
-        }
-        alert(`Payment initiation failed with status ${res.status}.`);
-        return;
-      }
+  const data = await res.json();
 
-      const data = await res.json();
+  // Regardless of payment success or failure, notify recipient
+  await fetch(`${BASE_URL}/notifications/send`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token ? `Bearer ${token}` : "",
+    },
+    body: JSON.stringify({
+      recipientEmail,
+      recipientPhone,
+      recipientWhatsApp,
+      recipientTelegram,
+      message,
+      senderName,
+      serviceTitle: service.title,
+      occasionTitle: occasion?.title || "",
+      notifyProvider,
+      providerMessage,
+      providerContact: service.provider,
+    }),
+  });
 
-      if (data.checkout_url) {
-        window.location.href = data.checkout_url;
-      } else {
-        alert("Payment initiation failed.");
-      }
-    } catch (err) {
-      alert("Payment error.");
-      console.error(err);
-    }
+  if (data.checkout_url) {
+    window.location.href = data.checkout_url;
+  } else {
+    alert("Payment failed, but gift was still sent.");
+  }
+} catch (err) {
+  alert("Payment failed, but gift was still sent.");
+  console.error(err);
+}
+
   };
 
+  /* —— JSX —— */
   return (
     <div className="max-w-lg mx-auto bg-white shadow-xl rounded-2xl overflow-hidden my-10">
       <div className="p-6 sm:p-8">
@@ -149,6 +201,7 @@ const SendGiftForm = () => {
           </p>
         )}
 
+        {/* —— Recipient contacts —— */}
         <input
           type="email"
           placeholder="Recipient Email"
@@ -173,6 +226,14 @@ const SendGiftForm = () => {
           className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-[#D4AF37] outline-none"
         />
 
+        <input
+          type="text"
+          placeholder="Recipient Telegram Username"
+          value={recipientTelegram}
+          onChange={(e) => setRecipientTelegram(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-[#D4AF37] outline-none"
+        />
+
         <textarea
           placeholder="Add a message (optional)"
           value={message}
@@ -180,6 +241,7 @@ const SendGiftForm = () => {
           className="w-full p-3 border border-gray-300 rounded-lg mb-6 h-32 resize-none focus:ring-2 focus:ring-[#D4AF37] outline-none"
         />
 
+        {/* —— Optional provider note —— */}
         {service.provider && (
           <div className="mb-6 border-t pt-4">
             <button
@@ -207,6 +269,7 @@ const SendGiftForm = () => {
           </div>
         )}
 
+        {/* —— Summary + action —— */}
         {service.price !== undefined && (
           <p className="text-right text-gray-700 mb-4">
             <span className="font-semibold">Total:</span>{" "}
@@ -226,6 +289,7 @@ const SendGiftForm = () => {
 };
 
 export default SendGiftForm;
+
 
 
 

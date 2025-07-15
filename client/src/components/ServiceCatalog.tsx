@@ -9,6 +9,7 @@ type Service = {
   description?: string;
   category: string;
   price: number;
+  location?:string;
   duration?: string;
   imageUrl?: string;
   providerId: { fullName: string };
@@ -107,39 +108,49 @@ const ServiceCatalog = () => {
               </summary>
 
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 p-4 pt-0">
-                {grouped.map((srv) => (
-                  <div
-                    key={srv._id}
-                    className="bg-white rounded-xl shadow hover:shadow-lg transition flex flex-col overflow-hidden"
-                  >
-                    <img
-                      src={imgSrc(srv.imageUrl)}
-                      alt={srv.title}
-                      className="w-full h-36 object-cover"
-                    />
+               {grouped.map((srv) => (
+  <div
+    key={srv._id}
+    className="bg-white rounded-xl shadow hover:shadow-lg transition flex flex-col overflow-hidden"
+  >
+    <img
+      src={imgSrc(srv.imageUrl)}
+      alt={srv.title}
+      className="w-full h-36 object-cover"
+    />
 
-                    <div className="p-4 flex flex-col flex-1">
-                      <h4 className="text-md font-semibold text-[#1c2b21]">
-                        {srv.title}
-                      </h4>
-                      <p className="text-sm text-gray-600">
-                        {srv.providerId?.fullName ?? "Unknown Provider"}
-                      </p>
-                      <p className="text-sm font-medium text-gray-800 mt-1">
-                        {formatPrice(srv.price)}
-                      </p>
+    <div className="p-4 flex flex-col flex-1">
+      <h4 className="text-md font-semibold text-[#1c2b21]">
+        {srv.title}
+      </h4>
 
-                      <button
-                        onClick={() =>
-                          navigate("/send-gift", { state: { service: srv } })
-                        }
-                        className="mt-auto bg-[#D4AF37] text-[#1c2b21] text-sm font-semibold py-2 rounded hover:bg-[#caa82f] transition"
-                      >
-                        Send This Gift
-                      </button>
-                    </div>
-                  </div>
-                ))}
+      <p className="text-sm text-gray-600">
+        👤 {srv.providerId?.fullName ?? "Unknown Provider"}
+      </p>
+
+      {srv.location && (
+        <p className="text-sm text-gray-500 mt-1">
+          📍 {srv.location}
+        </p>
+      )}
+
+      <p className="text-sm font-medium text-gray-800 mt-1">
+        {formatPrice(srv.price)}
+      </p>
+
+      <button
+        onClick={() =>
+          navigate("/send-gift", { state: { service: srv } })
+        }
+        className="mt-auto bg-[#D4AF37] text-[#1c2b21] text-sm font-semibold py-2 rounded hover:bg-[#caa82f] transition"
+      >
+        Send This Gift
+      </button>
+    </div>
+  </div>
+))}
+
+             
               </div>
             </details>
           );

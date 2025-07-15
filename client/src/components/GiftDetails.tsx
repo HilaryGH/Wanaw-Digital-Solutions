@@ -17,6 +17,7 @@ type Service = {
   title: string;
   price?: number;
   description?: string;
+  location?: string;     // ← made optional to avoid TS errors
   imageUrl?: string;
 };
 
@@ -25,7 +26,8 @@ const GiftDetails = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
 
-  const [occasion, setOccasion] = useState<Occasion | null>(null);
+const [occasion, setOccasion] = useState<Occasion | null | undefined>(undefined);
+
   const [services, setServices] = useState<Service[]>([]);
   const [selectedServiceId, setSelectedServiceId] = useState<string>("");
 
@@ -37,23 +39,27 @@ const GiftDetails = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        /* 1. Get all occasions (or a single one if you have an endpoint) */
+        /* 1. Get all occasions */
         const ocRes = await fetch(`${BASE_URL}/gift`);
         const occasions: Occasion[] = await ocRes.json();
-        const matched = occasions.find(o => slugify(o.title) === slug);
+        const matched = occasions.find((o) => slugify(o.title) === slug);
 
-        if (!matched) return setOccasion(null);
+        if (!matched) {
+          setOccasion(null); // will show "not found"
+          return;
+        }
 
         setOccasion(matched);
 
-        /* 2. Now fetch services linked to this occasion */
-      const srvRes = await fetch(`${BASE_URL}/services?occasionId=${matched._id}`);
-
-        
+        /* 2. Fetch services linked to this occasion */
+        const srvRes = await fetch(
+          `${BASE_URL}/services?occasionId=${matched._id}`
+        );
         const srvData: Service[] = await srvRes.json();
         setServices(srvData);
       } catch (err) {
         console.error("Error fetching details:", err);
+        setOccasion(null);
       }
     };
 
@@ -62,20 +68,22 @@ const GiftDetails = () => {
 
   /* --- Send Gift handler --- */
   const handleSendGift = () => {
-    const selectedService = services.find(s => s._id === selectedServiceId);
+    const selectedService = services.find((s) => s._id === selectedServiceId);
     if (!selectedService || !occasion) return;
 
     navigate("/send-gift", {
       state: {
-        occasion,          // the occasion info
-        service: selectedService // the concrete service
-      }
+        occasion,
+        service: selectedService,
+      },
     });
   };
 
   /* --- UI states --- */
-  if (occasion === null) return <div className="p-6">Gift occasion not found.</div>;
-  if (!occasion) return <div className="p-6">Loading...</div>;
+  if (occasion === null)
+    return <div className="p-6">Gift occasion not found.</div>;
+  if (occasion === undefined)
+    return <div className="p-6">Loading...</div>;
 
   /* --- Main render --- */
   return (
@@ -109,51 +117,66 @@ const GiftDetails = () => {
         </h2>
 
         {services.length === 0 ? (
-          <p className="text-gray-600">No services available for this occasion yet.</p>
+          <p className="text-gray-600">
+            No services available for this occasion yet.
+          </p>
         ) : (
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {services.map(service => (
-              <label
-                key={service._id}
-                className={`cursor-pointer bg-white border rounded-xl p-4 transition 
-                  duration-300 shadow hover:shadow-lg flex flex-col
-                  ${
-                    selectedServiceId === service._id
-                      ? "ring-2 ring-offset-2 ring-[#D4AF37]"
-                      : ""
-                  }`}
-              >
-                {service.imageUrl && (
-                  <img
-                    src={`${BASE_URL.replace("/api", "")}${service.imageUrl}`}
-                    alt={service.title}
-                    className="w-full h-40 object-cover rounded mb-3"
+            {services.map((service) => {
+              const checked = selectedServiceId === service._id;
+              return (
+                <label
+                  key={service._id}
+                  className={`cursor-pointer bg-white border rounded-xl p-4 transition
+                    duration-300 shadow hover:shadow-lg flex flex-col
+                    ${
+                      checked
+                        ? "ring-2 ring-offset-2 ring-[#D4AF37]"
+                        : ""
+                    }`}
+                >
+                  {/* Hidden radio keeps card selectable */}
+                  <input
+                    type="radio"
+                    name="service"
+                    value={service._id}
+                    className="sr-only"
+                    checked={checked}
+                    onChange={() => setSelectedServiceId(service._id)}
                   />
-                )}
 
-                <span className="text-lg font-semibold">{service.title}</span>
-                {service.price && (
-                  <span className="text-sm text-gray-500">
-                    {service.price} ETB
-                  </span>
-                )}
-                {service.description && (
-                  <span className="text-xs text-gray-500 mt-1 line-clamp-2">
-                    {service.description}
-                  </span>
-                )}
+                  {service.imageUrl && (
+                    <img
+                      src={`${BASE_URL.replace("/api", "")}${service.imageUrl}`}
+                      alt={service.title}
+                      className="w-full h-40 object-cover rounded mb-3"
+                    />
+                  )}
 
-                {/* Hidden radio for accessibility */}
-                <input
-                  type="radio"
-                  name="service"
-                  className="sr-only"
-                  value={service._id}
-                  checked={selectedServiceId === service._id}
-                  onChange={() => setSelectedServiceId(service._id)}
-                />
-              </label>
-            ))}
+                  <span className="text-lg font-semibold">
+                    {service.title}
+                  </span>
+
+                  {service.price && (
+                    <span className="text-sm text-gray-500">
+                      {service.price} ETB
+                    </span>
+                  )}
+
+                  {service.location && (
+                    <span className="text-sm text-gray-600 mt-1">
+                      📍 {service.location}
+                    </span>
+                  )}
+
+                  {service.description && (
+                    <span className="text-xs text-gray-500 mt-1 line-clamp-2">
+                      {service.description}
+                    </span>
+                  )}
+                </label>
+              );
+            })}
           </div>
         )}
 
@@ -161,7 +184,11 @@ const GiftDetails = () => {
           onClick={handleSendGift}
           disabled={!selectedServiceId}
           className={`mt-10 w-full bg-[#D4AF37] text-[#1c2b21] font-medium py-2 rounded-md
-            transition ${!selectedServiceId ? "opacity-50 cursor-not-allowed" : "hover:bg-[#caa82f]"}`}
+            transition ${
+              !selectedServiceId
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-[#caa82f]"
+            }`}
         >
           {selectedServiceId ? "Proceed to Checkout" : "Select a Service"}
         </button>
@@ -171,4 +198,5 @@ const GiftDetails = () => {
 };
 
 export default GiftDetails;
+
 

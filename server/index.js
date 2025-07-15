@@ -6,6 +6,8 @@ const passport = require("passport");
 const session = require("express-session");
 const path = require("path");
 const serviceRoutes = require("./routes/service");
+const notificationRoutes = require('./routes/notificationRoutes');
+
 
 
 dotenv.config();
@@ -58,6 +60,7 @@ app.use(passport.session());
 // ✅ Serve uploaded images
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+
 // ✅ Route mounting
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/services", serviceRoutes);
@@ -73,6 +76,7 @@ app.use("/api/membership", require("./routes/membership"));
 
 app.use("/api/services", require("./routes/service"));
 app.use("/api/payment", require("./routes/payment"));
+app.use('/api/notifications', notificationRoutes);
 
 // ✅ Start the server
 const PORT = process.env.PORT || 5000;

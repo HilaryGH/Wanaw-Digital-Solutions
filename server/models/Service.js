@@ -13,18 +13,17 @@ const serviceSchema = new mongoose.Schema(
     duration: { type: String }, // e.g. "60 minutes"
     tags: [String],
     imageUrl: String,
+    location: { type: String }, // <-- Added location field
     status: {
       type: String,
       enum: ["pending", "approved", "denied"],
       default: "pending",
     },
-
     providerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-
     rating: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true },
   },
@@ -32,3 +31,4 @@ const serviceSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("Service", serviceSchema);
+
