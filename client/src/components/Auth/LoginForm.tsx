@@ -9,35 +9,39 @@ const LoginForm = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+ const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError("");
 
-    try {
-      const response = await fetch(`${BASE_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+  try {
+    const response = await fetch(`${BASE_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (!response.ok) {
-        setError(data.msg || "Login failed");
-        return;
-      }
-
-      // Store token in localStorage (or cookie if preferred)
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      // Redirect to dashboard or homepage
-      navigate("/dashboard");
-    } catch (err) {
-      setError("Something went wrong. Please try again.");
+    if (!response.ok) {
+      setError(data.msg || "Login failed");
+      return;
     }
-  };
+
+    // Save to localStorage
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+
+    // ✅ Redirect based on role
+    const role = data.user.role;
+    if (role === "provider") navigate("/provider-dashboard");
+    else if (role === "corporate") navigate("/corporate-dashboard");
+    else if (role === "diaspora") navigate("/diaspora-dashboard");
+    else navigate("/dashboard"); // for 'individual' or unknown
+  } catch (err) {
+    console.error(err);
+    setError("Something went wrong. Please try again.");
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white px-4 relative overflow-hidden">

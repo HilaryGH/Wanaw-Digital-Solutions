@@ -1,61 +1,63 @@
 import { useState } from "react";
-import type {ChangeEvent, FormEvent} from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import BASE_URL from "../../api/api";
 
-
+/**
+ * RegisterForm – handles registration for all user roles
+ * Roles: "individual" | "provider" | "corporate" | "diaspora"
+ */
 const RegisterForm = () => {
-  /** ----------------------------------
-   * 1️⃣  STATE
-   * ----------------------------------*/
-const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">("user");
+  /* ──────────────────── 1️⃣ STATE ──────────────────── */
+  const [role, setRole] = useState<
+    "individual" | "provider" | "corporate" | "diaspora"
+  >("individual");
 
+  // Individual user form fields
+  const [userForm, setUserForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-  // ── Individual user form fields
- const [userForm, setUserForm] = useState({
-  firstName: "",
-  lastName: "",
-  email: "",
-  phone: "",
-  password: "",
-  confirmPassword: "",
-});
-
-
-  // ── Service‑provider form fields (+ file objects)
+  // Service‑provider style form fields (shared by provider | corporate | diaspora)
   const [providerForm, setProviderForm] = useState({
-  companyName: "",
-  serviceType: "",
-  category: role, // ← use the selected role directly
-  email: "",
-  phone: "",
-  whatsapp: "",
-  telegram: "",
-  city: "",
-  location: "",
-  password: "",
-  confirmPassword: "",
-  license: null as File | null,
-  tradeRegistration: null as File | null,
-  servicePhotos: [] as File[],
-  video: null as File | null,
-});
+    companyName: "",
+    serviceType: "",
+    email: "",
+    phone: "",
+    whatsapp: "",
+    telegram: "",
+    city: "",
+    location: "",
+    password: "",
+    confirmPassword: "",
+    license: null as File | null,
+    tradeRegistration: null as File | null,
+    servicePhotos: [] as File[],
+    video: null as File | null,
+  });
 
   const [consent, setConsent] = useState(false);
   const navigate = useNavigate();
 
-  /** ----------------------------------
-   * 2️⃣  HANDLERS
-   * ----------------------------------*/
+  /* ──────────────────── 2️⃣ HANDLERS ──────────────────── */
   const handleRoleChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    setRole(e.target.value as "user" | "provider" | "corporate" | "diaspora");
+    setRole(
+      e.target.value as "individual" | "provider" | "corporate" | "diaspora"
+    );
   };
 
   const handleUserChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUserForm({ ...userForm, [e.target.name]: e.target.value });
   };
 
-  const handleProviderChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleProviderChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value, files } = e.target as HTMLInputElement;
     if (files) {
       if (name === "servicePhotos") {
@@ -68,93 +70,95 @@ const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">
     }
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  /* ──────────────────── 3️⃣ SUBMIT ──────────────────── */
+ /* ──────────────────── 3️⃣ SUBMIT ──────────────────── */
+const handleSubmit = async (e: FormEvent) => {
+  e.preventDefault();
 
-    if (!consent) {
-      alert("You must agree to the data processing terms.");
+  if (!consent) {
+    alert("You must agree to the data processing terms.");
+    return;
+  }
+
+  /* ===== INDIVIDUAL  &  DIASPORA  (JSON) ===== */
+  if (role === "individual" || role === "diaspora") {
+    if (userForm.password !== userForm.confirmPassword) {
+      alert("Passwords do not match");
       return;
     }
 
-    try {
-      /****************************
-       * USER REGISTRATION
-       ***************************/
-      if (role === "user") {
-        if (userForm.password !== userForm.confirmPassword) {
-          alert("Passwords do not match");
-          return;
-        }
+    const payload = {
+      fullName: `${userForm.firstName} ${userForm.lastName}`.trim(),
+      email: userForm.email,
+      phone: userForm.phone,
+      password: userForm.password,
+      role, // "individual" or "diaspora"
+    };
 
-        const payload = {
-  fullName: `${userForm.firstName} ${userForm.lastName}`.trim(),
-  email: userForm.email,
-  phone: userForm.phone,
-  password: userForm.password,
+    const res = await fetch(`${BASE_URL}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const { msg } = await res.json().catch(() => ({}));
+      alert(msg || "Registration failed");
+      return;
+    }
+
+    alert("Account created successfully!");
+    navigate("/login");
+    return;
+  }
+
+  /* ===== PROVIDER / CORPORATE  (multipart) ===== */
+  if (providerForm.password !== providerForm.confirmPassword) {
+    alert("Passwords do not match");
+    return;
+  }
+  if (!providerForm.companyName || !providerForm.serviceType) {
+    alert("Company name and service type are required.");
+    return;
+  }
+
+  const fd = new FormData();
+  const fullNameValue = providerForm.companyName.trim() || "Provider";
+  fd.append("fullName", fullNameValue);
+
+  fd.append("companyName", providerForm.companyName);
+  fd.append("serviceType", providerForm.serviceType);
+  fd.append("role", role); // "provider" or "corporate"
+  fd.append("email", providerForm.email);
+  fd.append("phone", providerForm.phone);
+  fd.append("whatsapp", providerForm.whatsapp);
+  fd.append("telegram", providerForm.telegram);
+  fd.append("city", providerForm.city);
+  fd.append("location", providerForm.location);
+  fd.append("password", providerForm.password);
+
+  if (providerForm.license)           fd.append("license", providerForm.license);
+  if (providerForm.tradeRegistration) fd.append("tradeRegistration", providerForm.tradeRegistration);
+  providerForm.servicePhotos.forEach(file => fd.append("servicePhotos", file));
+  if (providerForm.video)             fd.append("video", providerForm.video);
+
+  const resProv = await fetch(`${BASE_URL}/auth/register`, {
+    method: "POST",
+    body: fd, // FormData sets its own Content‑Type
+  });
+
+  if (!resProv.ok) {
+    const { msg } = await resProv.json().catch(() => ({}));
+    alert(msg || "Provider registration failed");
+    return;
+  }
+
+  alert("Account created successfully!");
+  navigate("/login");
 };
 
 
-        const res = await fetch(`${BASE_URL}/auth/register`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-
-        if (!res.ok) throw new Error("Registration failed");
-        await res.json();
-        alert("Account created successfully!");
-        navigate("/login");
-      }
-
-      /****************************
-       * SERVICE‑PROVIDER REGISTRATION
-       ***************************/
-      if (role === "provider" || role === "corporate" || role === "diaspora") {
- 
-        if (providerForm.password !== providerForm.confirmPassword) {
-          alert("Passwords do not match");
-          return;
-        }
-
-        const fd = new FormData();
-        fd.append("companyName", providerForm.companyName);
-        fd.append("serviceType", providerForm.serviceType);
-        fd.append("category", role); // ✅ Append role as category
-        fd.append("email", providerForm.email);
-        fd.append("phone", providerForm.phone);
-        fd.append("whatsapp", providerForm.whatsapp);
-        fd.append("telegram", providerForm.telegram);
-        fd.append("city", providerForm.city);
-        fd.append("location", providerForm.location);
-        fd.append("password", providerForm.password);
-
-        if (providerForm.license) fd.append("license", providerForm.license);
-        if (providerForm.tradeRegistration)
-          fd.append("tradeRegistration", providerForm.tradeRegistration);
-        providerForm.servicePhotos.forEach((file) =>
-          fd.append("servicePhotos", file)
-        );
-        if (providerForm.video) fd.append("video", providerForm.video);
-
-        const res = await fetch(`${BASE_URL}/service-providers/register`, {
-          method: "POST",
-          body: fd,
-        });
-
-        if (!res.ok) throw new Error("Provider registration failed");
-        await res.json();
-        alert("Service‑provider account created successfully!");
-        navigate("/login");
-      }
-    } catch (error) {
-      console.error(error);
-      alert("An error occurred while registering. Please try again.");
-    }
-  };
-
-  /** ----------------------------------
-   * 3️⃣  RENDER
-   * ----------------------------------*/
+  /* ──────────────────── 4️⃣ RENDER ──────────────────── */
   return (
     <div className="relative min-h-screen flex flex-col md:flex-row overflow-hidden">
       {/* Left: Form Section */}
@@ -165,31 +169,31 @@ const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">
             <img src="/WHW.jpg" alt="Wanaw Logo" className="h-16 w-16 rounded-full object-cover" />
           </div>
           <h2 className="text-2xl font-bold mb-6 text-center text-[#1c2b21]">
-            {role === "user" ? "Create Your Account" : "Register as Service Provider"}
+            {role === "individual" ? "Create Your Account" : `Register as ${role.charAt(0).toUpperCase() + role.slice(1)} Provider`}
           </h2>
 
-          {/* ⚡️ Role selector */}
+          {/* Role selector */}
           <div className="mb-4">
             <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
               Registering as
             </label>
-          <select
-  id="role"
-  className="w-full p-2 border border-gray-300 rounded text-sm"
-  value={role}
-  onChange={handleRoleChange}
->
-  <option value="user">Individual User</option>
-  <option value="provider">Service Provider</option>
-  <option value="corporate">Corporate</option>
-  <option value="diaspora">Ethiopian Diaspora</option>
-</select>
-
+            <select
+              id="role"
+              className="w-full p-2 border border-gray-300 rounded text-sm"
+              value={role}
+              onChange={handleRoleChange}
+            >
+              <option value="individual">Individual User</option>
+              <option value="provider">Service Provider</option>
+              <option value="corporate">Corporate</option>
+              <option value="diaspora">Ethiopian Diaspora</option>
+            </select>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {role === "user" && (
+            {/* INDIVIDUAL FORM FIELDS */}
+            {role === "individual" && (
               <>
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input
@@ -211,7 +215,6 @@ const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">
                     className="w-full sm:w-1/2 p-2 border border-gray-300 rounded text-sm"
                   />
                 </div>
-
                 <input
                   type="email"
                   name="email"
@@ -222,16 +225,14 @@ const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
                 <input
-  type="tel"
-  name="phone"
-  placeholder="Phone"
-  required
-  value={userForm.phone || ""}
-  onChange={handleUserChange}
-  className="w-full p-2 border border-gray-300 rounded text-sm"
-/>
-
-
+                  type="tel"
+                  name="phone"
+                  placeholder="Phone"
+                  required
+                  value={userForm.phone || ""}
+                  onChange={handleUserChange}
+                  className="w-full p-2 border border-gray-300 rounded text-sm"
+                />
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="password"
@@ -254,7 +255,9 @@ const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">
                 </div>
               </>
             )}
-{(role === "provider" || role === "corporate" || role === "diaspora") && (
+
+            {/* PROVIDER / CORPORATE / DIASPORA FORM FIELDS */}
+            {(role === "provider" || role === "corporate" || role === "diaspora") && (
               <>
                 <input
                   type="text"
@@ -265,7 +268,6 @@ const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">
                   onChange={handleProviderChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
-
                 <select
                   name="serviceType"
                   required
@@ -277,13 +279,11 @@ const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">
                     Select Service Type
                   </option>
                   <option value="Wellness Services">Wellness Services</option>
-                  <option value=" Aesthetician"> Aesthetician</option>
+                  <option value="Aesthetician">Aesthetician</option>
                   <option value="Medical">Medical</option>
-                  <option value="Health Coach">Hotel Rooms </option>
-                  <option value="Nutritionist">Lifestyle</option>
-                  {/* TODO: pull list dynamically from backend */}
+                  <option value="Health Coach">Health Coach</option>
+                  <option value="Nutritionist">Nutritionist</option>
                 </select>
-
                 <input
                   type="email"
                   name="email"
@@ -293,7 +293,6 @@ const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">
                   onChange={handleProviderChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
-
                 <input
                   type="tel"
                   name="phone"
@@ -303,7 +302,6 @@ const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">
                   onChange={handleProviderChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
-
                 <input
                   type="tel"
                   name="whatsapp"
@@ -313,7 +311,6 @@ const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">
                   onChange={handleProviderChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
-
                 <input
                   type="text"
                   name="telegram"
@@ -323,7 +320,6 @@ const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">
                   onChange={handleProviderChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
-
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
@@ -344,8 +340,7 @@ const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">
                     className="w-full sm:w-1/2 p-2 border border-gray-300 rounded text-sm"
                   />
                 </div>
-
-                {/* Password fields (dashboard access) */}
+                {/* Password */}
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="password"
@@ -366,8 +361,7 @@ const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">
                     className="w-full sm:w-1/2 p-2 border border-gray-300 rounded text-sm"
                   />
                 </div>
-
-                {/* File uploads */}
+                {/* Files */}
                 <label className="block text-sm font-medium text-gray-700 mt-2">License (PDF/Image)</label>
                 <input
                   type="file"
@@ -377,7 +371,6 @@ const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">
                   onChange={handleProviderChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
-
                 <label className="block text-sm font-medium text-gray-700 mt-2">Trade Registration (PDF/Image)</label>
                 <input
                   type="file"
@@ -387,7 +380,6 @@ const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">
                   onChange={handleProviderChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
-
                 <label className="block text-sm font-medium text-gray-700 mt-2">Service Centre Photos (up to 5)</label>
                 <input
                   type="file"
@@ -398,8 +390,7 @@ const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">
                   onChange={handleProviderChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
-
-                <label className="block text-sm font-medium text-gray-700 mt-2">Intro Video (optional, ≤30 min)</label>
+                <label className="block text-sm font-medium text-gray-700 mt-2">Intro Video (optional)</label>
                 <input
                   type="file"
                   name="video"
@@ -410,7 +401,7 @@ const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">
               </>
             )}
 
-            {/* Country – unchanged */}
+            {/* Country (static) */}
             <input
               type="text"
               disabled
@@ -426,35 +417,31 @@ const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">
                 onChange={(e) => setConsent(e.target.checked)}
               />
               <label className="leading-snug">
-                I consent to the collection and processing of my personal data in
-                line with data regulations as described in the <a href="#" className="text-blue-600 underline">Privacy Policy</a> & <a href="#" className="text-blue-600 underline">Merchant Service Agreement</a>.
+                I consent to the collection and processing of my personal data in line with data regulations as described in the <a href="#" className="text-blue-600 underline">Privacy Policy</a> & <a href="#" className="text-blue-600 underline">Merchant Service Agreement</a>.
               </label>
             </div>
-
-            {/* Legal note */}
-            <p className="text-xs text-gray-600 text-center">
-              By clicking the <span className="font-semibold text-[#1c2b21]">"Create my account"</span> button, you agree to Wanaw's terms of acceptable use.
-            </p>
 
             {/* Submit */}
             <button
               type="submit"
               className="w-full bg-[#D4AF37] text-[#1c2b21] font-semibold py-2 rounded-full hover:rounded-md transition"
             >
-              {role === "user" ? "Create My Account" : "Register Service Provider"}
+              {role === "individual" ? "Create My Account" : `Register as ${role.charAt(0).toUpperCase() + role.slice(1)} `}
             </button>
           </form>
 
           {/* Login link */}
           <p className="text-center text-sm mt-4">
-            Already have an account? <Link to="/login" className="text-[#1c2b21] text-lg hover:underline">Login</Link>
+            Already have an account?{' '}
+            <Link to="/login" className="text-[#1c2b21] text-lg hover:underline">
+              Login
+            </Link>
           </p>
-
           <p className="text-center text-xs text-gray-400 mt-12">Ⓒ All rights reserved by Wanaw</p>
         </div>
       </div>
 
-      {/* Wave Divider */}
+   {/* Wave Divider */}
       <div className="hidden md:block absolute top-0 bottom-0 left-1/2 transform -translate-x-1/2 z-0">
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-4">
           <path d="M0,0 C50,50 50,50 100,100 L100,0 Z" fill="#fafafa" />
@@ -492,7 +479,9 @@ const [role, setRole] = useState<"user" | "provider" | "corporate" | "diaspora">
         </div>
       </div>
     </div>
+   
   );
 };
 
 export default RegisterForm;
+

@@ -6,7 +6,7 @@ const passport = require("passport");
 const session = require("express-session");
 const path = require("path");
 const serviceRoutes = require("./routes/service");
-const providerRoutes = require("./routes/providers");
+
 
 dotenv.config();
 
@@ -61,7 +61,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // ✅ Route mounting
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/services", serviceRoutes);
-app.use("/api/service-providers", providerRoutes);
+
 
 app.use("/api/gift", require("./routes/gift"));
 app.use("/api/admin/posts", require("./routes/admin.blog"));
@@ -70,7 +70,7 @@ app.use("/api/blog", require("./routes/blog"));
 app.use("/api/support", require("./routes/support"));
 app.use("/api/programs", require("./routes/programs"));
 app.use("/api/membership", require("./routes/membership"));
-app.use("/api/users", require("./routes/users"));
+
 app.use("/api/services", require("./routes/service"));
 app.use("/api/payment", require("./routes/payment"));
 
