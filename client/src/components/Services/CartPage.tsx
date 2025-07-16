@@ -76,13 +76,14 @@ const CartPage = () => {
             key={index}
             className="bg-white p-4 rounded-lg shadow hover:shadow-md transition"
           >
-            {item.imageUrl && (
-              <img
-                src={`${BASE_URL.replace("/api", "")}${item.imageUrl}`}
-                alt={item.title}
-                className="w-full h-48 object-cover mb-3 rounded-md"
-              />
-            )}
+           {item.imageUrl && (
+  <img
+    src={item.imageUrl}
+    alt={item.title}
+    className="w-full h-48 object-cover mb-3 rounded-md"
+  />
+)}
+
             <h2 className="text-lg font-semibold mb-2 text-[#1c2b21]">
               {item.title}
             </h2>
