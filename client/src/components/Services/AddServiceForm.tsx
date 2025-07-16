@@ -28,44 +28,65 @@ useEffect(() => {
 
 
   const handleSubmit = async () => {
-    if (!title || !category || !price || !image) {
-      alert("Title, Category, Price and Image are required.");
-      return;
+  if (!title || !category || !price || !image) {
+    alert("Title, Category, Price and Image are required.");
+    return;
+  }
+
+  try {
+    // 🔁 Step 1: Upload image to Cloudinary
+    const imageForm = new FormData();
+    imageForm.append("image", image);
+
+    const uploadRes = await fetch(`${BASE_URL.replace("/api", "")}/api/upload`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: imageForm,
+    });
+
+    const uploadData = await uploadRes.json();
+
+    if (!uploadRes.ok) {
+      throw new Error(uploadData.msg || "Image upload failed");
     }
 
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("category", category);
-    formData.append("price", price.toString());
-    formData.append("duration", duration);
-    formData.append("tags", tags); // e.g. "birthday,gift"
-    formData.append("image", image); // the uploaded image file
-    formData.append("location", location);
+    const imageUrl = uploadData.imageUrl;
 
+    // 🔁 Step 2: Submit service with imageUrl
+    const serviceRes = await fetch(`${BASE_URL}/services`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title,
+        description,
+        category,
+        price,
+        duration,
+        tags,
+        location,
+        imageUrl, // ✅ attach Cloudinary image URL
+      }),
+    });
 
-    try {
-      const res = await fetch(`${BASE_URL}/services`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`, // DO NOT set Content-Type manually with FormData
-        },
-        body: formData,
-      });
+    const serviceData = await serviceRes.json();
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.msg || "Something went wrong");
-      }
-
-      alert("Service added successfully!");
-      navigate("/services");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to add service");
+    if (!serviceRes.ok) {
+      throw new Error(serviceData.msg || "Failed to create service");
     }
-  };
+
+    alert("Service added successfully!");
+    navigate("/services");
+  } catch (err) {
+    console.error(err);
+    alert("Failed to add service");
+  }
+};
+
 
   return (
     <div className="border border-gray-300 rounded-xl p-6 bg-white rounded shadow w-full max-w-lg mx-auto mt-10">
