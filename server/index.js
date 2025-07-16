@@ -16,10 +16,10 @@ const app = express();
 connectDB();
 
 // ✅ Allowed frontend origins (local + Netlify)
-//const allowedOrigins = [
-// "http://localhost:5173",
-// "https://wanawhealthandwellness.netlify.app",
-//];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://wanawhealthandwellness.netlify.app",
+];
 
 // ✅ CORS middleware
 app.use(
