@@ -50,48 +50,49 @@ const SendGiftForm = () => {
     );
   }
 
-  /* —— Form State —— */
   const [recipientEmail, setRecipientEmail] = useState("");
   const [recipientPhone, setRecipientPhone] = useState("");
   const [recipientWhatsApp, setRecipientWhatsApp] = useState("");
   const [recipientTelegram, setRecipientTelegram] = useState("");
   const [message, setMessage] = useState("");
-
   const [notifyProvider, setNotifyProvider] = useState(false);
   const [providerMessage, setProviderMessage] = useState("");
 
   const senderName =
-    JSON.parse(localStorage.getItem("user") || "null")?.fullName ||
-    "Anonymous";
+    JSON.parse(localStorage.getItem("user") || "null")?.fullName || "Anonymous";
 
-  /* —— Notify helper —— */
-  const fireNotifications = async () => {
-    const payload = {
-      recipientEmail,
-      recipientPhone,
-      recipientWhatsApp,
-      recipientTelegram,
-      message,
-      senderName,
-      occasion,
-      service,
-      notifyProvider,
-      providerMessage,
-    };
-
+  /* ───── Notify via Backend ───── */
+  const notifyAllChannels = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/notifications/send`, {
+      const token = localStorage.getItem("token");
+      const payload = {
+        recipientEmail,
+        recipientPhone,
+        recipientWhatsApp,
+        recipientTelegram,
+        message,
+        senderName,
+        serviceTitle: service.title,
+        occasionTitle: occasion?.title || "",
+        notifyProvider,
+        providerMessage,
+        providerContact: service.provider,
+      };
+
+      await fetch(`${BASE_URL}/notifications/send`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) console.warn("Notification failure", await res.text());
-    } catch (e) {
-      console.error("Notification error:", e);
+    } catch (err) {
+      console.error("Notification failed:", err);
     }
   };
 
-  /* —— Main submit —— */
+  /* ───── Main Action ───── */
   const handlePayAndSend = async () => {
     if (
       !recipientEmail &&
@@ -99,13 +100,10 @@ const SendGiftForm = () => {
       !recipientWhatsApp &&
       !recipientTelegram
     ) {
-      alert(
-        "Please enter at least one recipient contact: Email, Phone, WhatsApp or Telegram."
-      );
+      alert("Please enter at least one recipient contact.");
       return;
     }
 
-    /* Save to localStorage in case user refreshes during payment */
     localStorage.setItem(
       "pendingGift",
       JSON.stringify({
@@ -122,69 +120,45 @@ const SendGiftForm = () => {
       })
     );
 
-    /* Kick off notifications (don’t block on them) */
-    const notifyPromise = fireNotifications();
+    await notifyAllChannels(); // Send gift via all platforms
 
-try {
-  const token = localStorage.getItem("token");
-  const res = await fetch(`${BASE_URL}/payment/pay`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token ? `Bearer ${token}` : "",
-    },
-    body: JSON.stringify({
-      amount: service.price ?? 0,
-      email: recipientEmail,
-      phone_number: recipientPhone,
-      whatsapp_number: recipientWhatsApp,
-      telegram: recipientTelegram,
-      first_name: "Gift",
-      last_name: "Receiver",
-      serviceId: service._id,
-      occasionId: occasion?._id,
-      notifyProvider,
-      providerMessage,
-      providerContact: service.provider,
-    }),
-  });
+    try {
+      const token = localStorage.getItem("token");
 
-  const data = await res.json();
+      const res = await fetch(`${BASE_URL}/payment/pay`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({
+          amount: service.price ?? 0,
+          email: recipientEmail,
+          phone_number: recipientPhone,
+          whatsapp_number: recipientWhatsApp,
+          telegram: recipientTelegram,
+          first_name: "Gift",
+          last_name: "Receiver",
+          serviceId: service._id,
+          occasionId: occasion?._id,
+          notifyProvider,
+          providerMessage,
+          providerContact: service.provider,
+        }),
+      });
 
-  // Regardless of payment success or failure, notify recipient
-  await fetch(`${BASE_URL}/notifications/send`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token ? `Bearer ${token}` : "",
-    },
-    body: JSON.stringify({
-      recipientEmail,
-      recipientPhone,
-      recipientWhatsApp,
-      recipientTelegram,
-      message,
-      senderName,
-      serviceTitle: service.title,
-      occasionTitle: occasion?.title || "",
-      notifyProvider,
-      providerMessage,
-      providerContact: service.provider,
-    }),
-  });
+      const data = await res.json();
 
-  if (data.checkout_url) {
-    window.location.href = data.checkout_url;
-  } else {
-    alert("Payment failed, but gift was still sent.");
-  }
-} catch (err) {
-  alert("Payment failed, but gift was still sent.");
-  console.error(err);
-}
-
+      if (data.checkout_url) {
+        window.location.href = data.checkout_url;
+      } else {
+        alert("Payment failed, but gift was still sent.");
+      }
+    } catch (err) {
+      alert("Payment failed, but gift was still sent.");
+      console.error(err);
+    }
   };
-
   /* —— JSX —— */
   return (
     <div className="max-w-lg mx-auto bg-white shadow-xl rounded-2xl overflow-hidden my-10">
