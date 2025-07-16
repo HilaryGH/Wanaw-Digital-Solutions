@@ -16,16 +16,17 @@ const app = express();
 connectDB();
 
 // ✅ Allowed frontend origins (local + Netlify)
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://wanawhealthandwellness.netlify.app",
-];
+//const allowedOrigins = [
+// "http://localhost:5173",
+// "https://wanawhealthandwellness.netlify.app",
+//];
 
 // ✅ CORS middleware
 app.use(
   cors({
     origin: function (origin, callback) {
       if (!origin || allowedOrigins.includes(origin)) {
+        // Allow undefined origin (like <img> tag requests)
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
@@ -34,6 +35,7 @@ app.use(
     credentials: true,
   })
 );
+
 
 // ✅ Parse JSON request bodies
 app.use(express.json());
