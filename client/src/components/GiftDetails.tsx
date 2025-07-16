@@ -145,13 +145,14 @@ const [occasion, setOccasion] = useState<Occasion | null | undefined>(undefined)
                     onChange={() => setSelectedServiceId(service._id)}
                   />
 
-                  {service.imageUrl && (
-                    <img
-                      src={`${BASE_URL.replace("/api", "")}${service.imageUrl}`}
-                      alt={service.title}
-                      className="w-full h-40 object-cover rounded mb-3"
-                    />
-                  )}
+                 {service.imageUrl && (
+  <img
+    src={service.imageUrl}
+    alt={service.title}
+    className="w-full h-40 object-cover rounded mb-3"
+  />
+)}
+
 
                   <span className="text-lg font-semibold">
                     {service.title}

@@ -59,8 +59,7 @@ require("./config/passport");
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ✅ Serve uploaded images
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 
 
 // ✅ Route mounting

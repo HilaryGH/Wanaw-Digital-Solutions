@@ -56,8 +56,9 @@ const ServiceCatalog = () => {
 
   /* Helpers */
   const formatPrice = (p: number) => `${p.toLocaleString()} ETB`;
-  const imgSrc = (url?: string) =>
-    url ? `${BASE_URL.replace("/api", "")}${url}` : "/placeholder.jpg";
+const imgSrc = (url?: string) =>
+  url || "/placeholder.jpg";
+
 
   /* UI states */
   if (loading)

@@ -80,37 +80,35 @@ const handleSubmit = async (e: React.FormEvent) => {
          {/* Contact Info */}
           <div className="grid md:grid-cols-4 gap-2 mb-8 text-center">
             <div>
-              <FaPhoneAlt className="text-gold text-xl mx-auto mb-2" />
               <a href="tel:+251989177777" className="text-gray-300">
-                +251 989 177 777
+               <FaPhoneAlt className="text-gold text-2xl mx-auto mb-2" />
               </a>
             </div>
             <div>
-              <FaEnvelope className="text-gold text-xl mx-auto mb-2" />
               <a href="mailto:support@wanaw.com" className="text-gray-300">
-                support@wanaw.com
+                <FaEnvelope className="text-gold text-2xl mx-auto mb-2" />
               </a>
             </div>
             <div>
-              <FaWhatsapp className="text-gold text-xl mx-auto mb-2" />
+              
               <a
                 href="https://wa.me/251989177777"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-300"
               >
-                WhatsApp Support
+              <FaWhatsapp className="text-gold text-2xl mx-auto mb-2" />
               </a>
             </div>
             <div>
-              <SiTelegram className="text-gold text-xl mx-auto mb-2" />
+             
               <a
                 href="https://t.me/+251989177777"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-300"
               >
-                Telegram Support
+               <SiTelegram className="text-gold text-2xl mx-auto mb-2" />
               </a>
             </div>
           </div>
