@@ -61,7 +61,8 @@ exports.createService = async (req, res) => {
         .json({ msg: "Invalid or missing category" });
     }
 
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : "";
+    const imageUrl = req.file?.path || "";
+
 
     const service = await Service.create({
       ...req.body,
