@@ -77,6 +77,7 @@ app.use("/api/membership", require("./routes/membership"));
 app.use("/api/services", require("./routes/service"));
 app.use("/api/payment", require("./routes/payment"));
 app.use('/api/notifications', notificationRoutes);
+app.use("/api/upload", require("./routes/upload"));
 
 // ✅ Start the server
 const PORT = process.env.PORT || 5000;

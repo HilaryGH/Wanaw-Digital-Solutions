@@ -68,12 +68,13 @@ const ServiceList = () => {
             className="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-lg transition duration-300 p-5 flex flex-col"
           >
             {service.imageUrl && (
-              <img
-                 src={`${BASE_URL.replace("/api", "")}${service.imageUrl}`}
-                alt={service.title}
-                className="w-full h-48 object-cover rounded-xl mb-4"
-              />
-            )}
+  <img
+    src={service.imageUrl}
+    alt={service.title}
+    className="w-full h-48 object-cover rounded-xl mb-4"
+  />
+)}
+
 
             <div className="flex-1">
               <h2 className="text-xl font-bold text-[#1c2b21] mb-2">

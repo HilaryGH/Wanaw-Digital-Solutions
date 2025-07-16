@@ -18,6 +18,7 @@ type Service = {
   price?: number;
   description?: string;
   provider?: ProviderContact;
+  imageUrl?:File;
 };
 
 type Occasion = {
@@ -74,91 +75,77 @@ const SendGiftForm = () => {
         senderName,
         serviceTitle: service.title,
         occasionTitle: occasion?.title || "",
+       serviceImageUrl: service.imageUrl,
         notifyProvider,
         providerMessage,
         providerContact: service.provider,
       };
 
-      await fetch(`${BASE_URL}/notifications/send`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify(payload),
-      });
+ const res = await fetch(`${BASE_URL}/notifications/send`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: token ? `Bearer ${token}` : "",
+  },
+  body: JSON.stringify(payload),
+});
+
+if (!res.ok) {
+  const errorText = await res.text();
+  console.error("❌ Notification API Error:", res.status, errorText);
+  throw new Error(`Notification failed with status ${res.status}`);
+}
+
+
     } catch (err) {
       console.error("Notification failed:", err);
     }
   };
 
   /* ───── Main Action ───── */
-  const handlePayAndSend = async () => {
-    if (
-      !recipientEmail &&
-      !recipientPhone &&
-      !recipientWhatsApp &&
-      !recipientTelegram
-    ) {
-      alert("Please enter at least one recipient contact.");
-      return;
-    }
+ /* ───── Main Action ───── */
+const handlePayAndSend = async () => {
+  // require at least one contact
+  if (
+    !recipientEmail &&
+    !recipientPhone &&
+    !recipientWhatsApp &&
+    !recipientTelegram
+  ) {
+    alert("Please enter at least one recipient contact.");
+    return;
+  }
 
-    localStorage.setItem(
-      "pendingGift",
-      JSON.stringify({
-        recipientEmail,
-        recipientPhone,
-        recipientWhatsApp,
-        recipientTelegram,
-        message,
-        senderName,
-        occasion,
-        service,
-        notifyProvider,
-        providerMessage,
-      })
-    );
+  // persist draft (optional)
+  localStorage.setItem(
+    "pendingGift",
+    JSON.stringify({
+      recipientEmail,
+      recipientPhone,
+      recipientWhatsApp,
+      recipientTelegram,
+      message,
+      senderName,
+      occasion,
+      service,
+      notifyProvider,
+      providerMessage,
+    })
+  );
 
-    await notifyAllChannels(); // Send gift via all platforms
+  try {
+    /* 1) Notify via all channels once */
+    await notifyAllChannels();
 
-    try {
-      const token = localStorage.getItem("token");
+    /* 2) (Payment skipped) */
+    alert("🎉 Gift notifications sent successfully!");
+    navigate("/"); // or any success page
+  } catch (error) {
+    console.error("Send gift error:", error);
+    alert("❌ Something went wrong while sending the gift.");
+  }
+};
 
-      const res = await fetch(`${BASE_URL}/payment/pay`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify({
-          amount: service.price ?? 0,
-          email: recipientEmail,
-          phone_number: recipientPhone,
-          whatsapp_number: recipientWhatsApp,
-          telegram: recipientTelegram,
-          first_name: "Gift",
-          last_name: "Receiver",
-          serviceId: service._id,
-          occasionId: occasion?._id,
-          notifyProvider,
-          providerMessage,
-          providerContact: service.provider,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (data.checkout_url) {
-        window.location.href = data.checkout_url;
-      } else {
-        alert("Payment failed, but gift was still sent.");
-      }
-    } catch (err) {
-      alert("Payment failed, but gift was still sent.");
-      console.error(err);
-    }
-  };
   /* —— JSX —— */
   return (
     <div className="max-w-lg mx-auto bg-white shadow-xl rounded-2xl overflow-hidden my-10">
