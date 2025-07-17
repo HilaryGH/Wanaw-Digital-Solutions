@@ -27,14 +27,14 @@ useEffect(() => {
 }, [navigate, user]);
 
 
-  const handleSubmit = async () => {
+ const handleSubmit = async () => {
   if (!title || !category || !price || !image) {
-    alert("Title, Category, Price and Image are required.");
+    alert("Title, Category, Price, and Image are required.");
     return;
   }
 
   try {
-    // 🔁 Step 1: Upload image to Cloudinary
+    // Step 1: Upload image to Cloudinary
     const imageForm = new FormData();
     imageForm.append("image", image);
 
@@ -46,15 +46,14 @@ useEffect(() => {
       body: imageForm,
     });
 
-    const uploadData = await uploadRes.json();
-
     if (!uploadRes.ok) {
-      throw new Error(uploadData.msg || "Image upload failed");
+      throw new Error("Failed to upload image to Cloudinary");
     }
 
+    const uploadData = await uploadRes.json();
     const imageUrl = uploadData.imageUrl;
 
-    // 🔁 Step 2: Submit service with imageUrl
+    // Step 2: Submit service with imageUrl
     const serviceRes = await fetch(`${BASE_URL}/services`, {
       method: "POST",
       headers: {
@@ -69,14 +68,12 @@ useEffect(() => {
         duration,
         tags,
         location,
-        imageUrl, // ✅ attach Cloudinary image URL
+        imageUrl,
       }),
     });
 
-    const serviceData = await serviceRes.json();
-
     if (!serviceRes.ok) {
-      throw new Error(serviceData.msg || "Failed to create service");
+      throw new Error("Failed to create service");
     }
 
     alert("Service added successfully!");
@@ -86,7 +83,6 @@ useEffect(() => {
     alert("Failed to add service");
   }
 };
-
 
   return (
     <div className="border border-gray-300 rounded-xl p-6 bg-white rounded shadow w-full max-w-lg mx-auto mt-10">

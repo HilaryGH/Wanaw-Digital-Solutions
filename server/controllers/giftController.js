@@ -29,22 +29,19 @@ exports.sendGift = async (req, res) => {
 const Gift = require("../models/Gift");
 
 exports.createGift = async (req, res) => {
-  const { title, category, occasion, description } = req.body;
-  const imageFile = req.file;
+  const { title, category, occasion, description, imageUrl } = req.body;
 
   if (!title || !category) {
     return res.status(400).json({ msg: "Title and category are required" });
   }
 
   try {
-    const imageUrl = imageFile ? `/uploads/${imageFile.filename}` : "";
-
     const newGift = new Gift({
       title,
       category,
       occasion,
       description,
-      imageUrl,
+      imageUrl: imageUrl || "", // fallback if imageUrl is not provided
     });
 
     await newGift.save();
@@ -54,6 +51,7 @@ exports.createGift = async (req, res) => {
     res.status(500).json({ msg: "Failed to add gift" });
   }
 };
+
 
 
 

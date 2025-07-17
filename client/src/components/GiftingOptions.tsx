@@ -18,31 +18,41 @@ const GiftingOptions = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchGifts = async () => {
-      try {
-        const res = await fetch(`${BASE_URL}/gift`);
-        if (!res.ok) throw new Error("Failed to fetch gifts");
-        const data: Gift[] = await res.json();
+  const fetchGifts = async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/gift`);
+      if (!res.ok) throw new Error("Failed to fetch gifts");
+      const data: Gift[] = await res.json();
 
-        // Deduplicate by title
-        const getUniqueByTitle = (gifts: Gift[]) => {
-          const seen = new Set<string>();
-          return gifts.filter(g => (seen.has(g.title) ? false : seen.add(g.title)));
-        };
+      // Deduplicate by title
+      const getUniqueByTitle = (gifts: Gift[]) => {
+        const seen = new Set<string>();
+        return gifts.filter(g => (seen.has(g.title) ? false : seen.add(g.title)));
+      };
 
-        setCorporateGifts(
+      const sortByTitle = (gifts: Gift[]) => {
+        return gifts.sort((a, b) => a.title.localeCompare(b.title));
+      };
+
+      setCorporateGifts(
+        sortByTitle(
           getUniqueByTitle(data.filter(g => g.category.toLowerCase() === "corporate"))
-        );
-        setIndividualGifts(
-          getUniqueByTitle(data.filter(g => g.category.toLowerCase() === "individual"))
-        );
-      } catch (err) {
-        console.error("Error fetching gifts:", err);
-      }
-    };
+        )
+      );
 
-    fetchGifts();
-  }, []);
+      setIndividualGifts(
+        sortByTitle(
+          getUniqueByTitle(data.filter(g => g.category.toLowerCase() === "individual"))
+        )
+      );
+    } catch (err) {
+      console.error("Error fetching gifts:", err);
+    }
+  };
+
+  fetchGifts();
+}, []);
+
 
   const slugify = (text: string) =>
     text.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");

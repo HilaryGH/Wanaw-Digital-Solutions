@@ -29,40 +29,69 @@ const AdminAddGift = () => {
     }
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    const formData = new FormData();
+const handleSubmit = async (e: FormEvent) => {
+  e.preventDefault();
 
-    Object.entries(gift).forEach(([key, value]) => {
-      formData.append(key, value);
+  try {
+    let imageUrl = "";
+
+    // Step 1: Upload to Cloudinary if there's an image
+    if (imageFile) {
+      const formData = new FormData();
+      formData.append("file", imageFile);
+      formData.append("upload_preset", "wanaw_unsigned"); // 👈 use actual preset
+      formData.append("cloud_name", "dgmqbwdzg"); // 👈 replace with actual cloud name
+
+      const cloudinaryRes = await fetch(
+        "https://api.cloudinary.com/v1_1/dgmqbwdzg/image/upload", // 👈 replace
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const cloudinaryData = await cloudinaryRes.json();
+
+      if (!cloudinaryData.secure_url) {
+        throw new Error("Failed to upload image to Cloudinary");
+      }
+
+      imageUrl = cloudinaryData.secure_url;
+    }
+
+    // Step 2: Send data to your backend
+    const giftData = {
+      ...gift,
+      imageUrl,
+    };
+
+    const res = await fetch(`${BASE_URL}/gift`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(giftData),
     });
 
-    if (imageFile) {
-      formData.append("image", imageFile);
-    }
+    const data = await res.json();
 
-    try {
-      const res = await fetch(`${BASE_URL}/gift`, {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        setMessage("✅ Gift added successfully!");
-        setSuccess(true);
-        setGift({ title: "", category: "corporate", occasion: "", description: "" });
-        setImageFile(null);
-        setPreviewUrl(null);
-      } else {
-        setMessage(`❌ ${data.msg}`);
-        setSuccess(false);
-      }
-    } catch (err) {
-      setMessage("❌ Server error");
+    if (res.ok) {
+      setMessage("✅ Gift added successfully!");
+      setSuccess(true);
+      setGift({ title: "", category: "corporate", occasion: "", description: "" });
+      setImageFile(null);
+      setPreviewUrl(null);
+    } else {
+      setMessage(`❌ ${data.msg}`);
       setSuccess(false);
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setMessage("❌ Server error");
+    setSuccess(false);
+  }
+};
+
 
   return (
     <div className="max-w-xl mx-auto bg-white shadow-xl rounded-xl p-8 mt-12 border border-gray-100">
