@@ -50,13 +50,17 @@ export default function AdminDashboardCards() {
       route: "/admin/support-requests",
       color: "bg-red-100",
     },
+     {
+      title: "User Lists ",
+      description: "View and respond to registered users.",
+      route: "/admin/user-lists",
+      color: "bg-black-100",
+    },
   ];
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
-      <h1 className="text-2xl font-bold mb-8 text-[#1c2b21]">
-        Admin Dashboard
-      </h1>
+      
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {features.map((item, index) => (
           <div

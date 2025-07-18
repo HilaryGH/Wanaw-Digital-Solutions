@@ -7,7 +7,7 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 /* ────── role sets ────── */
 const allowedRoles = ["individual", "provider", "corporate", "diaspora", "admin"];
-const providerRoles = ["provider", "corporate", "diaspora"];
+const providerRoles = ["provider", "corporate"];
 
 /* ─────────────────── REGISTER ─────────────────── */
 exports.register = async (req, res) => {

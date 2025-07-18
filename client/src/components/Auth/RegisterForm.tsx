@@ -1,26 +1,24 @@
+// (1) IMPORTS & STATE
 import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import BASE_URL from "../../api/api";
 
 const RegisterForm = () => {
-  /* ──────────────────── 1️⃣ STATE ──────────────────── */
-  const [role, setRole] = useState<
-    "individual" | "provider" | "corporate" | "diaspora"
-  >("individual");
+  const [role, setRole] = useState<"individual" | "provider" | "corporate" | "diaspora">("individual");
 
-  // Individual user form fields
-   const [userForm, setUserForm] = useState({
+  const [userForm, setUserForm] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
+    whatsapp: "",
+    telegram: "",
     password: "",
     confirmPassword: "",
-    idFile: null as File | null, // ✅ Add file
+    idFile: null as File | null,
   });
 
-  // Service‑provider style form fields (shared by provider | corporate | diaspora)
   const [providerForm, setProviderForm] = useState({
     companyName: "",
     serviceType: "",
@@ -41,20 +39,21 @@ const RegisterForm = () => {
   const [consent, setConsent] = useState(false);
   const navigate = useNavigate();
 
-  /* ──────────────────── 2️⃣ HANDLERS ──────────────────── */
+  // (2) HANDLERS
   const handleRoleChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    setRole(
-      e.target.value as "individual" | "provider" | "corporate" | "diaspora"
-    );
+    setRole(e.target.value as typeof role);
   };
 
   const handleUserChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setUserForm({ ...userForm, [e.target.name]: e.target.value });
+    const { name, value, files } = e.target;
+    if (files) {
+      setUserForm({ ...userForm, [name]: files[0] });
+    } else {
+      setUserForm({ ...userForm, [name]: value });
+    }
   };
 
-  const handleProviderChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleProviderChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, files } = e.target as HTMLInputElement;
     if (files) {
       if (name === "servicePhotos") {
@@ -67,17 +66,16 @@ const RegisterForm = () => {
     }
   };
 
- /* ──────────────────── 3️⃣ SUBMIT ──────────────────── */
-const handleSubmit = async (e: FormEvent) => {
-  e.preventDefault();
+  // (3) SUBMIT
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
 
-  if (!consent) {
-    alert("You must agree to the data processing terms.");
-    return;
-  }
+    if (!consent) {
+      alert("You must agree to the data processing terms.");
+      return;
+    }
 
-  /* ===== INDIVIDUAL  &  DIASPORA  (JSON) ===== */
-   if (role === "individual" || role === "diaspora") {
+    if (role === "individual" || role === "diaspora") {
       if (userForm.password !== userForm.confirmPassword) {
         alert("Passwords do not match");
         return;
@@ -90,7 +88,10 @@ const handleSubmit = async (e: FormEvent) => {
         fd.append("phone", userForm.phone);
         fd.append("password", userForm.password);
         fd.append("role", role);
-        fd.append("idFile", userForm.idFile);
+        fd.append("whatsapp", userForm.whatsapp);
+        fd.append("telegram", userForm.telegram);
+        fd.append("id", userForm.idFile); 
+        
 
         const res = await fetch(`${BASE_URL}/auth/register`, {
           method: "POST",
@@ -112,6 +113,8 @@ const handleSubmit = async (e: FormEvent) => {
           phone: userForm.phone,
           password: userForm.password,
           role,
+          whatsapp: userForm.whatsapp,
+          telegram: userForm.telegram,
         };
 
         const res = await fetch(`${BASE_URL}/auth/register`, {
@@ -131,45 +134,47 @@ const handleSubmit = async (e: FormEvent) => {
       }
       return;
     }
-  if (!providerForm.companyName || !providerForm.serviceType) {
-    alert("Company name and service type are required.");
-    return;
-  }
 
-  const fd = new FormData();
-  const fullNameValue = providerForm.companyName.trim() || "Provider";
-  fd.append("fullName", fullNameValue);
+    // PROVIDER / CORPORATE
+    if (!providerForm.companyName || !providerForm.serviceType) {
+      alert("Company name and service type are required.");
+      return;
+    }
 
-  fd.append("companyName", providerForm.companyName);
-  fd.append("serviceType", providerForm.serviceType);
-  fd.append("role", role); // "provider" or "corporate"
-  fd.append("email", providerForm.email);
-  fd.append("phone", providerForm.phone);
-  fd.append("whatsapp", providerForm.whatsapp);
-  fd.append("telegram", providerForm.telegram);
-  fd.append("city", providerForm.city);
-  fd.append("location", providerForm.location);
-  fd.append("password", providerForm.password);
+    const fd = new FormData();
+    fd.append("fullName", providerForm.companyName.trim());
+    fd.append("companyName", providerForm.companyName);
+    fd.append("serviceType", providerForm.serviceType);
+    fd.append("role", role);
+    fd.append("email", providerForm.email);
+    fd.append("phone", providerForm.phone);
+    fd.append("whatsapp", providerForm.whatsapp);
+    fd.append("telegram", providerForm.telegram);
+    fd.append("city", providerForm.city);
+    fd.append("location", providerForm.location);
+    fd.append("password", providerForm.password);
+    if (providerForm.license) fd.append("license", providerForm.license);
+    if (providerForm.tradeRegistration) fd.append("tradeRegistration", providerForm.tradeRegistration);
+    providerForm.servicePhotos.forEach(file => fd.append("servicePhotos", file));
+    if (providerForm.video) fd.append("video", providerForm.video);
 
-  if (providerForm.license)           fd.append("license", providerForm.license);
-  if (providerForm.tradeRegistration) fd.append("tradeRegistration", providerForm.tradeRegistration);
-  providerForm.servicePhotos.forEach(file => fd.append("servicePhotos", file));
-  if (providerForm.video)             fd.append("video", providerForm.video);
+    const resProv = await fetch(`${BASE_URL}/auth/register`, {
+      method: "POST",
+      body: fd,
+    });
 
-  const resProv = await fetch(`${BASE_URL}/auth/register`, {
-    method: "POST",
-    body: fd, // FormData sets its own Content‑Type
-  });
+    if (!resProv.ok) {
+      const { msg } = await resProv.json().catch(() => ({}));
+      alert(msg || "Provider registration failed");
+      return;
+    }
 
-  if (!resProv.ok) {
-    const { msg } = await resProv.json().catch(() => ({}));
-    alert(msg || "Provider registration failed");
-    return;
-  }
+    alert("Account created successfully!");
+    navigate("/login");
+  };
 
-  alert("Account created successfully!");
-  navigate("/login");
-};
+ 
+
 
 
   /* ──────────────────── 4️⃣ RENDER ──────────────────── */
@@ -247,18 +252,59 @@ const handleSubmit = async (e: FormEvent) => {
                   onChange={handleUserChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
-                <label className="block text-sm font-medium text-gray-700 mt-2">
-      Government ID (Passport / Yellow Card / Driving License)
-    </label>
+                {(role === "diaspora" || role === "individual") && (
+  <>
     <input
-            type="file"
-            name="idFile"
-            accept="image/*,application/pdf"
-            onChange={handleUserChange}
-            required
-          
+      type="tel"
+      name="whatsapp"
+      placeholder="WhatsApp"
+      required
+      value={userForm.whatsapp}
+      onChange={handleUserChange}
       className="w-full p-2 border border-gray-300 rounded text-sm"
     />
+    <input
+      type="text"
+      name="telegram"
+      placeholder="Telegram"
+      required
+      value={userForm.telegram}
+      onChange={handleUserChange}
+      className="w-full p-2 border border-gray-300 rounded text-sm"
+    />
+  </>
+)}
+
+{role === "diaspora" && (
+  <>
+    <label className="block text-sm font-medium text-gray-700 mt-2">
+      Yellow Card (PDF/Image)
+    </label>
+    <input
+ type="file" name="id" 
+      accept="application/pdf,image/*"
+      required
+      onChange={handleUserChange}
+      className="w-full p-2 border border-gray-300 rounded text-sm"
+    />
+  </>
+)}
+
+{role === "individual" && (
+  <>
+    <label className="block text-sm font-medium text-gray-700 mt-2">
+      Government ID (PDF/Image)
+    </label>
+    <input
+ type="file" name="id" 
+      accept="application/pdf,image/*"
+      required
+      onChange={handleUserChange}
+      className="w-full p-2 border border-gray-300 rounded text-sm"
+    />
+  </>
+)}
+
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="password"

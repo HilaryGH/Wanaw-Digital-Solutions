@@ -4,6 +4,10 @@ const fs = require("fs");
 const router = express.Router();
 const passport = require("passport");
 const { register, login, googleLogin } = require("../controllers/authController");
+const { getAllUsers } = require("../controllers/userController");
+const verifyToken = require("../middleware/verifyToken");
+const isAdmin = require("../middleware/isAdmin");
+
 
 // Multer setup for file uploads
 const storage = multer.diskStorage({
@@ -50,6 +54,9 @@ router.get(
     session: true,
   })
 );
+
+router.get("/", verifyToken, isAdmin, getAllUsers);
+
 
 module.exports = router;
 

@@ -28,6 +28,7 @@ import BlogCreate from "./components/Dashbords/Admin/BlogCreate";
 import BlogList from "./components/Dashbords/Admin/BlogList";
 import BlogDetail from "./components/pages/BlogDetail";
 import AdminSupportRequests from "./components/Dashbords/Admin/AdminSupportRequests";
+import AdminUserList from "./components/Dashbords/Admin/AdminUserList";
 
 // Wrapper to conditionally render Navbar
 const AppWrapper = () => {
@@ -61,6 +62,9 @@ const AppWrapper = () => {
        <Route path="admin/add-gift" element={<AdminAddGift />} />
        <Route path="/admin/blog-create" element={<BlogCreate />} />
        <Route path="/admin/blog-list" element={<BlogList />} />
+       <Route path=" /admin/user-lists" element={<AdminUserList />} />
+
+      
        <Route path="/blogs/:slug" element={<BlogDetail />} />
 <Route path="/admin/support-requests" element={<AdminSupportRequests />} />
 
