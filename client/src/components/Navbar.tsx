@@ -149,72 +149,73 @@ type MenuSection = {
 };
 
 const menuSections: MenuSection[] = [
-  {
-    key: "services",
-    translationKey: "services",
-    items: [
-      {
-        label: "Wellness",
-        path: "/services?category=wellness",
-        subItems: [
-          {
-            label: "Home Based Wellness Services",
-            path: "/services?category=wellness&sub=home-based",
-          },
-        ],
-      },
-      {
-        label: "Medical",
-        path: "/services?category=medical",
-        subItems: [
-          {
-            label: "Home Based Medical Services",
-            path: "/services?category=medical&sub=home-based-medical",
-            children: [
-              {
-                label: "Primary Care",
-                path: "/services?category=medical&sub=primary-care",
-              },
-              {
-                label: "Preventive Services",
-                path: "/services?category=medical&sub=preventive-services",
-              },
-            ],
-          },
-          {
-            label: "Skilled Nursing Services",
-            path: "/services?category=medical&sub=skilled-nursing",
-            children: [
-              {
-                label: "Full Time",
-                path: "/services?category=medical&sub=full-time",
-              },
-              {
-                label: "Assistants",
-                path: "/services?category=medical&sub=assistants",
-              },
-              {
-                label: "Care Taker",
-                path: "/services?category=medical&sub=care-taker",
-              },
-            ],
-          },
-        ],
-      },
-      {
-        label: "Aesthetician",
-        path: "/services?category=aesthetician",
-      },
-      {
-        label: "Hotel Rooms",
-        path: "/services?category=hotel",
-      },
-      {
-        label: "Lifestyle",
-        path: "/services?category=lifestyle",
-      },
-    ],
-  },
+ {
+  key: "services",
+  translationKey: "services",
+  items: [
+    {
+      label: "Wellness",
+      path: "/services?category=wellness",
+      subItems: [
+        {
+          label: "Spa and Wellness Treatments",
+          path: "/services?category=wellness&sub=spa-treatments",
+        },
+        {
+          label: "Cosmetic Services",
+          path: "/services?category=wellness&sub=cosmetic-services",
+        },
+        {
+          label: "Holistic Therapies",
+          path: "/services?category=wellness&sub=holistic-therapies",
+        },
+        {
+          label: "Home Based Wellness Services",
+          path: "/services?category=wellness&sub=home-based",
+        },
+      ],
+    },
+    {
+      label: "Medical",
+      path: "/services?category=medical",
+    },
+    {
+      label: "Aesthetician",
+      path: "/services?category=aesthetician",
+    },
+    {
+      label: "Hotel Rooms",
+      path: "/services?category=hotel",
+    },
+    {
+      label: "Home Based Services",
+      path: "/services?category=lifestyle",
+      subItems: [
+        {
+          label: "Primary Care",
+          path: "/services?category=lifestyle&sub=primary-care",
+        },
+        {
+          label: "Preventive Services",
+          path: "/services?category=lifestyle&sub=preventive-services",
+        },
+        {
+          label: "Full Time",
+          path: "/services?category=lifestyle&sub=full-time",
+        },
+        {
+          label: "Assistants",
+          path: "/services?category=lifestyle&sub=assistants",
+        },
+        {
+          label: "Care Taker",
+          path: "/services?category=lifestyle&sub=care-taker",
+        },
+      ],
+    },
+  ],
+}
+,
   {
     key: "programs",
     translationKey: "programs",
