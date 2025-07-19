@@ -125,38 +125,125 @@ const Navbar = () => {
     fetchAll();
   }, [searchOpen]);
 
-  /* desktop + mobile menu definition */
-  const menuSections = [
-    {
-      key: "services",
-      translationKey: "services",
-    items: [
-      { label: "Wellness",        path: "/services?category=wellness" },
-      { label: "Medical",         path: "/services?category=medical" },
-      { label: "Aesthetician",    path: "/services?category=aesthetician" },
-      { label: "Hotel Rooms",     path: "/services?category=hotel" },        // ➕ NEW
-      { label: "Lifestyle",       path: "/services?category=lifestyle" },    // ➕ NEW
-   
-    ],
-      
-    },
-    {
-      key: "programs",
-      translationKey: "programs",
-      items: [{ label: "Programs", path: "/programs" }],
-    },
-    {
-      key: "gifts",
-      translationKey: "giftOptions",
-      items: [
-        { label: "Individual Gifts", path: "/gifting-options" },
-        { label: "Corporate Gifts", path: "/gifting-options" },
-        { label: "Ethiopian Diaspora", path: "/gifting-options" },
+  type MenuChild = {
+  label: string;
+  path: string;
+};
 
-        
-      ],
-    },
-  ];
+type MenuSubItem = {
+  label: string;
+  path: string;
+  children?: MenuChild[]; // optional!
+};
+
+type MenuItem = {
+  label: string;
+  path: string;
+  subItems?: MenuSubItem[];
+};
+
+type MenuSection = {
+  key: string;
+  translationKey: string;
+  items: MenuItem[];
+};
+
+const menuSections: MenuSection[] = [
+  {
+    key: "services",
+    translationKey: "services",
+    items: [
+      {
+        label: "Wellness",
+        path: "/services?category=wellness",
+        subItems: [
+          {
+            label: "Home Based Wellness Services",
+            path: "/services?category=wellness&sub=home-based",
+          },
+        ],
+      },
+      {
+        label: "Medical",
+        path: "/services?category=medical",
+        subItems: [
+          {
+            label: "Home Based Medical Services",
+            path: "/services?category=medical&sub=home-based-medical",
+            children: [
+              {
+                label: "Primary Care",
+                path: "/services?category=medical&sub=primary-care",
+              },
+              {
+                label: "Preventive Services",
+                path: "/services?category=medical&sub=preventive-services",
+              },
+            ],
+          },
+          {
+            label: "Skilled Nursing Services",
+            path: "/services?category=medical&sub=skilled-nursing",
+            children: [
+              {
+                label: "Full Time",
+                path: "/services?category=medical&sub=full-time",
+              },
+              {
+                label: "Assistants",
+                path: "/services?category=medical&sub=assistants",
+              },
+              {
+                label: "Care Taker",
+                path: "/services?category=medical&sub=care-taker",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        label: "Aesthetician",
+        path: "/services?category=aesthetician",
+      },
+      {
+        label: "Hotel Rooms",
+        path: "/services?category=hotel",
+      },
+      {
+        label: "Lifestyle",
+        path: "/services?category=lifestyle",
+      },
+    ],
+  },
+  {
+    key: "programs",
+    translationKey: "programs",
+    items: [
+      {
+        label: "Programs",
+        path: "/programs",
+      },
+    ],
+  },
+  {
+    key: "gifts",
+    translationKey: "giftOptions",
+    items: [
+      {
+        label: "Individual Gifts",
+        path: "/gifting-options?type=individual",
+      },
+      {
+        label: "Corporate Gifts",
+        path: "/gifting-options?type=corporate",
+      },
+      {
+        label: "Ethiopian Diaspora",
+        path: "/gifting-options?type=diaspora",
+      },
+    ],
+  },
+];
 
   const topMessages = [
     "📢 Latest News: WHW platform is live now!",
@@ -209,40 +296,76 @@ const Navbar = () => {
           {/* DESKTOP LINKS */}
           <nav className="hidden md:flex items-center gap-12 text-sm lg:text-[16px]">
             {/* render Program as simple link, others as dropdowns */}
-            {menuSections.map(section =>
-              section.key === "programs" ? (
-                <Link
-                  key={section.key}
-                  to="/programs"
-                  className=" hover:text-[#1c2b21]"
-                >
-                  {t[section.translationKey as keyof typeof t]}
-                  <IoIosArrowDown className="inline ml-1" />
-                </Link>
-              ) : (
-                <div key={section.key} className="relative group">
-                  <span className="cursor-pointer pb-1 group-hover:text-[#1c2b21]">
-                    {t[section.translationKey as keyof typeof t]}{" "}
-                    <IoIosArrowDown className="inline ml-1" />
-                  </span>
-                  <ul className="absolute left-0 mt-2 bg-zinc-50 rounded shadow-lg p-6 hidden group-hover:block min-w-[300px] z-50">
-                    {section.items.map(item => (
-                      <Link
-                        key={item.label}
-                        to={item.path}
-                        className="flex items-start gap-3 text-sm py-1.5 rounded px-2 hover:bg-gray-100"
-                      >
-                        {getIcon(item.label)}
-                        <div>
-                          <p className="font-semibold">{item.label}</p>
-                          <p className="text-xs text-gray-500">{getDescription(item.label)}</p>
-                        </div>
-                      </Link>
-                    ))}
-                  </ul>
-                </div>
-              )
+          {menuSections.map(section =>
+  section.key === "programs" ? (
+    <Link
+      key={section.key}
+      to="/programs"
+      className=" hover:text-[#1c2b21]"
+    >
+      {t[section.translationKey as keyof typeof t]}
+      <IoIosArrowDown className="inline ml-1" />
+    </Link>
+  ) : (
+    <div key={section.key} className="relative group">
+      <span className="cursor-pointer pb-1 group-hover:text-[#1c2b21]">
+        {t[section.translationKey as keyof typeof t]}{" "}
+        <IoIosArrowDown className="inline ml-1" />
+      </span>
+      <ul className="absolute left-0 mt-2 bg-zinc-50 rounded shadow-lg p-6 hidden group-hover:block min-w-[300px] z-50">
+        {section.items.map(item => (
+          <div key={item.label} className="relative group/item">
+            <Link
+              to={item.path}
+              className="flex items-start gap-3 text-sm py-1.5 rounded px-2 hover:bg-gray-100"
+            >
+              {getIcon(item.label)}
+              <div>
+                <p className="font-semibold">{item.label}</p>
+                <p className="text-xs text-gray-500">{getDescription(item.label)}</p>
+              </div>
+              {item.subItems?.length ? (
+                <IoIosArrowForward className="ml-auto mt-1" />
+              ) : null}
+            </Link>
+
+            {item.subItems?.length && (
+              <ul className="absolute top-0 left-full ml-1 bg-zinc-100 p-4 rounded shadow-lg hidden group-hover/item:block min-w-[250px]">
+                {item.subItems.map(sub => (
+                  <div key={sub.label}>
+                    <Link
+                      to={sub.path}
+                      className="block py-1 px-2 text-sm hover:bg-gray-200 rounded"
+                    >
+                      {sub.label}
+                    </Link>
+
+                    {sub.children?.length && (
+                      <ul className="pl-4 mt-1 space-y-1">
+                        {sub.children?.map(child=> (
+                          <Link
+                            key={child.label}
+                            to={child.path}
+                            className="block text-xs py-1 px-2 hover:bg-gray-100 rounded"
+                          >
+                            - {child.label}
+                          </Link>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                ))}
+              </ul>
             )}
+          </div>
+        ))}
+      </ul>
+    </div>
+  )
+)}
+
+      
+
             <Link to="/company">Company</Link>
             <Link to="/support">
               Support
@@ -353,41 +476,69 @@ const Navbar = () => {
 
             <nav className="flex flex-col space-y-4">
               {menuSections.map(section => (
-                section.key === "programs" ? (
+  section.key === "programs" ? (
+    <Link
+      key={section.key}
+      to="/programs"
+      className="text-lg font-medium py-2 border-b"
+      onClick={() => setMenuOpen(false)}
+    >
+      {t[section.translationKey as keyof typeof t]}
+    </Link>
+  ) : (
+    <div key={section.key} className="border-b pb-2">
+      <button
+        className="flex items-center justify-between w-full text-lg font-medium py-2"
+        onClick={() => setDropdownOpen(d => d === section.key ? null : section.key)}
+      >
+        {t[section.translationKey as keyof typeof t]}
+        <IoIosArrowDown className={`transition-transform ${dropdownOpen === section.key ? "rotate-180" : ""}`} />
+      </button>
+
+      {dropdownOpen === section.key && (
+        <div className="ml-3 space-y-2 mt-2">
+          {section.items.map(item => (
+            <div key={item.label}>
+              <Link
+                to={item.path}
+                className="flex items-center gap-2 text-base py-1.5 hover:underline"
+                onClick={() => setMenuOpen(false)}
+              >
+                <IoIosArrowForward size={14} /> {item.label}
+              </Link>
+
+              {/* Nested Subitems */}
+              {item.subItems?.map(sub => (
+                <div key={sub.label} className="ml-5 mt-1">
                   <Link
-                    key={section.key}
-                    to="/programs"
-                    className="text-lg font-medium py-2 border-b"
+                    to={sub.path}
+                    className="block text-sm py-1 text-gray-700 hover:underline"
                     onClick={() => setMenuOpen(false)}
                   >
-                    {t[section.translationKey as keyof typeof t]}
+                    {sub.label}
                   </Link>
-                ) : (
-                  <div key={section.key} className="border-b pb-2">
-                    <button
-                      className="flex items-center justify-between w-full text-lg font-medium py-2"
-                      onClick={() => setDropdownOpen(d => d === section.key ? null : section.key)}
+
+                  {/* Nested Children */}
+                  {sub.children?.map(child => (
+                    <Link
+                      key={child.label}
+                      to={child.path}
+                      className="block ml-4 text-sm py-0.5 text-gray-600 hover:underline"
+                      onClick={() => setMenuOpen(false)}
                     >
-                      {t[section.translationKey as keyof typeof t]}
-                      <IoIosArrowDown className={`transition-transform ${dropdownOpen === section.key ? "rotate-180" : ""}`} />
-                    </button>
-                    {dropdownOpen === section.key && (
-                      <div className="ml-3 space-y-2 mt-2">
-                        {section.items.map(item => (
-                          <Link
-                            key={item.label}
-                            to={item.path}
-                            className="flex items-center gap-2 text-base py-1.5 hover:underline"
-                            onClick={() => setMenuOpen(false)}
-                          >
-                            <IoIosArrowForward size={14} /> {item.label}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )
+                      - {child.label}
+                    </Link>
+                  ))}
+                </div>
               ))}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+))}
+
 
               <Link to="/company" className="text-lg font-medium py-2 border-b" onClick={() => setMenuOpen(false)}>Company</Link>
               <Link to="/support" className="text-lg font-medium py-2 border-b" onClick={() => setMenuOpen(false)}>Support</Link>
