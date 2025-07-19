@@ -162,17 +162,14 @@ const menuSections: MenuSection[] = [
         path: "/services?category=medical",
       },
       {
-        label: "Aesthetician",
-        path: "/services?category=aesthetician",
+        label: "Home Based Services",
+        path: "/services?category=Home Based Services",
       },
       {
         label: "Hotel Rooms",
         path: "/services?category=hotel",
       },
-      {
-        label: "Home Based Services",
-        path: "/services?category=Home Based Services",
-      },
+     
     ],
   },
   {

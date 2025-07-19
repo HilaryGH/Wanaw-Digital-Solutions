@@ -34,32 +34,18 @@ const homeBasedSubcategories = [
   },
 ];
 
-
-const aestheticianSubcategories = [
-  {
-    label: "Dermatology",
-    options: [
-      "Acne Treatment",
-      "Scar Removal Treatment",
-      "Hair Transplant",
-      "Laser Hair Removal",
-      "General Treatment",
-    ],
-  },
-  {
-    label: "Aesthetic Treatments",
-    options: [
-      "Facials",
-      "Chemical peels",
-      "Microneedling",
-      "Waxing",
-      "Makeup application",
-      "Body treatments",
-    ],
-  },
-];
-
 const medicalSubcategories = [
+  {
+    label: "Full Checkups",
+    options: [
+      "General Health Checkup",
+      "Blood Tests",
+      "Blood Pressure Monitoring",
+      "Cholesterol & Glucose Screening",
+      "Vision & Hearing Tests",
+      "Physical Examination",
+    ],
+  },
   {
     label: "Prenatal Services",
     options: [
@@ -94,7 +80,53 @@ const medicalSubcategories = [
     label: "Diagnostic Imaging Services",
     options: ["CT Scan", "MRI"],
   },
+  {
+    label: "Kidney Dialysis Services",
+    options: [
+      "Consultation",
+      "Single Dialysis Session",
+      "Weekly ~ Three Dialysis Session",
+      "Bi-weekly ~ Six Dialysis Session",
+      "Monthly ~ Twelve Dialysis Session",
+    ],
+  },
+  {
+    label: "Aesthetic Services - Dermatology",
+    options: [
+      "Acne Treatment",
+      "Scar Removal Treatment",
+      "Hair Transplant",
+      "Laser Hair Removal",
+      "General Treatment",
+    ],
+  },
+  {
+    label: "Nutritionist Services",
+    options: [
+      "Personalized Nutrition Plans",
+      "Nutritional Counseling",
+      "Nutritional Education",
+      "Cooking Classes",
+      "Weight Management",
+      "Chronic Disease Management",
+      "Ongoing Support",
+      "Group Sessions",
+    ],
+  },
+  {
+    label: "Aesthetic Services - Aesthetic Treatments",
+    options: [
+      "Facials",
+      "Chemical peels",
+      "Microneedling",
+      "Waxing",
+      "Makeup application",
+      "Body treatments",
+    ],
+  },
 ];
+
+
 
 
 const hotelRoomSubcategories = [
@@ -272,25 +304,6 @@ useEffect(() => {
   </select>
 )}
 
-{/* 🧖 Aesthetician Services Dropdown */}
-{categoryFilter?.toLowerCase() === "aesthetician" && (
-  <select
-    value={selectedSubcategory}
-    onChange={(e) => setSelectedSubcategory(e.target.value)}
-    className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
-  >
-    <option value="">-- Select Aesthetician Subcategory --</option>
-    {aestheticianSubcategories.map((group) => (
-      <optgroup key={group.label} label={group.label}>
-        {group.options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </optgroup>
-    ))}
-  </select>
-)}
 {categoryFilter?.toLowerCase() === "home based services" && (
   <select
     value={selectedSubcategory}
@@ -312,24 +325,34 @@ useEffect(() => {
 
 
   {/* 🏥 Medical Subcategory Dropdown */}
-  {categoryFilter?.toLowerCase() === "medical" && (
-    <select
-      value={selectedSubcategory}
-      onChange={(e) => setSelectedSubcategory(e.target.value)}
-      className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
-    >
-      <option value="">-- Select Medical Subcategory --</option>
-      {medicalSubcategories.map((group) => (
-        <optgroup key={group.label} label={group.label}>
-          {group.options.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </optgroup>
-      ))}
-    </select>
-  )}
+  {/* 🏥 Medical Subcategory Dropdown */}
+{categoryFilter?.toLowerCase() === "medical" && (
+  <select
+    value={selectedSubcategory}
+    onChange={(e) => setSelectedSubcategory(e.target.value)}
+    className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+  >
+    <option value="">-- Select Medical Subcategory --</option>
+    {medicalSubcategories.map((group) => (
+      <optgroup key={group.label} label={group.label}>
+        {group.options.map((option) => (
+          <option
+            key={option}
+            value={option}
+            style={
+              group.label === "Kidney Dialysis Services"
+                ? { color: "red"}
+                : {}
+            }
+          >
+            {option}
+          </option>
+        ))}
+      </optgroup>
+    ))}
+  </select>
+)}
+
 </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

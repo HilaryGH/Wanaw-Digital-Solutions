@@ -11,31 +11,20 @@ const subcategoriesByCategory: Record<string, { label: string; options: string[]
       "Holistic Therapies",
     ],
   },
-  Medical: {
-    label: "Medical Subcategories",
-    options: [
-      "Prenatal Services",
-      "Dental Services",
-      "Physiotherapy Services",
-      "Diagnostic Imaging Services",
-    ],
-  },
-  Aesthetician: {
-    label: "Dermatology Subcategories",
-    options: [
-      "Facials",
-      "Chemical peels",
-      "Microneedling",
-      "Waxing",
-      "Makeup application",
-      "Body treatments",
-      "Acne Treatment",
-      "Scar Removal Treatment",
-      "Hair Transplant",
-      "Laser Hair Removal",
-      "General Treatment",
-    ],
-  },
+ Medical: {
+  label: "Medical Subcategories",
+  options: [
+    "Prenatal Services",
+    "Dental Services",
+    "Physiotherapy Services",
+    "Diagnostic Imaging Services",
+    "Kidney Dialysis Services",
+    "Aesthetic Services - Dermatology",
+    "Aesthetic Services - Aesthetic Treatments",
+  ],
+},
+
+ 
 Hotel: {
   label: "Hotel Room Types",
   options: [
@@ -209,7 +198,7 @@ const AddServiceForm = () => {
         <option value="">Select Category *</option>
         <option value="Wellness">Wellness</option>
         <option value="Medical">Medical</option>
-        <option value="Aesthetician">Aesthetician</option>
+        
         <option value="HomeBasedServices">Home Based Services</option>
 
         <option value="Hotel">Hotel</option>
