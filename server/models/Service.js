@@ -9,11 +9,12 @@ const serviceSchema = new mongoose.Schema(
       required: true,
       enum: ["Wellness", "Medical", "Aesthetician", "Personal", "Lifestyle", "Hotel"]
     },
+    subcategory: { type: String }, // ✅ Add this line
     price: { type: Number, required: true },
-    duration: { type: String }, // e.g. "60 minutes"
+    duration: { type: String },
     tags: [String],
     imageUrl: String,
-    location: { type: String }, // <-- Added location field
+    location: { type: String },
     status: {
       type: String,
       enum: ["pending", "approved", "denied"],
@@ -31,4 +32,5 @@ const serviceSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("Service", serviceSchema);
+
 

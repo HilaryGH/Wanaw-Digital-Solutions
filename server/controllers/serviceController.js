@@ -65,12 +65,19 @@ exports.createService = async (req, res) => {
 
 
 
+    const { title, description, price, location, subcategory } = req.body;
+
     const service = await Service.create({
-      ...req.body,
+      title,
+      description,
+      price,
+      location,
       category: normalizedCategory,
+      subcategory, // ✅ Explicitly saved
       imageUrl,
-      providerId: user._id, // Admin can also be set as providerId
+      providerId: user._id,
     });
+
 
     res
       .status(201)

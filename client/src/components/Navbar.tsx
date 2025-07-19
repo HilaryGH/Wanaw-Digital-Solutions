@@ -33,7 +33,7 @@ const getIcon = (item: string) => {
       return <FaSpa className="text-pink-500" />;
     case "Hotel Rooms":
       return <FaBriefcase className="text-blue-500" />;
-    case "Lifestyle":
+    case "home based services":
       return <FaGift className="text-yellow-500" />;
     case "Products":
       return <FaGift className="text-purple-600" />;
@@ -149,73 +149,32 @@ type MenuSection = {
 };
 
 const menuSections: MenuSection[] = [
- {
-  key: "services",
-  translationKey: "services",
-  items: [
-    {
-      label: "Wellness",
-      path: "/services?category=wellness",
-      subItems: [
-        {
-          label: "Spa and Wellness Treatments",
-          path: "/services?category=wellness&sub=spa-treatments",
-        },
-        {
-          label: "Cosmetic Services",
-          path: "/services?category=wellness&sub=cosmetic-services",
-        },
-        {
-          label: "Holistic Therapies",
-          path: "/services?category=wellness&sub=holistic-therapies",
-        },
-        {
-          label: "Home Based Wellness Services",
-          path: "/services?category=wellness&sub=home-based",
-        },
-      ],
-    },
-    {
-      label: "Medical",
-      path: "/services?category=medical",
-    },
-    {
-      label: "Aesthetician",
-      path: "/services?category=aesthetician",
-    },
-    {
-      label: "Hotel Rooms",
-      path: "/services?category=hotel",
-    },
-    {
-      label: "Home Based Services",
-      path: "/services?category=lifestyle",
-      subItems: [
-        {
-          label: "Primary Care",
-          path: "/services?category=lifestyle&sub=primary-care",
-        },
-        {
-          label: "Preventive Services",
-          path: "/services?category=lifestyle&sub=preventive-services",
-        },
-        {
-          label: "Full Time",
-          path: "/services?category=lifestyle&sub=full-time",
-        },
-        {
-          label: "Assistants",
-          path: "/services?category=lifestyle&sub=assistants",
-        },
-        {
-          label: "Care Taker",
-          path: "/services?category=lifestyle&sub=care-taker",
-        },
-      ],
-    },
-  ],
-}
-,
+  {
+    key: "services",
+    translationKey: "services",
+    items: [
+      {
+        label: "Wellness",
+        path: "/services?category=wellness",
+      },
+      {
+        label: "Medical",
+        path: "/services?category=medical",
+      },
+      {
+        label: "Aesthetician",
+        path: "/services?category=aesthetician",
+      },
+      {
+        label: "Hotel Rooms",
+        path: "/services?category=hotel",
+      },
+      {
+        label: "Home Based Services",
+        path: "/services?category=Home Based Services",
+      },
+    ],
+  },
   {
     key: "programs",
     translationKey: "programs",
@@ -245,6 +204,7 @@ const menuSections: MenuSection[] = [
     ],
   },
 ];
+
 
   const topMessages = [
     "📢 Latest News: WHW platform is live now!",
@@ -313,12 +273,12 @@ const menuSections: MenuSection[] = [
         {t[section.translationKey as keyof typeof t]}{" "}
         <IoIosArrowDown className="inline ml-1" />
       </span>
-      <ul className="absolute left-0 mt-2 bg-zinc-50 rounded shadow-lg p-6 hidden group-hover:block min-w-[300px] z-50">
+      <ul className="absolute left-0 mt-2 bg-zinc-50 rounded shadow-lg p-12 gap-10 hidden group-hover:block min-w-[400px] z-50">
         {section.items.map(item => (
           <div key={item.label} className="relative group/item">
             <Link
               to={item.path}
-              className="flex items-start gap-3 text-sm py-1.5 rounded px-2 hover:bg-gray-100"
+              className="flex items-start gap-8 text-sm py-3 rounded px-2 hover:bg-gray-100"
             >
               {getIcon(item.label)}
               <div>
