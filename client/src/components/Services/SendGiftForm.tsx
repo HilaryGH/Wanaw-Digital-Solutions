@@ -58,6 +58,8 @@ const SendGiftForm = () => {
   const [message, setMessage] = useState("");
   const [notifyProvider, setNotifyProvider] = useState(false);
   const [providerMessage, setProviderMessage] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState<string>("");
+
 
   const senderName =
     JSON.parse(localStorage.getItem("user") || "null")?.fullName || "Anonymous";
@@ -216,6 +218,16 @@ const handlePayAndSend = async () => {
           onChange={(e) => setRecipientTelegram(e.target.value)}
           className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-[#D4AF37] outline-none"
         />
+        <label className="block mb-2 font-medium text-[#1c2b21]">
+  Delivery Date
+</label>
+<input
+  type="date"
+  value={deliveryDate}
+  onChange={(e) => setDeliveryDate(e.target.value)}
+  className="w-full p-3 border border-gray-300 rounded-lg mb-6 focus:ring-2 focus:ring-[#D4AF37] outline-none"
+/>
+
 
         <textarea
           placeholder="Add a message (optional)"

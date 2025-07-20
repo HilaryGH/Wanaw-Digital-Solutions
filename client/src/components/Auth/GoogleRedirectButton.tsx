@@ -1,9 +1,12 @@
-// components/GoogleRedirectButton.tsx
-import BASE_URL from "../../api/api";
-
 const GoogleRedirectButton = () => {
   const handleGoogleLogin = () => {
-    window.location.href = `${BASE_URL.replace("/api", "")}/api/auth/google`;
+    const isDev = import.meta.env.DEV;
+
+    const BASE_URL = isDev
+      ? "http://localhost:5000"
+      : "https://wanaw-digital-solutions.onrender.com";
+
+    window.location.href = `${BASE_URL}/api/auth/google`;
   };
 
   return (
@@ -17,4 +20,8 @@ const GoogleRedirectButton = () => {
 };
 
 export default GoogleRedirectButton;
+
+
+
+
 

@@ -6,8 +6,8 @@ const { sendEmail, sendSMS, sendTelegram } = require("../utils/notification");
 
 exports.purchaseService = async (req, res) => {
   try {
-    // Get buyer info from request body (e.g., name and email)
-    const { buyerName, buyerEmail } = req.body;
+    // Get buyer info and deliveryDate from request body
+    const { buyerName, buyerEmail, deliveryDate } = req.body;
 
     if (!buyerName || !buyerEmail) {
       return res.status(400).json({ msg: "Buyer name and email are required" });
@@ -18,7 +18,16 @@ exports.purchaseService = async (req, res) => {
 
     const provider = service.providerId;
 
-    // Send notifications to provider with buyer info from request
+    // Prepare a formatted date string if deliveryDate is provided
+    let deliveryDateString = "";
+    if (deliveryDate) {
+      const d = new Date(deliveryDate);
+      if (!isNaN(d)) {
+        deliveryDateString = d.toLocaleString();  // readable format
+      }
+    }
+
+    // Send notifications to provider with buyer info and delivery date
     await sendEmail({
       to: provider.email || process.env.NOTIFY_EMAIL,
       subject: `🎉 New Service Purchased: ${service.title}`,
@@ -26,12 +35,13 @@ exports.purchaseService = async (req, res) => {
         <p><strong>Service:</strong> ${service.title}</p>
         <p><strong>Price:</strong> $${service.price}</p>
         <p><strong>Buyer:</strong> ${buyerName} (${buyerEmail})</p>
+        ${deliveryDateString ? `<p><strong>Delivery Date:</strong> ${deliveryDateString}</p>` : ""}
         <p>Login to view the request and follow up.</p>
         <p>— Wanaw</p>
       `,
     });
 
-    // Similarly send SMS, Telegram if needed...
+    // You can also save deliveryDate to DB here if you have a purchase/order model
 
     res.json({ msg: "Service purchased. Notifications sent." });
   } catch (err) {
@@ -39,6 +49,7 @@ exports.purchaseService = async (req, res) => {
     res.status(500).json({ msg: "Purchase failed." });
   }
 };
+
 
 
 // Normalize category helper

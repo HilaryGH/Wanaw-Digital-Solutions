@@ -3,7 +3,7 @@ const multer = require("multer");
 const fs = require("fs");
 const router = express.Router();
 const passport = require("passport");
-const { register, login, googleLogin } = require("../controllers/authController");
+const { register, login } = require("../controllers/authController");
 const { getAllUsers } = require("../controllers/userController");
 const verifyToken = require("../middleware/verifyToken");
 const isAdmin = require("../middleware/isAdmin");
@@ -54,6 +54,7 @@ router.get(
     session: true,
   })
 );
+
 
 
 
