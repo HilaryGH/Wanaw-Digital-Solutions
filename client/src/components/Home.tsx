@@ -38,10 +38,10 @@ const Home = () => {
 
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
               <Link
-                to="/services"
+                to="/login"
                 className="w-full sm:w-auto text-center bg-[#D4AF37] text-[#1c2b21] font-semibold px-6 py-2.5 rounded-full border border-gray-300 shadow-sm hover:rounded transition"
               >
-                Explore Services
+                Sign in 
               </Link>
               <Link
                 to="/gifting-options"

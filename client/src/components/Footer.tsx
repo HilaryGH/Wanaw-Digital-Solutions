@@ -58,16 +58,16 @@ const Footer = () => {
               Connect With Us
             </h4>
             <div className="flex space-x-4">
-              <a href="#" className="hover:text-[#D4AF37]">
+              <a href="https://www.facebook.com/share/14JxGfvVv4C/" className="hover:text-[#D4AF37]">
                 <FaFacebook />
               </a>
-              <a href="#" className="hover:text-[#D4AF37]">
+              <a href="https://www.instagram.com/wanaw_health_and_wellness_?igsh=bmJxdTVkMGY3NDVn" className="hover:text-[#D4AF37]">
                 <FaInstagram />
               </a>
-              <a href="#" className="hover:text-[#D4AF37]">
+              <a href="https://www.linkedin.com/company/wanaw-health-and-wellness-digital-solution/" className="hover:text-[#D4AF37]">
                 <FaLinkedin />
               </a>
-              <a href="#" className="hover:text-[#D4AF37]">
+              <a href="https://www.tiktok.com/@wanawhealthandwellness?_t=ZM-8yBOhm4EAIa&_r=1" className="hover:text-[#D4AF37]">
                 <FaTiktok />
               </a>
             </div>

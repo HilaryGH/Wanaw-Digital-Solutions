@@ -1,20 +1,59 @@
 const Service = require("../models/Service");
 const User = require("../models/User");
 
+// controller/serviceController.js
+const { sendEmail, sendSMS, sendTelegram } = require("../utils/notification");
+
+exports.purchaseService = async (req, res) => {
+  try {
+    // Get buyer info from request body (e.g., name and email)
+    const { buyerName, buyerEmail } = req.body;
+
+    if (!buyerName || !buyerEmail) {
+      return res.status(400).json({ msg: "Buyer name and email are required" });
+    }
+
+    const service = await Service.findById(req.params.id).populate("providerId");
+    if (!service) return res.status(404).json({ msg: "Service not found" });
+
+    const provider = service.providerId;
+
+    // Send notifications to provider with buyer info from request
+    await sendEmail({
+      to: provider.email || process.env.NOTIFY_EMAIL,
+      subject: `🎉 New Service Purchased: ${service.title}`,
+      html: `
+        <p><strong>Service:</strong> ${service.title}</p>
+        <p><strong>Price:</strong> $${service.price}</p>
+        <p><strong>Buyer:</strong> ${buyerName} (${buyerEmail})</p>
+        <p>Login to view the request and follow up.</p>
+        <p>— Wanaw</p>
+      `,
+    });
+
+    // Similarly send SMS, Telegram if needed...
+
+    res.json({ msg: "Service purchased. Notifications sent." });
+  } catch (err) {
+    console.error("Purchase error:", err.message);
+    res.status(500).json({ msg: "Purchase failed." });
+  }
+};
+
+
 // Normalize category helper
 const normalizeCategory = (input) => {
   if (!input) return null;
   const c = input.trim().toLowerCase();
 
-  if (["wellness", "wellness & spa", "spa"].includes(c)) return "Wellness";
+  if (["wellness", "spa", "wellness & spa"].includes(c)) return "Wellness";
   if (["medical", "health"].includes(c)) return "Medical";
-  if (["aesthetician", "beauty", "skin care"].includes(c)) return "Aesthetician";
-  if (["personal", "self-care", "self care"].includes(c)) return "Personal";
-  if (["lifestyle", "gifts", "fashion"].includes(c)) return "Lifestyle";
-  if (["hotel", "hotel rooms", "rooms"].includes(c)) return "Hotel";
+  if (["home based services", "home-based", "home services"].includes(c)) return "Home Based Services";
+  if (["hotel", "hotel rooms", "rooms"].includes(c)) return "Hotel Rooms";
 
   return null; // Invalid category
 };
+
 
 exports.createService = async (req, res) => {
   const user = req.user;
@@ -91,13 +130,31 @@ exports.createService = async (req, res) => {
 
 exports.getAllServices = async (req, res) => {
   try {
-    const services = await Service.find({ isActive: true }).populate("providerId", "fullName");
+    const { category, subcategory } = req.query;
+
+    const filter = { isActive: true };
+
+    // Normalize and apply category filter if present
+    if (category) {
+      const normalizedCategory = normalizeCategory(category);
+      if (normalizedCategory) {
+        filter.category = normalizedCategory;
+      }
+    }
+
+    // Apply subcategory filter if present
+    if (subcategory) {
+      filter.subcategory = { $regex: subcategory, $options: "i" };
+    }
+
+    const services = await Service.find(filter).populate("providerId", "fullName");
     res.status(200).json(services);
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Error fetching services" });
   }
 };
+
 
 exports.getServiceById = async (req, res) => {
   try {

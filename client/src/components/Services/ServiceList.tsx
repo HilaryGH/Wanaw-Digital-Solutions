@@ -187,7 +187,13 @@ const ServiceList = () => {
 useEffect(() => {
   const fetchServices = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/services`);
+      const query = new URLSearchParams();
+
+if (categoryFilter) query.append("category", categoryFilter);
+if (selectedSubcategory) query.append("subcategory", selectedSubcategory);
+
+const res = await fetch(`${BASE_URL}/services?${query.toString()}`);
+
       const data = await res.json();
 
       const filtered = data.filter((s: any) => {

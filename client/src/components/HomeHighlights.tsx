@@ -1,43 +1,41 @@
-import { FaSpa, FaGift, FaBriefcase } from "react-icons/fa";
-import { MdMedicalServices } from "react-icons/md";
+import { FaListAlt, FaUserFriends, FaCalendarAlt, FaPaperPlane } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 const HomeHighlights = () => {
   const highlights = [
-  {
-    icon: <FaSpa className="text-pink-500 text-3xl sm:text-4xl" />,
-    title: "Wellness & Spa",
-    description:
-      "Book massages, yoga sessions, steam baths, and spa treatments with ease.",
-    link: "/services?category=spa", // ✅ query param
-    action: "Explore Spa",
-  },
-  {
-    icon: <MdMedicalServices className="text-cyan-500 text-3xl sm:text-4xl" />,
-    title: "Medical Services",
-    description:
-      "Access verified physiotherapy, labs, and online doctor consultations.",
-    link: "/services?category=medical", // ✅ query param
-    action: "View Medical",
-  },
-  {
-    icon: <FaGift className="text-yellow-500 text-3xl sm:text-4xl" />,
-    title: "Gift Options",
-    description:
-      "Send health & wellness gifts to family, friends, or corporate partners.",
-    link: "/gifting-options", // ✅ query param
-    action: "Send a Gift",
-  },
-  {
-    icon: <FaBriefcase className="text-green-500 text-3xl sm:text-4xl" />,
-    title: "Corporate Wellness",
-    description:
-      "Tailored health packages, hotel rooms, and event gifting for institutions.",
-    link: "/services?category=corporate", // ✅ query param
-    action: "See Options",
-  },
-];
-
+    {
+      icon: <FaListAlt className="text-gold text-3xl sm:text-4xl" />,
+      title: "Browse Services by Category",
+      description:
+        "Explore curated health & wellness services — including spa, physiotherapy, diagnostics, and more.",
+      link: "/services",
+      action: "Explore Services",
+    },
+    {
+      icon: <FaUserFriends className="text-gold text-3xl sm:text-4xl" />,
+      title: "Choose Your Role",
+      description:
+        "Gift as an individual (for friends & family) or as a corporate (for employees, clients, or partners).",
+      link: "/gifting-options",
+      action: "Start Gifting",
+    },
+    {
+      icon: <FaCalendarAlt className="text-gold text-3xl sm:text-4xl" />,
+      title: "Pick the Occasion",
+      description:
+        "Celebrate festivals, milestones, or personal moments like birthdays, weddings, or thank-you gestures.",
+      link: "/gifting-occasions",
+      action: "View Occasions",
+    },
+    {
+      icon: <FaPaperPlane className="text-gold text-3xl sm:text-4xl" />,
+      title: "Send with a Personal Touch",
+      description:
+        "Customize your gift with messages, scheduling, and optional branding — we’ll handle the rest!",
+      link: "/how-it-works",
+      action: "How It Works",
+    },
+  ];
 
   return (
     <section className="relative bg-green pt-20 pb-24 px-6 sm:px-10 md:px-20 overflow-hidden">
@@ -102,12 +100,7 @@ const HomeHighlights = () => {
                   {item.title}
                 </h3>
                 <p className="text-sm text-white mb-3">{item.description}</p>
-                <Link
-                  to={item.link}
-                  className="inline-block bg-[#D4AF37] text-green font-semibold text-sm px-4 py-2 rounded-full hover:rounded-md hover:text-[#1c2b21] transition"
-                >
-                  {item.action}
-                </Link>
+                
               </div>
             </div>
           ))}
@@ -118,3 +111,4 @@ const HomeHighlights = () => {
 };
 
 export default HomeHighlights;
+

@@ -11,21 +11,24 @@ const subcategoriesByCategory: Record<string, { label: string; options: string[]
       "Holistic Therapies",
     ],
   },
- Medical: {
+Medical: {
   label: "Medical Subcategories",
   options: [
+    "Full Checkups", // newly added
     "Prenatal Services",
     "Dental Services",
     "Physiotherapy Services",
     "Diagnostic Imaging Services",
     "Kidney Dialysis Services",
+    "Nutritionist Services", // newly added
     "Aesthetic Services - Dermatology",
     "Aesthetic Services - Aesthetic Treatments",
   ],
 },
 
+
  
-Hotel: {
+"Hotel Rooms": {
   label: "Hotel Room Types",
   options: [
     // A. Star Rated
@@ -55,7 +58,7 @@ Hotel: {
     "Pension - Suite Room",
   ],
 },
-HomeBasedServices: {
+"Home Based Services": {
   label: "home based services",
   options: [
     // A. Health
@@ -189,20 +192,19 @@ const AddServiceForm = () => {
         className="w-full border border-gray-300 rounded-xl p-2 mb-4"
       />
 
-      <select
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-        className="w-full border border-gray-300 rounded-xl p-2 mb-4"
-        required
-      >
-        <option value="">Select Category *</option>
-        <option value="Wellness">Wellness</option>
-        <option value="Medical">Medical</option>
-        
-        <option value="HomeBasedServices">Home Based Services</option>
+   <select
+  value={category}
+  onChange={(e) => setCategory(e.target.value)}
+  className="w-full border border-gray-300 rounded-xl p-2 mb-4"
+  required
+>
+  <option value="">Select Category *</option>
+  <option value="Wellness">Wellness</option>
+  <option value="Medical">Medical</option>
+  <option value="Home Based Services">Home Based Services</option> {/* ✅ fixed */}
+  <option value="Hotel Rooms">Hotel Rooms</option> {/* ✅ fixed */}
+</select>
 
-        <option value="Hotel">Hotel</option>
-      </select>
 
       {/* Show subcategory dropdown if category selected and has subcategories */}
       {category && subcategoriesByCategory[category] && (

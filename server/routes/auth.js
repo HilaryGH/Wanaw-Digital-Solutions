@@ -55,7 +55,7 @@ router.get(
   })
 );
 
-router.get("/", verifyToken, isAdmin, getAllUsers);
+
 
 
 module.exports = router;

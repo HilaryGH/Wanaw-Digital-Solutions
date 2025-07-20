@@ -103,9 +103,7 @@ if (!res.ok) {
   };
 
   /* ───── Main Action ───── */
- /* ───── Main Action ───── */
 const handlePayAndSend = async () => {
-  // require at least one contact
   if (
     !recipientEmail &&
     !recipientPhone &&
@@ -116,7 +114,11 @@ const handlePayAndSend = async () => {
     return;
   }
 
-  // persist draft (optional)
+  // You might want to collect buyer info inputs here too, or use senderName from localStorage or input fields
+
+  // For demo, let's just send senderName and senderEmail
+  const senderEmail = JSON.parse(localStorage.getItem("user") || "null")?.email || "";
+
   localStorage.setItem(
     "pendingGift",
     JSON.stringify({
@@ -126,6 +128,7 @@ const handlePayAndSend = async () => {
       recipientTelegram,
       message,
       senderName,
+      senderEmail,
       occasion,
       service,
       notifyProvider,
@@ -134,19 +137,38 @@ const handlePayAndSend = async () => {
   );
 
   try {
-    /* 1) Notify via all channels once */
+    const purchasePayload = {
+      buyerName: senderName,
+      buyerEmail: senderEmail,
+    };
+
+    const purchaseRes = await fetch(`${BASE_URL}/services/${service._id}/purchase`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // Don't send Authorization header if unauthenticated
+      },
+      body: JSON.stringify(purchasePayload),
+    });
+
+    if (!purchaseRes.ok) {
+      const error = await purchaseRes.text();
+      console.error("❌ Purchase API error:", purchaseRes.status, error);
+      alert("Failed to register the gift. Please try again.");
+      return;
+    }
+
+    // Step 2: Send notifications
     await notifyAllChannels();
 
-    /* 2) (Payment skipped) */
-    alert("🎉 Gift notifications sent successfully!");
-    navigate("/"); // or any success page
+    alert("🎉 Gift sent and purchase recorded!");
+    navigate("/");
   } catch (error) {
     console.error("Send gift error:", error);
     alert("❌ Something went wrong while sending the gift.");
   }
 };
 
-  /* —— JSX —— */
   return (
     <div className="max-w-lg mx-auto bg-white shadow-xl rounded-2xl overflow-hidden my-10">
       <div className="p-6 sm:p-8">

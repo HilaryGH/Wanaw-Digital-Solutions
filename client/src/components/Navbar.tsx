@@ -502,11 +502,20 @@ const menuSections: MenuSection[] = [
               <Link to="/support" className="text-lg font-medium py-2 border-b" onClick={() => setMenuOpen(false)}>Support</Link>
 
               <div className="flex gap-4 mt-6 text-[#1c2b21]">
-                <FaFacebook size={18} />
-                <FaLinkedin size={18} />
-                <FaInstagram size={18} />
-                <FaTiktok size={18} />
-              </div>
+  <a href="https://www.facebook.com/share/14JxGfvVv4C/" target="_blank" rel="noopener noreferrer">
+    <FaFacebook size={18} />
+  </a>
+  <a href="https://www.linkedin.com/company/wanaw-health-and-wellness-digital-solution/" target="_blank" rel="noopener noreferrer">
+    <FaLinkedin size={18} />
+  </a>
+  <a href="https://www.instagram.com/wanaw_health_and_wellness_?igsh=bmJxdTVkMGY3NDVn" target="_blank" rel="noopener noreferrer">
+    <FaInstagram size={18} />
+  </a>
+  <a href="https://www.tiktok.com/@wanawhealthandwellness?_t=ZM-8yBOhm4EAIa&_r=1" target="_blank" rel="noopener noreferrer">
+    <FaTiktok size={18} />
+  </a>
+</div>
+
 
               <Link
                 to="/login"

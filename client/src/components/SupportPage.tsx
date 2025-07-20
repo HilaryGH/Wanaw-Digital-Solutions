@@ -55,7 +55,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     },
     {
       question: "How do I contact support?",
-      answer: "Use the contact form below or reach us via phone or email.",
+      answer: "Use the contact form above or reach us via phone or email.",
     },
   ];
 
@@ -76,7 +76,6 @@ const handleSubmit = async (e: React.FormEvent) => {
       <div className="max-w-xl mx-auto bg-green rounded-2xl z-10 shadow-md p-8">
         <h1 className="text-3xl font-bold text-center mb-6 text-gold">Support & Help Center</h1>
 
-        {/* Contact Info */}
          {/* Contact Info */}
           <div className="grid md:grid-cols-4 gap-2 mb-8 text-center">
             <div>
@@ -85,7 +84,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               </a>
             </div>
             <div>
-              <a href="mailto:support@wanaw.com" className="text-gray-300">
+              <a href="mailto:g.fikre2@gmail.com" className="text-gray-300">
                 <FaEnvelope className="text-gold text-2xl mx-auto mb-2" />
               </a>
             </div>

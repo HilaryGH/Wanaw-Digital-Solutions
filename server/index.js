@@ -79,6 +79,11 @@ app.use("/api/services", require("./routes/service"));
 app.use("/api/payment", require("./routes/payment"));
 app.use('/api/notifications', notificationRoutes);
 app.use("/api/upload", require("./routes/upload"));
+app.use("/api/users", require("./routes/userRoute"));
+const serviceRouter = require("./routes/serviceRoute");
+app.use("/api/services", serviceRouter);
+
+
 
 // ✅ Start the server
 const PORT = process.env.PORT || 5000;
