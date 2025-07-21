@@ -1,16 +1,22 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+type User = {
+  fullName: string;
+  role: string;
+  // add any other fields if needed
+};
+
 const IndividualDashboard = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null); // ✅ FIXED here
 
   useEffect(() => {
     const checkUser = async () => {
       const storedUser = localStorage.getItem("user");
       if (!storedUser) return navigate("/login");
 
-      const parsedUser = JSON.parse(storedUser);
+      const parsedUser: User = JSON.parse(storedUser);
       if (parsedUser.role !== "individual") return navigate("/login");
 
       setUser(parsedUser);
@@ -21,12 +27,16 @@ const IndividualDashboard = () => {
 
   return (
     <div>
-      {/* Your dashboard UI here */}
-      <p>user</p>
+      {user ? (
+        <p>Welcome, {user.fullName || "Individual"}!</p>
+      ) : (
+        <p>Loading...</p>
+      )}
     </div>
   );
 };
 
 export default IndividualDashboard;
+
 
 
