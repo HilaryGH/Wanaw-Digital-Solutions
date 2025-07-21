@@ -27,11 +27,16 @@ const homeBasedSubcategories = [
     options: ["Full Time", "Assistants", "Care Taker"],
   },
   {
-    label: "Wellness",
-    options: [
-      // Add wellness services later
-    ],
+    
+    label: "Spa and Wellness Treatments",
+    options: ["Massages", "Facials", "Other Spa Services"],
   },
+  {
+    label: "Cosmetic Services",
+    options: ["Skin Treatments", "Hair Styling", "Makeup Services"],
+  },
+    
+  
 ];
 
 const medicalSubcategories = [
@@ -328,9 +333,6 @@ const res = await fetch(`${BASE_URL}/services?${query.toString()}`);
     ))}
   </select>
 )}
-
-
-  {/* 🏥 Medical Subcategory Dropdown */}
   {/* 🏥 Medical Subcategory Dropdown */}
 {categoryFilter?.toLowerCase() === "medical" && (
   <select

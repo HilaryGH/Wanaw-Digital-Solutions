@@ -52,6 +52,10 @@ const HomeHighlights = () => {
 
       <div className="relative z-10 flex flex-col gap-10">
         {/* Top: Image + Two Highlights */}
+     <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12 border-b-4 border-[#fcd34d] inline-block pb-2">
+  Your Seamless Gifting Journey with Wanaw
+</h2>
+
         <div className="flex flex-col md:flex-row items-center gap-10">
           {/* Image */}
           <div className="w-full md:w-1/2 flex justify-center">

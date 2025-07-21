@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 import { FaSpa, FaHeartbeat, FaUser, FaHotel } from "react-icons/fa";
-import { GiLotus, GiLipstick, GiHealthPotion } from "react-icons/gi";
+import { GiLotus} from "react-icons/gi";
 import type { JSX } from "react";
 import BASE_URL from "../../api/api";
 
 const categories = [
   "All",
   "Wellness",
-  "Aesthetician",
   "Medical",
-  "Lifestyle",
+  "Home Based/Mobile Services",
   "Hotel Rooms",
   
 ];
@@ -26,16 +25,12 @@ const getIcon = (category: string): JSX.Element => {
   switch (category) {
     case "Wellness":
       return <FaSpa className="text-green-600 text-2xl" />;
-    case "Aesthetician":
-      return <GiLipstick className="text-pink-600 text-2xl" />;
     case "Medical":
       return <FaHeartbeat className="text-red-600 text-2xl" />;
-    case "Lifestyle":
+    case "Home Based/Mobile Services":
       return <GiLotus className="text-purple-600 text-2xl" />;
     case "Hotel Rooms":
       return <FaHotel className="text-yellow-600 text-2xl" />;
-    case "Products":
-      return <GiHealthPotion className="text-indigo-600 text-2xl" />;
     default:
       return <FaUser className="text-gray-500 text-2xl" />;
   }

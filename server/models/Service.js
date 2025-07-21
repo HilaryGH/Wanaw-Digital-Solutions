@@ -7,7 +7,7 @@ const serviceSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
-      enum: ["Wellness", "Medical", "Aesthetician", "Personal", "Lifestyle", "Hotel"]
+      enum: ["Wellness", "Medical", "Home Based/Mobile Services", "Hotel"]
     },
     subcategory: { type: String }, // ✅ Add this line
     price: { type: Number, required: true },

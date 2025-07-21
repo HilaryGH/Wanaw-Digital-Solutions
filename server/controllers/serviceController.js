@@ -59,7 +59,8 @@ const normalizeCategory = (input) => {
 
   if (["wellness", "spa", "wellness & spa"].includes(c)) return "Wellness";
   if (["medical", "health"].includes(c)) return "Medical";
-  if (["home based services", "home-based", "home services"].includes(c)) return "Home Based Services";
+  if (["home based services", "home-based", "home services", "home based/mobile"].includes(c)) return "Home Based/Mobile Services";
+
   if (["hotel", "hotel rooms", "rooms"].includes(c)) return "Hotel Rooms";
 
   return null; // Invalid category

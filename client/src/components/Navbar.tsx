@@ -29,14 +29,12 @@ const getIcon = (item: string) => {
       return <FaSpa className="text-green-600" />;
     case "Medical":
       return <FaStethoscope className="text-red-600" />;
-    case "Aesthetician":
-      return <FaSpa className="text-pink-500" />;
+    
     case "Hotel Rooms":
       return <FaBriefcase className="text-blue-500" />;
     case "home based services":
       return <FaGift className="text-yellow-500" />;
-    case "Products":
-      return <FaGift className="text-purple-600" />;
+    
     default:
       return <FaGift />;
   }
@@ -48,18 +46,15 @@ const getDescription = (item: string) => {
       return "Relaxation, yoga, and spa treatments.";
     case "Medical":
       return "Health consultations and screenings.";
-    case "Aesthetician":
-      return "Skin care and beauty services.";
+    case "Home Based/Mobile Services":
+      return "Enjoy services delivered to your home or location of choice.";
     case "Hotel Rooms":
       return "Book hotel stays and rooms.";
-    case "Lifestyle":
-      return "Gifts, flowers, and traditional fashion.";
-    case "Products":
-      return "Health and wellness product range.";
     default:
       return "";
   }
 };
+
 
 /* ---------- component ---------- */
 const Navbar = () => {
@@ -162,8 +157,8 @@ const menuSections: MenuSection[] = [
         path: "/services?category=medical",
       },
       {
-        label: "Home Based Services",
-        path: "/services?category=Home Based Services",
+        label: "Home Based/Mobile Services",
+        path: "/services?category=Home Based/Mobile Services",
       },
       {
         label: "Hotel Rooms",
