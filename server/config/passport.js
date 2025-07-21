@@ -2,8 +2,6 @@ const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const User = require("../models/User");
 
-
-
 passport.use(
   new GoogleStrategy(
     {
@@ -31,10 +29,9 @@ passport.use(
             email,
             googleId: id,
             password: "",
-            role: "individual", // 👈 Default role for Google signups
+            role: "individual",
           });
         }
-
 
         return done(null, user);
       } catch (err) {
@@ -44,3 +41,18 @@ passport.use(
     }
   )
 );
+
+// ✅ ADD THIS
+passport.serializeUser((user, done) => {
+  done(null, user.id); // store user id in session
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id); // get user from db using id
+    done(null, user);
+  } catch (err) {
+    done(err, null);
+  }
+});
+
