@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { FaUserTie } from "react-icons/fa";
 import Navbar from "./Navbar";
-import { Link } from "react-router-dom";
 import AdminDashboardCards from "./AdminDashboardCards";
 
 type UserType = {
@@ -44,7 +43,7 @@ const Dashboard = () => {
             </p>
           </div>
 
-          {/* Admin Section */}
+          {/* Admin View */}
           {user.role === "admin" && (
             <div className="bg-white p-6 md:p-10 rounded-xl shadow">
               <h2 className="text-2xl font-semibold mb-4 text-[#1c2b21]">
@@ -57,55 +56,92 @@ const Dashboard = () => {
             </div>
           )}
 
-       {/* User Section in Two Columns */}
-{user.role !== "admin" && (
-  <div className="grid md:grid-cols-2 gap-6">
-    {/* Membership Section */}
-    <div className="bg-gradient-to-br from-white to-gray-50 p-6 md:p-8 rounded-2xl shadow-lg border border-gray-100">
-     <div className="flex items-center gap-4 mb-4">
-            <FaUserTie className="text-3xl text-[#1c2b21]" />
-            <h3 className="text-xl font-bold text-[#1c2b21]">
-              Your Membership
-            </h3>
-          </div>
-      <p className="text-gray-600 mb-6 leading-relaxed">
-  Choose the membership plan that fits you best — whether it's Basic for essential access, Enterprise for team collaboration, or Premium for full-featured wellness benefits.
-</p>
-      <Link
-  to="/membership"
-  className="inline-block bg-[#D4AF37] text-[#1c2b21] font-semibold py-2 px-6 rounded-lg hover:rounded-full transition"
->
-  View Membership
-</Link>
+          {/* Non-admin Dashboard Sections */}
+          {user.role !== "admin" && (
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Membership Info */}
+              <div className="bg-gradient-to-br from-white to-gray-50 p-6 md:p-8 rounded-2xl shadow-lg border border-gray-100">
+                <div className="flex items-center gap-4 mb-4">
+                  <FaUserTie className="text-3xl text-[#1c2b21]" />
+                  <h3 className="text-xl font-bold text-[#1c2b21]">
+                    Your Membership
+                  </h3>
+                </div>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Choose the membership plan that fits you best — whether it's
+                  Basic for essential access, Enterprise for team collaboration,
+                  or Premium for full-featured wellness benefits.
+                </p>
+                <Link
+                  to="/membership"
+                  className="inline-block bg-[#D4AF37] text-[#1c2b21] font-semibold py-2 px-6 rounded-lg hover:rounded-full transition"
+                >
+                  View Membership
+                </Link>
+              </div>
 
-    </div>
+              {/* Provider Panel */}
+              {user.role === "provider" && (
+                <div className="bg-gradient-to-br from-white to-gray-50 p-6 md:p-8 rounded-2xl shadow-lg border border-gray-100">
+                  <h2 className="text-2xl font-bold mb-3 text-[#1c2b21] flex items-center gap-2">
+                    ⚙️ Service Provider Panel
+                  </h2>
+                  <p className="text-gray-600 mb-4 leading-relaxed">
+                    Manage your services and interact with your audience.
+                  </p>
+                  <ul className="list-disc pl-5 text-gray-700 space-y-1 mb-6 text-sm md:text-base">
+                    <li>Update or remove your services</li>
+                    <li>Track bookings from users</li>
+                    <li>Monitor analytics and performance</li>
+                    <li>Create time-limited offers</li>
+                  </ul>
+                  <button
+                    onClick={() => navigate("/provider/add-service")}
+                    className="bg-[#D4AF37] text-[#1c2b21] font-semibold py-2 px-6 rounded-lg hover:rounded-full transition"
+                  >
+                    ➕ Add New Service
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
-    {/* Service Provider Panel */}
-    {user.role === "provider" && (
-      <div className="bg-gradient-to-br from-white to-gray-50 p-6 md:p-8 rounded-2xl shadow-lg border border-gray-100">
-        <h2 className="text-2xl font-bold mb-3 text-[#1c2b21] flex items-center gap-2">
-          ⚙️ Service Provider Panel
-        </h2>
-        <p className="text-gray-600 mb-4 leading-relaxed">
-          Manage your services and interact with your audience.
-        </p>
-        <ul className="list-disc pl-5 text-gray-700 space-y-1 mb-6 text-sm md:text-base">
-          <li>Update or remove your services</li>
-          <li>Track bookings from users</li>
-          <li>Monitor analytics and performance</li>
-          <li>Create time-limited offers</li>
-        </ul>
-        <button
-          onClick={() => navigate("/provider/add-service")}
-          className="bg-[#D4AF37] text-[#1c2b21] font-semibold py-2 px-6 rounded-lg hover:rounded-full transition"
-        >
-          ➕ Add New Service
-        </button>
-      </div>
-    )}
-  </div>
-)}
+          {/* Specific Role Additions */}
+          {user.role === "individual" && (
+            <div className="bg-white p-6 rounded-xl shadow">
+              <h2 className="text-xl font-bold text-[#1c2b21] mb-2">
+                🌿 Wellness Access
+              </h2>
+              <p className="text-gray-600">
+                As an individual user, you can explore wellness programs,
+                purchase gifts, and subscribe to services tailored to you.
+              </p>
+            </div>
+          )}
 
+          {user.role === "corporate" && (
+            <div className="bg-white p-6 rounded-xl shadow">
+              <h2 className="text-xl font-bold text-[#1c2b21] mb-2">
+                🏢 Corporate Portal
+              </h2>
+              <p className="text-gray-600">
+                Manage your team’s wellness packages, track usage, and set
+                company benefits.
+              </p>
+            </div>
+          )}
+
+          {user.role === "diaspora" && (
+            <div className="bg-white p-6 rounded-xl shadow">
+              <h2 className="text-xl font-bold text-[#1c2b21] mb-2">
+                🌍 Diaspora Member Area
+              </h2>
+              <p className="text-gray-600">
+                Send wellness gifts, support loved ones back home, and manage
+                cross-border services.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </>
@@ -113,4 +149,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

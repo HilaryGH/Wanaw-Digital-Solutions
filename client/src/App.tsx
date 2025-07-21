@@ -1,5 +1,6 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import OAuthSuccessRedirect from "./components/Auth/OAuthSuccessRedirect";
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import LoginForm from "./components/Auth/LoginForm";
@@ -10,7 +11,7 @@ import PrivateRoute from "./components/Dashbords/PrivateRoute";
 import ServiceList from "./components/Services/ServiceList";
 import SelectMembership from "./components/SelectMembership";
 import AddService from "./components/Services/AddServiceForm";
-import ProviderDashboard from "./components/Services/Provider/ProviderDashboard";
+
 import CartPage from "./components/Services/CartPage";
 import SendGiftForm from "./components/Services/SendGiftForm";
 import PaymentSuccess from "./components/pages/PaymentSuccess";
@@ -29,11 +30,14 @@ import BlogList from "./components/Dashbords/Admin/BlogList";
 import BlogDetail from "./components/pages/BlogDetail";
 import AdminSupportRequests from "./components/Dashbords/Admin/AdminSupportRequests";
 import AdminUserList from "./components/Dashbords/Admin/AdminUserList";
+import ProviderDashbord from "./components/Dashbords/providor/ProviderDashbord";
+import IndividualDashboard from "./components/Dashbords/individual/IndividualDashboard";
 
 // Wrapper to conditionally render Navbar
 const AppWrapper = () => {
   const location = useLocation();
   const hideNavbarPaths = ["/login", "/register","/dashboard"];
+ 
 
   return (
     <>
@@ -43,10 +47,11 @@ const AppWrapper = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
+         <Route path="/oauth-success" element={<OAuthSuccessRedirect />} />
         <Route path="/gifting-options" element={<GiftingOptions />} />
         <Route path="/services" element={<ServiceList />} />
         <Route path="/membership" element={<SelectMembership />} />
-        <Route path="/provider/dashboard" element={<ProviderDashboard />} />
+       <Route path="/provider-dashboard" element={<ProviderDashbord />} />
         <Route path="/admin/add-service" element={<AddService />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/send-gift" element={<SendGiftForm />} />
@@ -63,6 +68,9 @@ const AppWrapper = () => {
        <Route path="/admin/blog-create" element={<BlogCreate />} />
        <Route path="/admin/blog-list" element={<BlogList />} />
        <Route path="/admin/user-lists" element={<AdminUserList />} />
+       <Route path="/individual-dashboard" element={<IndividualDashboard />} />
+
+      
 
       
        <Route path="/blogs/:slug" element={<BlogDetail />} />

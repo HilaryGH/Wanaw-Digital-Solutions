@@ -8,8 +8,7 @@ const LoginForm = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-
- const handleLogin = async (e: React.FormEvent) => {
+const handleLogin = async (e: React.FormEvent) => {
   e.preventDefault();
   setError("");
 
@@ -33,15 +32,17 @@ const LoginForm = () => {
 
     // ✅ Redirect based on role
     const role = data.user.role;
-    if (role === "provider") navigate("/provider-dashboard");
+    if (role === "admin") navigate("/admin-dashboard");
+    else if (role === "provider") navigate("/provider-dashboard");
     else if (role === "corporate") navigate("/corporate-dashboard");
     else if (role === "diaspora") navigate("/diaspora-dashboard");
-    else navigate("/dashboard"); // for 'individual' or unknown
+    else if (role === "individual") navigate("/individual-dashboard");
   } catch (err) {
     console.error(err);
     setError("Something went wrong. Please try again.");
   }
 };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white px-4 relative overflow-hidden">
