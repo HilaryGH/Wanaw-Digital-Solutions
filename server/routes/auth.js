@@ -49,7 +49,7 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    successRedirect: "https://wanawhealthandwellness.netlify.app/individual-dashboard",
+    successRedirect: "https://wanawhealthandwellness.netlify.app/dashboard",
     failureRedirect: "https://wanawhealthandwellness.netlify.app/login",
     session: true,
   })
