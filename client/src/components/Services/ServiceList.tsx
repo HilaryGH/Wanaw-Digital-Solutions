@@ -244,9 +244,10 @@ const res = await fetch(`${BASE_URL}/services?${query.toString()}`);
     service.description.toLowerCase().includes(query) ||
     service.category.toLowerCase().includes(query);
 
-  const matchesSubcategory = selectedSubcategory
-    ? service.subcategory === selectedSubcategory
-    : true; // if no subcategory selected, don't filter by it
+ const matchesSubcategory = selectedSubcategory
+  ? service.subcategory?.toLowerCase().trim() === selectedSubcategory.toLowerCase().trim()
+  : true;
+
 
   return matchesSearch && matchesSubcategory;
 });
@@ -263,7 +264,7 @@ const res = await fetch(`${BASE_URL}/services?${query.toString()}`);
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-10">
       <h1 className="text-3xl font-extrabold text-center text-[#1c2b21] mb-6">
-        🎁 Available Services
+         Available Services
       </h1>
 
      {/* 🔍 Search input */}
@@ -273,7 +274,7 @@ const res = await fetch(`${BASE_URL}/services?${query.toString()}`);
     placeholder="Search services..."
     value={searchTerm}
     onChange={(e) => setSearchTerm(e.target.value)}
-    className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] text-sm"
   />
 
   {/* 🏨 Hotel Room Subcategory Dropdown */}
@@ -281,7 +282,7 @@ const res = await fetch(`${BASE_URL}/services?${query.toString()}`);
     <select
       value={selectedSubcategory}
       onChange={(e) => setSelectedSubcategory(e.target.value)}
-      className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+      className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] text-sm"
     >
       <option value="">-- Select Room Type --</option>
       {hotelRoomSubcategories.map((group) => (
@@ -300,7 +301,7 @@ const res = await fetch(`${BASE_URL}/services?${query.toString()}`);
   <select
     value={selectedSubcategory}
     onChange={(e) => setSelectedSubcategory(e.target.value)}
-    className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] text-sm"
   >
     <option value="">-- Select Wellness Subcategory --</option>
     {wellnessSubcategories.map((group) => (
@@ -315,11 +316,11 @@ const res = await fetch(`${BASE_URL}/services?${query.toString()}`);
   </select>
 )}
 
-{categoryFilter?.toLowerCase() === "home based services" && (
+{categoryFilter?.toLowerCase() === "home based/mobile services" && (
   <select
     value={selectedSubcategory}
     onChange={(e) => setSelectedSubcategory(e.target.value)}
-    className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] text-sm"
   >
     <option value="">-- Select Home Based Subcategory --</option>
     {homeBasedSubcategories.map((group) => (
@@ -338,7 +339,7 @@ const res = await fetch(`${BASE_URL}/services?${query.toString()}`);
   <select
     value={selectedSubcategory}
     onChange={(e) => setSelectedSubcategory(e.target.value)}
-    className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] text-sm"
   >
     <option value="">-- Select Medical Subcategory --</option>
     {medicalSubcategories.map((group) => (
@@ -397,7 +398,7 @@ const res = await fetch(`${BASE_URL}/services?${query.toString()}`);
                   </p>
                 )}
 
-                <p className="text-xs text-gray-400 mb-4">
+                <p className="text-sm text-gray-400 mb-4">
                   Posted by: {service?.providerId?.fullName || "Unknown"}
                 </p>
               </div>

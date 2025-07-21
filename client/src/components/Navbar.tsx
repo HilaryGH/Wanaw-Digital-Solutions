@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import BASE_URL from "../api/api";
+
+import { FaPhoneAlt, FaEnvelope, FaWhatsapp } from "react-icons/fa";
+import { SiTelegram } from "react-icons/si";
+
 import {
   IoIosArrowDown,
   IoIosArrowForward,
-  IoIosArrowBack,
   IoIosSearch,
 } from "react-icons/io";
 import { MdLanguage } from "react-icons/md";
@@ -74,7 +77,7 @@ const Navbar = () => {
   const [filteredResults, setFilteredResults] = useState<any[]>([]);
 
   /* top messages */
-  const [messageIndex, setMessageIndex] = useState(0);
+  const [, setMessageIndex] = useState(0);
   const [fade, setFade] = useState(true);
   const [latestBlog, setLatestBlog] = useState<{ title: string; slug: string } | null>(null);
 
@@ -197,43 +200,64 @@ const menuSections: MenuSection[] = [
   },
 ];
 
-
-  const topMessages = [
-    "📢 Latest News: WHW platform is live now!",
-    "📣 Announcement: Wellness Camp @ Wenchi starts Aug 5!",
-    latestBlog ? `📰 Blog: ${latestBlog.title}` : "📰 Blog: Check out our latest post!",
-  ];
-
   /* ---------- JSX ---------- */
   return (
     <>
-      {/* TOP BAR */}
-      <div className="flex justify-between items-center bg-green text-white text-xs sm:text-sm px-4 sm:px-6 lg:px-12 py-2 font-inter">
-        <div className="flex gap-2 items-center overflow-hidden">
-          <button className="bg-[#D4AF37] text-[#1c2b21] font-semibold text-xs px-3 py-1 rounded-full">
-            {["News", "Announcement", "Blog"][messageIndex]}
-          </button>
-          <span
-            className={`transition-opacity duration-700 ${fade ? "opacity-100" : "opacity-0"} ${
-              messageIndex === 2 ? "cursor-pointer hover:underline" : ""
-            }`}
-            onClick={() => {
-              if (messageIndex === 2 && latestBlog?.slug) navigate(`/blogs/${latestBlog.slug}`);
-            }}
-          >
-            {topMessages[messageIndex]}
-          </span>
-        </div>
+   {/* TOP BAR */}
+<div className="flex flex-col sm:flex-row justify-between  bg-green text-white text-xs sm:text-sm px-4 sm:px-6 lg:px-12 py-2 font-inter gap-2 sm:gap-0">
+  {/* Left Side - Blog */}
+  <div className="flex items-center gap-2 order-1 sm:order-none">
+    <button
+      className="bg-[#D4AF37] text-[#1c2b21] font-semibold text-xs px-3 py-1 rounded-full"
+      onClick={() => latestBlog?.slug && navigate(`/blogs/${latestBlog.slug}`)}
+    >
+      Blog
+    </button>
+    <span
+      className={`transition-opacity duration-700 ${
+        fade ? "opacity-100" : "opacity-0"
+      } cursor-pointer hover:underline`}
+      onClick={() => latestBlog?.slug && navigate(`/blogs/${latestBlog.slug}`)}
+    >
+      {latestBlog?.title || "View our latest blog"}
+    </span>
+  </div>
 
-        <div className="flex items-center gap-2">
-          <button onClick={() => setMessageIndex(p => (p - 1 + 3) % 3)}>
-            <IoIosArrowBack size={18} />
-          </button>
-          <button onClick={() => setMessageIndex(p => (p + 1) % 3)}>
-            <IoIosArrowForward size={18} />
-          </button>
-        </div>
-      </div>
+  {/* Right Side - Contact Info */}
+  <div className="hidden md:grid grid-cols-4 gap-6 text-center order-0 sm:order-none">
+    <div>
+      <a href="tel:+251989177777" className="text-gray-300">
+        <FaPhoneAlt className="text-gold text-lg  mx-auto mb-1" />
+      </a>
+    </div>
+    <div>
+      <a href="mailto:g.fikre2@gmail.com" className="text-gray-300">
+        <FaEnvelope className="text-gold text-lg  mx-auto mb-1" />
+      </a>
+    </div>
+    <div>
+      <a
+        href="https://wa.me/251989177777"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-gray-300"
+      >
+        <FaWhatsapp className="text-gold text-lg  mx-auto mb-1" />
+      </a>
+    </div>
+    <div>
+      <a
+        href="https://t.me/+251989177777"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-gray-300"
+      >
+        <SiTelegram className="text-gold text-lg  mx-auto mb-1" />
+      </a>
+    </div>
+  </div>
+</div>
+
 
       {/* NAVBAR */}
       <header className="bg-zinc-50 shadow-md sticky top-0 z-50">
@@ -249,6 +273,9 @@ const menuSections: MenuSection[] = [
           {/* DESKTOP LINKS */}
           <nav className="hidden md:flex items-center gap-12 text-sm lg:text-[16px]">
             {/* render Program as simple link, others as dropdowns */}
+            
+             <Link to="/company">About</Link>
+            
           {menuSections.map(section =>
   section.key === "programs" ? (
     <Link
@@ -317,12 +344,11 @@ const menuSections: MenuSection[] = [
   )
 )}
 
-      
-
-            <Link to="/company">Company</Link>
-            <Link to="/support">
+      <Link to="/support">
               Support
             </Link>
+
+           
           </nav>
 
           {/* search icon */}
@@ -364,59 +390,90 @@ const menuSections: MenuSection[] = [
         </div>
 
         {/* SEARCH OVERLAY */}
-        {searchOpen && (
-          <div className="absolute top-full left-0 w-full bg-white shadow-md z-40 p-4 border-t md:flex md:justify-center">
-            <div className="w-full md:max-w-xl">
-              {/* input */}
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  placeholder="Search any service, gift, or program..."
-                  className="flex-grow px-4 py-2 rounded-full border"
-                  autoFocus
-                  value={searchQuery}
-                  onChange={(e) => {
-                    const q = e.target.value.toLowerCase();
-                    setSearchQuery(q);
-                    setFilteredResults(
-                      allItems.filter(it => it.title?.toLowerCase().includes(q))
-                    );
-                  }}
-                />
-                <button onClick={() => { setSearchOpen(false); setSearchQuery(""); setFilteredResults([]); }}>
-                  <X size={20} />
-                </button>
-              </div>
+  {searchOpen && (
+  <div className="absolute top-full left-0 w-full bg-white shadow-md z-40 p-4 border-t md:flex md:justify-center">
+    <div className="w-full md:max-w-xl">
+      {/* input */}
+      <div className="flex items-center gap-2">
+        <input
+          type="text"
+          placeholder="Search by title, category, location..."
+          className="flex-grow px-4 py-2 rounded-full border text-sm"
+          autoFocus
+          value={searchQuery}
+          onChange={(e) => {
+            const q = e.target.value.toLowerCase();
+            setSearchQuery(q);
 
-              {/* results */}
-              {searchQuery && (
-                <div className="mt-4 bg-white border rounded shadow max-h-64 overflow-y-auto">
-                  {filteredResults.length ? (
-                    filteredResults.map((item, idx) => {
-                      let path = "/";
-                      if (item.type === "Program") path = "/programs";
-                      else if (item.type === "Service") path = `/services?category=${encodeURIComponent(item.category)}`;
-                      else if (item.type === "Gift") path = "/gifting-options";
+            // Combined filtering logic
+            setFilteredResults(
+              allItems.filter((item) => {
+                const titleMatch = item.title?.toLowerCase().includes(q);
+                const categoryMatch = item.category?.toLowerCase().includes(q);
+                const locationMatch = item.location?.toLowerCase().includes(q);
+                const priceMatch = item.price?.toString().includes(q);
+                const ratingMatch = item.rating?.toString().includes(q);
 
-                      return (
-                        <div
-                          key={idx}
-                          className="p-3 border-b hover:bg-gray-100 cursor-pointer"
-                          onClick={() => { navigate(path); setSearchOpen(false); setSearchQuery(""); }}
-                        >
-                          <p className="font-medium">{item.title}</p>
-                          <p className="text-xs text-gray-500">{item.type}</p>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <p className="p-3 text-sm text-gray-500">No results found.</p>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+                return (
+                  titleMatch ||
+                  categoryMatch ||
+                  locationMatch ||
+                  priceMatch ||
+                  ratingMatch
+                );
+              })
+            );
+          }}
+        />
+        <button
+          onClick={() => {
+            setSearchOpen(false);
+            setSearchQuery("");
+            setFilteredResults([]);
+          }}
+        >
+          <X size={20} />
+        </button>
+      </div>
+
+      {/* results */}
+      {searchQuery && (
+  <div className="mt-4 bg-white border rounded shadow max-h-64 overflow-y-auto">
+    {filteredResults.length ? (
+      filteredResults.map((item, idx) => {
+        let path = "/";
+        if (item.type === "Program") {
+          path = "/programs";
+        } else if (item.type === "Service") {
+          path = `/services?category=${encodeURIComponent(
+            item.category
+          )}&location=${encodeURIComponent(item.location)}`;
+        } else if (item.type === "Gift") {
+          path = "/gifting-options";
+        }
+
+        return (
+          <a
+            key={idx}
+            href={path}
+            className="block px-4 py-2 hover:bg-gray-100 text-sm"
+          >
+            <strong>{item.title}</strong> <br />
+            <span className="text-xs text-gray-500">
+              {item.category} | {item.location} | ${item.price} | ⭐ {item.rating}
+            </span>
+          </a>
+        );
+      })
+    ) : (
+      <p className="text-center text-gray-500 p-2 text-sm">No results found.</p>
+    )}
+  </div>
+)}
+
+    </div>
+  </div>
+)}
 
         {/* MOBILE MENU */}
         <div className={`fixed inset-0 z-40 transition-transform duration-300 ${menuOpen ? "translate-x-0" : "translate-x-full"}`}>
@@ -428,6 +485,9 @@ const menuSections: MenuSection[] = [
             </div>
 
             <nav className="flex flex-col space-y-4">
+
+              <Link to="/Home" className="text-lg font-medium py-2 border-b" onClick={() => setMenuOpen(false)}>Home</Link>
+   <Link to="/company" className="text-lg font-medium py-2 border-b" onClick={() => setMenuOpen(false)}>About</Link>
               {menuSections.map(section => (
   section.key === "programs" ? (
     <Link
@@ -491,10 +551,7 @@ const menuSections: MenuSection[] = [
     </div>
   )
 ))}
-
-
-              <Link to="/company" className="text-lg font-medium py-2 border-b" onClick={() => setMenuOpen(false)}>Company</Link>
-              <Link to="/support" className="text-lg font-medium py-2 border-b" onClick={() => setMenuOpen(false)}>Support</Link>
+  <Link to="/support" className="text-lg font-medium py-2 border-b" onClick={() => setMenuOpen(false)}>Support</Link>
 
               <div className="flex gap-4 mt-6 text-[#1c2b21]">
   <a href="https://www.facebook.com/share/14JxGfvVv4C/" target="_blank" rel="noopener noreferrer">

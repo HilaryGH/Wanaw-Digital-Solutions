@@ -32,6 +32,7 @@ import AdminSupportRequests from "./components/Dashbords/Admin/AdminSupportReque
 import AdminUserList from "./components/Dashbords/Admin/AdminUserList";
 import ProviderDashbord from "./components/Dashbords/providor/ProviderDashbord";
 import IndividualDashboard from "./components/Dashbords/individual/IndividualDashboard";
+import PaymentOptions from "./components/pages/PaymentOptions";
 
 // Wrapper to conditionally render Navbar
 const AppWrapper = () => {
@@ -69,6 +70,7 @@ const AppWrapper = () => {
        <Route path="/admin/blog-list" element={<BlogList />} />
        <Route path="/admin/user-lists" element={<AdminUserList />} />
        <Route path="/individual-dashboard" element={<IndividualDashboard />} />
+       <Route path="/payment-options" element={<PaymentOptions />} />
 
       
 

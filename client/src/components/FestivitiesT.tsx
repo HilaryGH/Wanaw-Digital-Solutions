@@ -70,12 +70,12 @@ function FestivitiesT() {
                 <div
                   key={idx}
                   className="min-w-[260px] sm:min-w-[300px] flex-shrink-0
-                             bg-[#D4AF37] border border-none
+                             bg-green border border-none
                              p-5 rounded-2xl
                              hover:scale-105 transform transition-all duration-300"
                 >
-                  <h3 className="text-lg font-semibold mb-2">{festival.title}</h3>
-                  <p className="text-sm text-gray-800 leading-relaxed">{festival.desc}</p>
+                  <h3 className="text-lg font-semibold text-gold mb-2">{festival.title}</h3>
+                  <p className="text-sm text-gray-800 text-gold leading-relaxed">{festival.desc}</p>
                 </div>
               ))}
             </div>

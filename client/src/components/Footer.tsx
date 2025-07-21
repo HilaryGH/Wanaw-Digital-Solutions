@@ -18,8 +18,7 @@ const Footer = () => {
               Wanaw Health & Wellness
             </h4>
             <p className="text-gray-300">
-              Your digital gateway to wellness services, gifting, and wellness
-              programs across Ethiopia.
+            Your digital gateway to health and wellness services and gifting programs across Ethiopia.
             </p>
           </div>
 
@@ -30,22 +29,22 @@ const Footer = () => {
             </h4>
             <ul className="space-y-2">
               <li>
-                <a href="#services" className="hover:underline">
+                <a href="/services" className="hover:underline">
                   Services
                 </a>
               </li>
               <li>
-                <a href="#gifts" className="hover:underline">
+                <a href="/gifting-options" className="hover:underline">
                   Gift Options
                 </a>
               </li>
               <li>
-                <a href="#programs" className="hover:underline">
+                <a href="/programs" className="hover:underline">
                   Programs
                 </a>
               </li>
               <li>
-                <a href="#support" className="hover:underline">
+                <a href="/support" className="hover:underline">
                   Support
                 </a>
               </li>

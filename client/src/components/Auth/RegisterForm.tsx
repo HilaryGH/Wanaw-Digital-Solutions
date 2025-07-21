@@ -351,10 +351,9 @@ const RegisterForm = () => {
                     Select Service Type
                   </option>
                   <option value="Wellness Services">Wellness Services</option>
-                  <option value="Aesthetician">Aesthetician</option>
-                  <option value="Medical">Medical</option>
-                  <option value="Health Coach">Health Coach</option>
-                  <option value="Nutritionist">Nutritionist</option>
+                  <option value="Medical">Medical Services</option>
+                  <option value="Home Based/Mobile services">Home Based/Mobile services</option>
+                  <option value="Hotel Rooms">Hotel Rooms</option>
                 </select>
                 <input
                   type="email"

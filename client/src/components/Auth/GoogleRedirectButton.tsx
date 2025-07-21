@@ -13,7 +13,7 @@ const GoogleRedirectButton = () => {
   return (
     <button
       onClick={handleGoogleLogin}
-      className="w-full mt-1 p-2 bg-green text-white rounded-full text-sm flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+      className="w-full mt-1 p-2 bg-green text-gold rounded-full text-sm flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
     >
       <FcGoogle size={20} />
       Sign in with Google

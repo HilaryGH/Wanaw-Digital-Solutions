@@ -81,6 +81,7 @@ const SendGiftForm = () => {
         notifyProvider,
         providerMessage,
         providerContact: service.provider,
+        deliveryDate,
       };
 
  const res = await fetch(`${BASE_URL}/notifications/send`, {
@@ -142,6 +143,7 @@ const handlePayAndSend = async () => {
     const purchasePayload = {
       buyerName: senderName,
       buyerEmail: senderEmail,
+       deliveryDate, 
     };
 
     const purchaseRes = await fetch(`${BASE_URL}/services/${service._id}/purchase`, {
@@ -164,7 +166,15 @@ const handlePayAndSend = async () => {
     await notifyAllChannels();
 
     alert("🎉 Gift sent and purchase recorded!");
-    navigate("/");
+    navigate("/payment-options", {
+  state: {
+    service,
+    senderName,
+    senderEmail,
+    amount: service.price,
+  },
+});
+
   } catch (error) {
     console.error("Send gift error:", error);
     alert("❌ Something went wrong while sending the gift.");
