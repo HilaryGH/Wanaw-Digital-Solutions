@@ -32,7 +32,7 @@ const handleLogin = async (e: React.FormEvent) => {
 
     // ✅ Redirect based on role
     const role = data.user.role;
-    if (role === "admin") navigate("/admin-dashboard");
+    if (role === "admin") navigate("/dashboard");
     else if (role === "provider") navigate("/provider-dashboard");
     else if (role === "corporate") navigate("/corporate-dashboard");
     else if (role === "diaspora") navigate("/diaspora-dashboard");
