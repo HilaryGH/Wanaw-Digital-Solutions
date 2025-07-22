@@ -6,7 +6,6 @@ const PaymentOptions = () => {
   const { state } = useLocation();
   const {
     service,
-  
     recipientEmail,
     recipientPhone,
     recipientWhatsApp,
@@ -57,6 +56,11 @@ const PaymentOptions = () => {
     }
   };
 
+  const handleWalletPayment = () => {
+    // Placeholder function – you can replace this with your own wallet logic
+    alert("Wallet payment feature coming soon or under development.");
+  };
+
   return (
     <div className="max-w-xl mx-auto p-6">
       <h2 className="text-2xl font-bold mb-4">Choose Payment Method</h2>
@@ -72,6 +76,12 @@ const PaymentOptions = () => {
         <button className="p-3 bg-green text-gold rounded">Pay with Bank Transfer</button>
         <button className="p-3 bg-green text-gold rounded">Pay with Card</button>
         <button className="p-3 bg-green text-gold rounded">Pay with Bank App</button>
+        <button
+          onClick={handleWalletPayment}
+          className="p-3 bg-purple-700 text-white rounded hover:bg-purple-800 transition"
+        >
+          Pay with Wallet
+        </button>
         <button
           onClick={handleChapaPayment}
           className="p-3 bg-green-600 text-white rounded hover:bg-green-700 transition"

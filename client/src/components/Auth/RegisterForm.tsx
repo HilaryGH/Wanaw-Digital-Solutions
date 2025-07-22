@@ -278,7 +278,7 @@ const RegisterForm = () => {
 {role === "diaspora" && (
   <>
     <label className="block text-sm font-medium text-gray-700 mt-2">
-      Yellow Card (PDF/Image)
+      Yellow Card/Passport (PDF/Image)
     </label>
     <input
  type="file" name="id" 
@@ -293,7 +293,7 @@ const RegisterForm = () => {
 {role === "individual" && (
   <>
     <label className="block text-sm font-medium text-gray-700 mt-2">
-      Government ID (PDF/Image)
+      Government ID/Driving licence(PDF/Image)
     </label>
     <input
  type="file" name="id" 

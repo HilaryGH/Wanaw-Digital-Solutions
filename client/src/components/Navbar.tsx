@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import BASE_URL from "../api/api";
+import slugify from "slugify";
 
 import { FaPhoneAlt, FaEnvelope, FaWhatsapp } from "react-icons/fa";
 import { SiTelegram } from "react-icons/si";
@@ -75,6 +76,7 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [allItems, setAllItems] = useState<any[]>([]);
   const [filteredResults, setFilteredResults] = useState<any[]>([]);
+  const normalize = (text: string) => slugify(text || "", { lower: true });
 
   /* top messages */
   const [, setMessageIndex] = useState(0);
@@ -101,27 +103,47 @@ const Navbar = () => {
     return () => clearInterval(id);
   }, []);
 
-  /* fetch searchable data when user opens search */
   useEffect(() => {
-    if (!searchOpen) return;
-    const fetchAll = async () => {
-      try {
-        const [services, programs, gifts] = await Promise.all([
-          fetch(`${BASE_URL}/services`).then(r => r.json()),
-          fetch(`${BASE_URL}/programs`).then(r => r.json()),
-          fetch(`${BASE_URL}/gifts`).then(r => r.json()),
-        ]);
-        setAllItems([
-          ...services.map((s: any) => ({ ...s, type: "Service" })),
-          ...programs.map((p: any) => ({ ...p, type: "Program" })),
-          ...gifts.map((g: any) => ({ ...g, type: "Gift" })),
-        ]);
-      } catch (e) {
-        console.error("Search fetch error:", e);
-      }
-    };
-    fetchAll();
-  }, [searchOpen]);
+  console.log("All items:", allItems);
+  if (Array.isArray(allItems)) {
+    console.log("First item:", allItems[0]);
+  } else {
+    console.error("allItems is not an array");
+  }
+}, [allItems]);
+
+
+  /* fetch searchable data when user opens search */
+ useEffect(() => {
+  if (!searchOpen || allItems.length > 0) return; // Don't fetch again if already fetched
+
+  const fetchAll = async () => {
+    try {
+      const [services, programs, gifts] = await Promise.all([
+        fetch(`${BASE_URL}/services`).then(r => r.json()),
+        fetch(`${BASE_URL}/programs`).then(r => r.json()),
+        fetch(`${BASE_URL}/gifts`).then(r => r.json()),
+      ]);
+
+      setAllItems([
+        ...(Array.isArray(services) ? services.map((s: any) => ({ ...s, type: "Service" })) : []),
+        ...(Array.isArray(programs) ? programs.map((p: any) => ({ ...p, type: "Program" })) : []),
+        ...(Array.isArray(gifts) ? gifts.map((g: any) => ({ ...g, type: "Gift" })) : []),
+      ]);
+
+      console.log("Services:", services);
+      console.log("Programs:", programs);
+      console.log("Gifts:", gifts);
+    } catch (e) {
+      console.error("Search fetch error:", e);
+    }
+  };
+
+  fetchAll();
+}, [searchOpen, allItems]);
+
+
+
 
   type MenuChild = {
   label: string;
@@ -405,24 +427,28 @@ const menuSections: MenuSection[] = [
             const q = e.target.value.toLowerCase();
             setSearchQuery(q);
 
-            // Combined filtering logic
-            setFilteredResults(
-              allItems.filter((item) => {
-                const titleMatch = item.title?.toLowerCase().includes(q);
-                const categoryMatch = item.category?.toLowerCase().includes(q);
-                const locationMatch = item.location?.toLowerCase().includes(q);
-                const priceMatch = item.price?.toString().includes(q);
-                const ratingMatch = item.rating?.toString().includes(q);
+         
 
-                return (
-                  titleMatch ||
-                  categoryMatch ||
-                  locationMatch ||
-                  priceMatch ||
-                  ratingMatch
-                );
-              })
-            );
+setFilteredResults(
+  allItems.filter((item) => {
+    const titleMatch = String(item.title || "").toLowerCase().includes(q);
+    const categoryMatch = String(item.category || "").toLowerCase().includes(q);
+    const locationMatch = String(item.location || "").toLowerCase().includes(q);
+    const priceMatch = String(item.price || "").toLowerCase().includes(q);
+    const ratingMatch = String(item.rating || "").toLowerCase().includes(q);
+
+    return (
+      titleMatch ||
+      categoryMatch ||
+      locationMatch ||
+      priceMatch ||
+      ratingMatch
+    );
+  })
+);
+
+               
+        
           }}
         />
         <button
@@ -486,7 +512,7 @@ const menuSections: MenuSection[] = [
 
             <nav className="flex flex-col space-y-4">
 
-              <Link to="/Home" className="text-lg font-medium py-2 border-b" onClick={() => setMenuOpen(false)}>Home</Link>
+              <Link to="/" className="text-lg font-medium py-2 border-b" onClick={() => setMenuOpen(false)}>Home</Link>
    <Link to="/company" className="text-lg font-medium py-2 border-b" onClick={() => setMenuOpen(false)}>About</Link>
               {menuSections.map(section => (
   section.key === "programs" ? (
