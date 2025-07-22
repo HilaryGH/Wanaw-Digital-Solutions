@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import BASE_URL from "../api/api";
-import slugify from "slugify";
+
 
 import { FaPhoneAlt, FaEnvelope, FaWhatsapp } from "react-icons/fa";
 import { SiTelegram } from "react-icons/si";
@@ -76,7 +76,7 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [allItems, setAllItems] = useState<any[]>([]);
   const [filteredResults, setFilteredResults] = useState<any[]>([]);
-  const normalize = (text: string) => slugify(text || "", { lower: true });
+
 
   /* top messages */
   const [, setMessageIndex] = useState(0);
