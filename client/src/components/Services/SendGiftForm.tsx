@@ -67,7 +67,7 @@ const SendGiftForm = () => {
   /* ───── Notify via Backend ───── */
   const notifyAllChannels = async () => {
     try {
-      const token = localStorage.getItem("token");
+    
       const payload = {
         recipientEmail,
         recipientPhone,
@@ -84,14 +84,16 @@ const SendGiftForm = () => {
         deliveryDate,
       };
 
- const res = await fetch(`${BASE_URL}/notifications/send`, {
+ const headers = {
+  "Content-Type": "application/json",
+};
+
+const res = await fetch(`${BASE_URL}/notifications/send`, {
   method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: token ? `Bearer ${token}` : "",
-  },
+  headers,
   body: JSON.stringify(payload),
 });
+
 
 if (!res.ok) {
   const errorText = await res.text();

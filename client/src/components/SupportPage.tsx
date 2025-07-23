@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { FaPhoneAlt, FaEnvelope,FaWhatsapp, } from "react-icons/fa";
-import DeliveryInfo from "./pages/DeliveryInfo";
 import BASE_URL from "../api/api";
 
 import { SiTelegram } from "react-icons/si";
+import DeliveryMap from "./DeliveryMap";
 
 
 const SupportPage = () => {
@@ -169,7 +169,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         </div>
       </div>
     </div>
-    <DeliveryInfo/>
+    <DeliveryMap/>
     </>
   );
 };

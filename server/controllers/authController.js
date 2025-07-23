@@ -4,6 +4,10 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const crypto = require("crypto"); // make sure it's required at the top if not already
+const { sendEmail } = require("../utils/notification");
+
+
 
 /* ────── role sets ────── */
 const allowedRoles = ["individual", "provider", "corporate", "diaspora", "admin"];
@@ -149,6 +153,60 @@ exports.createService = async (req, res) => {
 };
 
 
+exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
 
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ msg: "Email not found" });
 
+    const token = crypto.randomBytes(32).toString("hex");
+    user.resetToken = token;
+    user.tokenExpire = Date.now() + 1000 * 60 * 15; // valid for 15 minutes
+    await user.save();
 
+    const resetLink = `http://localhost:5173/reset-password?token=${token}`;
+
+    await sendEmail({
+      to: user.email,
+      subject: "Reset Your Password",
+      html: `
+        <p>Hello ${user.fullName || "there"},</p>
+        <p>You requested a password reset.</p>
+        <p><a href="${resetLink}" target="_blank">Click here to reset your password</a></p>
+        <p>This link will expire in 15 minutes.</p>
+        <p>If you didn’t request this, just ignore this email.</p>
+      `,
+    });
+
+    res.status(200).json({ msg: "Reset link sent to your email." });
+  } catch (error) {
+    console.error("Forgot Password Error:", error);
+    res.status(500).json({ msg: "Server error" });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  const { token, password } = req.body;
+
+  try {
+    const user = await User.findOne({
+      resetToken: token,
+      tokenExpire: { $gt: Date.now() }, // not expired
+    });
+
+    if (!user) return res.status(400).json({ msg: "Invalid or expired token" });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+    user.resetToken = undefined;
+    user.tokenExpire = undefined;
+
+    await user.save();
+
+    res.status(200).json({ msg: "Password reset successful" });
+  } catch (error) {
+    console.error("Reset Password Error:", error);
+    res.status(500).json({ msg: "Server error" });
+  }
+};

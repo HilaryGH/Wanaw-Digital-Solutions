@@ -1,32 +1,20 @@
 // src/components/DeliveryMap.tsx
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
-
-// Fix Leaflet marker icon path
-import iconUrl from "leaflet/dist/images/marker-icon.png";
-import iconShadowUrl from "leaflet/dist/images/marker-shadow.png";
-
-const DefaultIcon = L.icon({ iconUrl, shadowUrl: iconShadowUrl });
-L.Marker.prototype.options.icon = DefaultIcon;
 
 const DeliveryMap = () => {
-  const addisCoords: [number, number] = [9.03, 38.74];
-
   return (
-    <div className="h-[500px] rounded-lg overflow-hidden shadow">
-      <MapContainer center={addisCoords} zoom={12} style={{ height: "100%", width: "100%" }}>
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution="&copy; OpenStreetMap contributors"
-        />
-        <Marker position={addisCoords}>
-          <Popup>Wanaw delivers in Addis Ababa!</Popup>
-        </Marker>
-      </MapContainer>
+    <div className="w-full h-[450px] rounded-lg overflow-hidden shadow">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d126102.13000402067!2d38.70014808209121!3d9.000502444160198!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2set!4v1753199967165!5m2!1sen!2set"
+        width="100%"
+        height="100%"
+        style={{ border: 0 }}
+        allowFullScreen
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+        title="Wanaw Location"
+      ></iframe>
     </div>
   );
 };
 
 export default DeliveryMap;
-

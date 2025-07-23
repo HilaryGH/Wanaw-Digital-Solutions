@@ -33,6 +33,8 @@ const userSchema = new mongoose.Schema(
     tradeRegUrl: { type: String },
     photoUrls: [String],
     videoUrl: { type: String },
+    resetToken: { type: String },
+    tokenExpire: { type: Date },
   },
   { timestamps: true }
 );

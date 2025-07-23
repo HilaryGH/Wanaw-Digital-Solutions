@@ -7,6 +7,8 @@ const { register, login } = require("../controllers/authController");
 const { getAllUsers } = require("../controllers/userController");
 const verifyToken = require("../middleware/verifyToken");
 const isAdmin = require("../middleware/isAdmin");
+const authController = require("../controllers/authController");
+
 
 
 // Multer setup for file uploads
@@ -54,6 +56,9 @@ router.get(
     session: true,
   })
 );
+
+router.post("/forgot-password", authController.forgotPassword);
+router.post("/reset-password", authController.resetPassword);
 
 
 
