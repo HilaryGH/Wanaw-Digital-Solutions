@@ -82,13 +82,16 @@ const SendGiftForm = () => {
   const [notifyProvider, setNotifyProvider] = useState(false);
   const [providerMessage, setProviderMessage] = useState("");
   const [deliveryDate, setDeliveryDate] = useState<string>("");
+  const [recipientName, setRecipientName] = useState("");
+
 
   const loggedInUser = JSON.parse(localStorage.getItem("user") || "null");
   const senderName = loggedInUser?.fullName || senderNameInput || "Anonymous";
   const senderEmail = loggedInUser?.email || senderEmailInput;
 
   /* ───── Notify via Backend ───── */
-  const notifyAllChannels = async () => {
+  const notifyAllChannels = async (deliveryCode: string) => {
+
     try {
       const payload = {
         buyerName: senderName,
@@ -106,6 +109,7 @@ const SendGiftForm = () => {
         providerMessage,
         providerContact: service.provider,
         deliveryDate,
+          deliveryCode,
       };
 
       const res = await fetch(`${BASE_URL}/notifications/send`, {
@@ -167,6 +171,30 @@ const SendGiftForm = () => {
         alert("Failed to register the gift. Please try again.");
         return;
       }
+      // Generate 4-digit random code
+const recipientPayload = {
+  name: recipientName || recipientEmail || recipientPhone || "Unnamed Recipient",
+  email: recipientEmail || "",
+  phone: recipientPhone || "",
+  whatsapp: recipientWhatsApp || "",
+  telegram: recipientTelegram || "",
+};
+
+const assignRes = await fetch(`${BASE_URL}/gift/${service._id}/assign-delivery-code`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ recipient: recipientPayload }),
+});
+
+
+if (!assignRes.ok) {
+  const errText = await assignRes.text();
+  console.error("❌ Assign code failed:", assignRes.status, errText);
+  alert("Failed to assign delivery code.");
+  return;
+}
+
+const { code: deliveryCode } = await assignRes.json();
 
       localStorage.setItem(
         "pendingGift",
@@ -182,11 +210,12 @@ const SendGiftForm = () => {
           service,
           notifyProvider,
           providerMessage,
+          deliveryCode,
         })
       );
-
       // Step 2: Send notifications
-      await notifyAllChannels();
+      await notifyAllChannels(deliveryCode);
+
 
       alert("🎉 Gift sent and purchase recorded!");
       navigate("/payment-options", {
@@ -237,6 +266,14 @@ const SendGiftForm = () => {
             />
           </>
         )}
+
+<input
+  type="text"
+  placeholder="Recipient Name"
+  value={recipientName}
+  onChange={(e) => setRecipientName(e.target.value)}
+  className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-[#D4AF37] outline-none"
+/>
 
         {/* —— Recipient contacts —— */}
         <input
