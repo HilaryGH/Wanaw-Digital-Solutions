@@ -68,21 +68,25 @@ const SendGiftForm = () => {
   const notifyAllChannels = async () => {
     try {
     
-      const payload = {
-        recipientEmail,
-        recipientPhone,
-        recipientWhatsApp,
-        recipientTelegram,
-        message,
-        senderName,
-        serviceTitle: service.title,
-        occasionTitle: occasion?.title || "",
-       serviceImageUrl: service.imageUrl,
-        notifyProvider,
-        providerMessage,
-        providerContact: service.provider,
-        deliveryDate,
-      };
+      const senderEmail = JSON.parse(localStorage.getItem("user") || "null")?.email || "";
+
+const payload = {
+  buyerName: senderName,
+  buyerEmail: senderEmail,
+  recipientEmail,
+  recipientPhone,
+  recipientWhatsApp,
+  recipientTelegram,
+  message,
+  senderName,
+  serviceTitle: service.title,
+  occasionTitle: occasion?.title || "",
+  serviceImageUrl: service.imageUrl,
+  notifyProvider,
+  providerMessage,
+  providerContact: service.provider,
+  deliveryDate,
+};
 
  const headers = {
   "Content-Type": "application/json",
