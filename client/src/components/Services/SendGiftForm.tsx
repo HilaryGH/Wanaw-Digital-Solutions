@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Gift as GiftIcon, ChevronDown, ChevronUp } from "lucide-react";
 import BASE_URL from "../../api/api";
@@ -18,7 +18,7 @@ type Service = {
   price?: number;
   description?: string;
   provider?: ProviderContact;
-  imageUrl?:File;
+  imageUrl?: File;
 };
 
 type Occasion = {
@@ -51,6 +51,29 @@ const SendGiftForm = () => {
     );
   }
 
+  const isLoggedIn = !!localStorage.getItem("user");
+  const [senderNameInput, setSenderNameInput] = useState("");
+  const [senderEmailInput, setSenderEmailInput] = useState("");
+
+  // Load saved guest sender info if not logged in
+  useEffect(() => {
+    if (!isLoggedIn) {
+      const saved = JSON.parse(localStorage.getItem("guestSender") || "{}");
+      setSenderNameInput(saved.name || "");
+      setSenderEmailInput(saved.email || "");
+    }
+  }, [isLoggedIn]);
+
+  // Save guest sender info whenever it changes
+  useEffect(() => {
+    if (!isLoggedIn) {
+      localStorage.setItem(
+        "guestSender",
+        JSON.stringify({ name: senderNameInput, email: senderEmailInput })
+      );
+    }
+  }, [senderNameInput, senderEmailInput, isLoggedIn]);
+
   const [recipientEmail, setRecipientEmail] = useState("");
   const [recipientPhone, setRecipientPhone] = useState("");
   const [recipientWhatsApp, setRecipientWhatsApp] = useState("");
@@ -60,132 +83,125 @@ const SendGiftForm = () => {
   const [providerMessage, setProviderMessage] = useState("");
   const [deliveryDate, setDeliveryDate] = useState<string>("");
 
-
-  const senderName =
-    JSON.parse(localStorage.getItem("user") || "null")?.fullName || "Anonymous";
+  const loggedInUser = JSON.parse(localStorage.getItem("user") || "null");
+  const senderName = loggedInUser?.fullName || senderNameInput || "Anonymous";
+  const senderEmail = loggedInUser?.email || senderEmailInput;
 
   /* ───── Notify via Backend ───── */
   const notifyAllChannels = async () => {
     try {
-    
-      const senderEmail = JSON.parse(localStorage.getItem("user") || "null")?.email || "";
+      const payload = {
+        buyerName: senderName,
+        buyerEmail: senderEmail,
+        recipientEmail,
+        recipientPhone,
+        recipientWhatsApp,
+        recipientTelegram,
+        message,
+        senderName,
+        serviceTitle: service.title,
+        occasionTitle: occasion?.title || "",
+        serviceImageUrl: service.imageUrl,
+        notifyProvider,
+        providerMessage,
+        providerContact: service.provider,
+        deliveryDate,
+      };
 
-const payload = {
-  buyerName: senderName,
-  buyerEmail: senderEmail,
-  recipientEmail,
-  recipientPhone,
-  recipientWhatsApp,
-  recipientTelegram,
-  message,
-  senderName,
-  serviceTitle: service.title,
-  occasionTitle: occasion?.title || "",
-  serviceImageUrl: service.imageUrl,
-  notifyProvider,
-  providerMessage,
-  providerContact: service.provider,
-  deliveryDate,
-};
+      const res = await fetch(`${BASE_URL}/notifications/send`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
- const headers = {
-  "Content-Type": "application/json",
-};
-
-const res = await fetch(`${BASE_URL}/notifications/send`, {
-  method: "POST",
-  headers,
-  body: JSON.stringify(payload),
-});
-
-
-if (!res.ok) {
-  const errorText = await res.text();
-  console.error("❌ Notification API Error:", res.status, errorText);
-  throw new Error(`Notification failed with status ${res.status}`);
-}
-
-
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("❌ Notification API Error:", res.status, errorText);
+        throw new Error(`Notification failed with status ${res.status}`);
+      }
     } catch (err) {
       console.error("Notification failed:", err);
     }
   };
 
   /* ───── Main Action ───── */
-const handlePayAndSend = async () => {
-  if (
-    !recipientEmail &&
-    !recipientPhone &&
-    !recipientWhatsApp &&
-    !recipientTelegram
-  ) {
-    alert("Please enter at least one recipient contact.");
-    return;
-  }
-
-  // You might want to collect buyer info inputs here too, or use senderName from localStorage or input fields
-
-  // For demo, let's just send senderName and senderEmail
-  const senderEmail = JSON.parse(localStorage.getItem("user") || "null")?.email || "";
-
-  localStorage.setItem(
-    "pendingGift",
-    JSON.stringify({
-      recipientEmail,
-      recipientPhone,
-      recipientWhatsApp,
-      recipientTelegram,
-      message,
-      senderName,
-      senderEmail,
-      occasion,
-      service,
-      notifyProvider,
-      providerMessage,
-    })
-  );
-
-  try {
-    const purchasePayload = {
-      buyerName: senderName,
-      buyerEmail: senderEmail,
-       deliveryDate, 
-    };
-
-    const purchaseRes = await fetch(`${BASE_URL}/services/${service._id}/purchase`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // Don't send Authorization header if unauthenticated
-      },
-      body: JSON.stringify(purchasePayload),
-    });
-
-    if (!purchaseRes.ok) {
-      const error = await purchaseRes.text();
-      console.error("❌ Purchase API error:", purchaseRes.status, error);
-      alert("Failed to register the gift. Please try again.");
+  const handlePayAndSend = async () => {
+    // Validate recipient contact
+    if (
+      !recipientEmail &&
+      !recipientPhone &&
+      !recipientWhatsApp &&
+      !recipientTelegram
+    ) {
+      alert("Please enter at least one recipient contact.");
       return;
     }
 
-    // Step 2: Send notifications
-    await notifyAllChannels();
+    // Validate sender email if guest
+    if (!isLoggedIn && !senderEmailInput) {
+      alert("Please enter your email.");
+      return;
+    }
 
-    alert("🎉 Gift sent and purchase recorded!");
-    navigate("/payment-options", {
-  state: {
-    service,
-    senderName,
-    senderEmail,
-    amount: service.price,
-  },
-});
+    try {
+      const purchasePayload = {
+        buyerName: senderName,
+        buyerEmail: senderEmail,
+        deliveryDate,
+      };
 
-  } catch (error) {
-    console.error("Send gift error:", error);
-    alert("❌ Something went wrong while sending the gift.");
-  }
-};
+      const purchaseRes = await fetch(
+        `${BASE_URL}/services/${service._id}/purchase`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(purchasePayload),
+        }
+      );
+
+      if (!purchaseRes.ok) {
+        const error = await purchaseRes.text();
+        console.error("❌ Purchase API error:", purchaseRes.status, error);
+        alert("Failed to register the gift. Please try again.");
+        return;
+      }
+
+      localStorage.setItem(
+        "pendingGift",
+        JSON.stringify({
+          recipientEmail,
+          recipientPhone,
+          recipientWhatsApp,
+          recipientTelegram,
+          message,
+          senderName,
+          senderEmail,
+          occasion,
+          service,
+          notifyProvider,
+          providerMessage,
+        })
+      );
+
+      // Step 2: Send notifications
+      await notifyAllChannels();
+
+      alert("🎉 Gift sent and purchase recorded!");
+      navigate("/payment-options", {
+        state: {
+          service,
+          senderName,
+          senderEmail,
+          amount: service.price,
+        },
+      });
+    } catch (error) {
+      console.error("Send gift error:", error);
+      alert("❌ Something went wrong while sending the gift.");
+    }
+  };
 
   return (
     <div className="max-w-lg mx-auto bg-white shadow-xl rounded-2xl overflow-hidden my-10">
@@ -200,6 +216,26 @@ const handlePayAndSend = async () => {
             Occasion:&nbsp;
             <span className="font-medium">{occasion.title}</span>
           </p>
+        )}
+
+        {!isLoggedIn && (
+          <>
+            <input
+              type="text"
+              placeholder="Your Name"
+              value={senderNameInput}
+              onChange={(e) => setSenderNameInput(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-[#D4AF37] outline-none"
+            />
+            <input
+              type="email"
+              placeholder="Your Email (required)"
+              value={senderEmailInput}
+              onChange={(e) => setSenderEmailInput(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-[#D4AF37] outline-none"
+              required
+            />
+          </>
         )}
 
         {/* —— Recipient contacts —— */}
@@ -234,16 +270,14 @@ const handlePayAndSend = async () => {
           onChange={(e) => setRecipientTelegram(e.target.value)}
           className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-[#D4AF37] outline-none"
         />
-        <label className="block mb-2 font-medium text-[#1c2b21]">
-  Delivery Date
-</label>
-<input
-  type="date"
-  value={deliveryDate}
-  onChange={(e) => setDeliveryDate(e.target.value)}
-  className="w-full p-3 border border-gray-300 rounded-lg mb-6 focus:ring-2 focus:ring-[#D4AF37] outline-none"
-/>
 
+        <label className="block mb-2 font-medium text-[#1c2b21]">Delivery Date</label>
+        <input
+          type="date"
+          value={deliveryDate}
+          onChange={(e) => setDeliveryDate(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg mb-6 focus:ring-2 focus:ring-[#D4AF37] outline-none"
+        />
 
         <textarea
           placeholder="Add a message (optional)"
@@ -283,8 +317,7 @@ const handlePayAndSend = async () => {
         {/* —— Summary + action —— */}
         {service.price !== undefined && (
           <p className="text-right text-gray-700 mb-4">
-            <span className="font-semibold">Total:</span>{" "}
-            {service.price.toLocaleString()} ETB
+            <span className="font-semibold">Total:</span> {service.price.toLocaleString()} ETB
           </p>
         )}
 
