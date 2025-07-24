@@ -9,9 +9,8 @@ const {
   getGifts,
   deleteGift,
   assignDeliveryCode,
+  confirmGiftCode, // <-- import this function from your controller
 } = require("../controllers/giftController");
-
-// Optional: add auth middleware like verifyToken if needed
 
 // Existing service gift email sender
 router.post("/send-gift", sendGift);
@@ -20,7 +19,10 @@ router.post("/:giftId/assign-delivery-code", assignDeliveryCode);
 // New product gift email sender
 router.post("/send-product-gift", sendProductGift);
 
-// 👇 Apply upload middleware for file handling
+// Confirm gift code route — add this:
+router.post("/:giftId/confirm-gift", confirmGiftCode);
+
+// Apply upload middleware for file handling
 router.post("/", upload.single("image"), createGift);
 
 // Other gift routes

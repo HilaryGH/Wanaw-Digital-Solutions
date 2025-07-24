@@ -35,6 +35,9 @@ import IndividualDashboard from "./components/Dashbords/individual/IndividualDas
 import PaymentOptions from "./components/pages/PaymentOptions";
 import ForgotPassword from "./components/Auth/ForgotPassword";
 import ResetPassword from "./components/Auth/ResetPassword";
+import WanawCommunityMembership from "./components/WanawCommunityMembership";
+
+import PartnerWithUs from "./components/PartnerWithUs";
 
 // Wrapper to conditionally render Navbar
 const AppWrapper = () => {
@@ -75,6 +78,11 @@ const AppWrapper = () => {
        <Route path="/payment-options" element={<PaymentOptions />} />
        <Route path="/forgot-password" element={<ForgotPassword />} />
 <Route path="/reset-password" element={<ResetPassword />} />
+<Route path="/community-membership" element={<WanawCommunityMembership/>} />
+<Route path="/partner-with-us" element={<PartnerWithUs/>} />
+
+
+
 
 
 

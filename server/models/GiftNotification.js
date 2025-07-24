@@ -20,9 +20,8 @@ const giftNotificationSchema = new mongoose.Schema(
     sentVia: [String], // e.g., ["email", "sms", "whatsapp"]
     status: { type: String, enum: ["pending", "success", "partial", "failed"] },
 
-
     // Delivery tracking fields
-    deliveryCode: String,
+    giftCode: String, // 🔁 renamed from deliveryCode
     deliveryStatus: { type: String, enum: ["pending", "delivered"], default: "pending" },
     deliveredAt: Date,
     serviceProvider: mongoose.Types.ObjectId,
@@ -31,4 +30,5 @@ const giftNotificationSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("GiftNotification", giftNotificationSchema);
+
 

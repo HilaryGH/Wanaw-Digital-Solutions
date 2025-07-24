@@ -9,10 +9,7 @@ const giftSchema = new mongoose.Schema({
   imageUrl: { type: String },
   tags: [String],
   isActive: { type: Boolean, default: true },
-  deliveryCode: String,
-  status: String, // pending | delivered
-  serviceProvider: mongoose.ObjectId,
-  deliveredAt: Date,
+
 
 }, { timestamps: true });
 

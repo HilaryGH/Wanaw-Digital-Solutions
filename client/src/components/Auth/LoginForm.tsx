@@ -132,9 +132,6 @@ const handleLogin = async (e: React.FormEvent) => {
     Forgot Password?
   </Link>
 </div>
-
-
-
         <p className="text-center text-xs text-gray-400 mt-4">
           Ⓒ All rights reserved by Wanaw
         </p>

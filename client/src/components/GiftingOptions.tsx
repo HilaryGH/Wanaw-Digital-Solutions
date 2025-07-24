@@ -88,7 +88,7 @@ const GiftingOptions = () => {
               id="corporateGift"
               value={selectedCorporateGift}
               onChange={e => setSelectedCorporateGift(e.target.value)}
-              className="w-full mt-1 mb-6 p-3 rounded-lg text-[#1c2b21] bg-white shadow-inner focus:outline-none appearance-auto text-xs md:text-sm relative z-20"
+              className="w-full mt-1 mb-6 px-4 py-2.5 rounded-lg text-[13px] md:text-sm text-gray-700 bg-white border border-gray-300 focus:ring-2 focus:ring-green-400 focus:border-green-500 shadow-sm transition-all duration-200 ease-in-out"
               style={{ minHeight: "50px" }}
             >
               <option value="">-- Choose Corporate Gift --</option>
@@ -131,7 +131,7 @@ const GiftingOptions = () => {
               id="individualGift"
               value={selectedIndividualGift}
               onChange={e => setSelectedIndividualGift(e.target.value)}
-              className="w-full mt-1 mb-6 p-3 rounded-lg text-[#1c2b21] bg-white shadow-inner focus:outline-none text-xs md:text-sm appearance-auto relative z-20"
+              className="w-full mt-1 mb-6 px-4 py-2.5 rounded-lg text-[13px] md:text-sm text-gray-700 bg-white border border-gray-300 focus:ring-2 focus:ring-green-400 focus:border-green-500 shadow-sm transition-all duration-200 ease-in-out"
               style={{ minHeight: "50px" }}
             >
               <option value="">-- Choose Individual Gift --</option>
@@ -174,7 +174,7 @@ const GiftingOptions = () => {
               id="diasporaGift"
               value={selectedDiasporaGift}
               onChange={e => setSelectedDiasporaGift(e.target.value)}
-              className="w-full mt-1 mb-6 p-3 rounded-lg text-[#1c2b21] bg-white text-xs md:text-sm shadow-inner focus:outline-none appearance-auto relative z-20"
+              className="w-full mt-1 mb-6 px-4 py-2.5 rounded-lg text-[13px] md:text-sm text-gray-700 bg-white border border-gray-300 focus:ring-2 focus:ring-green-400 focus:border-green-500 shadow-sm transition-all duration-200 ease-in-out"
               style={{ minHeight: "50px" }}
             >
               <option value="">-- Choose Diaspora Gift --</option>

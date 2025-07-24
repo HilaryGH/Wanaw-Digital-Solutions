@@ -52,9 +52,18 @@ const HomeHighlights = () => {
 
       <div className="relative z-10 flex flex-col gap-10">
         {/* Top: Image + Two Highlights */}
-     <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12 border-b-4 border-[#fcd34d] inline-block pb-2">
-  Your Seamless Gifting Journey with Wanaw
-</h2>
+    <div className="text-center mb-14">
+  <h2 className="relative inline-block text-3xl md:text-4xl font-extrabold text-white leading-tight tracking-tight">
+    <span className="relative z-10">
+      Your Seamless Gifting Journey with <span className="text-yellow-300">Wanaw</span>
+    </span>
+    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3/4 h-2 bg-yellow-400 rounded-full opacity-60 blur-sm"></span>
+  </h2>
+  <p className="mt-4 text-white/80 text-sm md:text-base max-w-xl mx-auto">
+   Discover how Wanaw, a digital health and wellness platform, makes gifting joyful, thoughtful, and effortless — for everyone and every occasion.
+  </p>
+</div>
+
 
         <div className="flex flex-col md:flex-row items-center gap-10">
           {/* Image */}

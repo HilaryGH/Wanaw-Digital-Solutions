@@ -65,7 +65,8 @@ app.use(passport.session());
 // ✅ Route mounting
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/services", serviceRoutes);
-
+const partnerRoutes = require("./routes/partnerRoutes");
+app.use("/api", partnerRoutes);
 
 app.use("/api/gift", require("./routes/gift"));
 app.use("/api/admin/posts", require("./routes/admin.blog"));
@@ -82,6 +83,9 @@ app.use("/api/upload", require("./routes/upload"));
 app.use("/api/users", require("./routes/userRoute"));
 const serviceRouter = require("./routes/serviceRoute");
 app.use("/api/services", serviceRouter);
+const communityRoutes = require("./routes/communityRoutes");
+app.use("/api/community", communityRoutes);
+
 
 
 

@@ -120,62 +120,123 @@ exports.deleteGift = async (req, res) => {
   }
 };
 
-// Assign a 4-digit delivery code and store recipient info
+// Assign a 4-digit gift code and store recipient info
 exports.assignDeliveryCode = async (req, res) => {
   try {
     const { giftId } = req.params;
     const { recipient, service, senderName = "Someone", message = "" } = req.body;
-
-    console.log("✅ Received request to assign delivery code.");
-    console.log("Gift ID:", giftId);
-    console.log("Recipient:", recipient);
 
     if (!giftId || !recipient || (!recipient.email && !recipient.phone)) {
       console.log("❌ Missing required recipient info.");
       return res.status(400).json({ msg: "Missing required recipient info" });
     }
 
-    // Generate 4-digit delivery code
+    // Generate 4-digit gift code
     const code = Math.floor(1000 + Math.random() * 9000).toString();
-    console.log("✅ Generated delivery code:", code);
+    console.log("✅ Generated gift code:", code);
 
     // Save to DB
     const notification = new GiftNotification({
+      service,
       giftId,
-      deliveryCode: code,
+      deliveryCode: code, // keep field name as-is if your DB uses deliveryCode
       recipient,
       status: "pending",
     });
 
     await notification.save();
-    console.log("✅ Notification saved successfully.");
+    console.log("✅ Gift notification saved to database.");
 
     // 🔔 Send Email
     if (recipient.email) {
-      const subject = `${senderName} sent you a gift! 🎁`;
+      const subject = `🎁 A special gift just for you from ${senderName}`;
       const html = `
-        <h2>🎁 You've received a gift!</h2>
-        <p><strong>Service:</strong> ${service?.title || "N/A"}</p>
-        <p><strong>Category:</strong> ${service?.category || "N/A"}</p>
-        <p><strong>Message:</strong> ${message || "No message provided."}</p>
-        <p><strong>Delivery Code:</strong> <b style="font-size:18px;">${code}</b></p>
-        <p style="margin-top:20px;">Visit <a href="https://wanawhealthandwellness.netlify.app" target="_blank">Wanaw</a> to explore more!</p>
+        <div style="font-family: Arial, sans-serif; color: #333;">
+          <h2>🎉 You've received a gift!</h2>
+          <p><strong>From:</strong> ${senderName}</p>
+          <p><strong>Service:</strong> ${service?.title || "Not specified"}</p>
+          <p><strong>Category:</strong> ${service?.category || "Not specified"}</p>
+          <p><strong>Message:</strong> ${message?.trim() ? message : "No personal message was included."}</p>
+          <p><strong>Your Gift Code:</strong> <span style="font-size: 20px; font-weight: bold; color: #007BFF;">${code}</span></p>
+          <p style="margin-top: 20px;">
+            🎁 Redeem your gift now at 
+            <a href="https://wanawhealthandwellness.netlify.app" target="_blank">
+              Wanaw Health & Wellness
+            </a>
+          </p>
+        </div>
       `;
-      const text = `You’ve received a gift from ${senderName}!\nService: ${service?.title || "N/A"}\nDelivery Code: ${code}\nMessage: ${message}`;
+
+      const text = `
+🎉 You've received a gift!
+
+From: ${senderName}
+Service: ${service?.title || "Not specified"}
+Category: ${service?.category || "Not specified"}
+Message: ${message?.trim() ? message : "No personal message was included."}
+Your Gift Code: ${code}
+
+🎁 Redeem your gift now:
+https://wanawhealthandwellness.netlify.app
+      `;
 
       try {
         await sendGiftEmail({ to: recipient.email, subject, html, text });
-        console.log("📧 Email sent →", recipient.email);
-        res.status(200).json({ msg: "Delivery code assigned", code });
+        console.log("📧 Gift email sent successfully.");
+        res.status(200).json({ msg: "Gift code assigned and email sent", code });
       } catch (emailErr) {
-        console.error("❌ Error sending email:", emailErr.message);
-        res.status(500).json({ msg: "Failed to send gift email" });
+        console.error("❌ Failed to send gift email:", emailErr);
+        res.status(500).json({ msg: "Gift code assigned, but failed to send email" });
       }
     } else {
-      res.status(200).json({ msg: "Delivery code assigned", code });
+      res.status(200).json({ msg: "Gift code assigned (no email provided)", code });
     }
   } catch (err) {
-    console.error("❌ assignDeliveryCode error:", err);
-    res.status(500).json({ msg: "Server error assigning delivery code" });
+    console.error("❌ Error assigning gift code:", err);
+    res.status(500).json({ msg: "Server error while assigning gift code" });
+  }
+};
+// Confirm gift code and update notification status
+
+
+exports.confirmGiftCode = async (req, res) => {
+  try {
+    const { giftId } = req.params;
+    const { code } = req.body;
+
+    if (!giftId || !code) {
+      console.log("❌ Missing gift ID or code in request.");
+      return res.status(400).json({ msg: "Gift ID and code are required" });
+    }
+
+    // ✅ Find by ID and compare with giftCode
+    const notification = await GiftNotification.findById(giftId);
+
+    if (!notification || notification.giftCode !== code) {
+      console.log("❌ Invalid gift code or gift ID.");
+      return res.status(400).json({ msg: "Invalid gift code or gift ID" });
+    }
+
+    if (notification.deliveryStatus === "delivered") {
+      return res.status(200).json({ msg: "Gift already confirmed", status: "delivered" });
+    }
+
+    // ✅ Update status and save
+    notification.deliveryStatus = "delivered";
+    notification.deliveredAt = new Date();
+    await notification.save();
+
+    console.log(`✅ Gift code confirmed for gift ID: ${giftId}`);
+
+    res.status(200).json({
+      msg: "Gift code confirmed successfully",
+      status: "delivered",
+      service: notification.service,
+      recipient: notification.recipient,
+    });
+
+  } catch (err) {
+    console.error("❌ Error confirming gift code:", err);
+    res.status(500).json({ msg: "Server error confirming gift code" });
   }
 };

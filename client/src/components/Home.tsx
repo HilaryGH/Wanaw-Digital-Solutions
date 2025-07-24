@@ -9,6 +9,9 @@ import Footer from "./Footer";
 import FestivitiesT from "./FestivitiesT";
 
 
+import Cards from "./Cards";
+
+
 
 const Home = () => {
   return (
@@ -104,10 +107,10 @@ const Home = () => {
       </div>
 
       <HomeHighlights />
-      <MembershipPreview />
+      <Cards/>
       <GiftShowcase />
       <FestivitiesT />
-     
+     <MembershipPreview />
       <Footer />
     </>
   );
