@@ -58,7 +58,9 @@ router.get(
 );
 
 router.post("/forgot-password", authController.forgotPassword);
-router.post("/reset-password", authController.resetPassword);
+// ✅ FIXED VERSION
+router.post("/reset-password/:token", authController.resetPassword);
+
 
 
 

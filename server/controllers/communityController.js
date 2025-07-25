@@ -43,3 +43,12 @@ exports.createMember = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+exports.getAllMembers = async (req, res) => {
+  try {
+    const members = await CommunityMember.find().sort({ createdAt: -1 });
+    res.status(200).json(members);
+  } catch (error) {
+    console.error("❌ Error fetching members:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};

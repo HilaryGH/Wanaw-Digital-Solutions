@@ -1,5 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
+import BASE_URL from "../../api/api";
 
 const ResetPassword = () => {
   const location = useLocation();
@@ -14,14 +15,21 @@ const ResetPassword = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch(`http://localhost:5000/api/auth/reset-password/${token}`, {
+      const res = await fetch(`${BASE_URL}/auth/reset-password/${token}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }),
       });
 
       const data = await res.json();
-      setMessage(data.message);
+
+      if (!res.ok) {
+        setMessage(data.msg || "Something went wrong.");
+        return;
+      }
+
+      setMessage(data.msg); // ✅ fixed key
+      setPassword(""); // optional
     } catch (err) {
       setMessage("Something went wrong.");
     }
@@ -31,15 +39,21 @@ const ResetPassword = () => {
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
       <h2 className="text-xl font-semibold mb-4">Reset Password</h2>
       <form onSubmit={handleReset}>
+        {/* Optional hidden username for accessibility */}
+        <input type="text" name="username" autoComplete="username" style={{ display: "none" }} />
+        
         <input
           type="password"
           className="w-full border p-2 mb-4"
           placeholder="Enter new password"
+          autoComplete="new-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button className="bg-blue-600 text-white px-4 py-2 rounded">Reset Password</button>
+        <button className="bg-blue-600 text-white px-4 py-2 rounded">
+          Reset Password
+        </button>
       </form>
       {message && <p className="mt-4 text-green-600">{message}</p>}
     </div>
@@ -47,4 +61,3 @@ const ResetPassword = () => {
 };
 
 export default ResetPassword;
-

@@ -13,22 +13,39 @@ const ConfirmGift = ({ giftId, }: ConfirmGiftProps) => {
   const [isSuccess, setIsSuccess] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleConfirm = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.post(`${BASE_URL}gift/${giftId}/confirm-gift`, {
-        code: giftCode,
-      });
+const handleConfirm = async () => {
+  if (!giftId || !giftCode) {
+    setMessage("Gift ID and code are required.");
+    setIsSuccess(false);
+    return;
+  }
 
-      setMessage(response.data.msg);
-      setIsSuccess(true);
-    } catch (err: any) {
-      setMessage(err.response?.data?.msg || "Something went wrong.");
-      setIsSuccess(false);
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  try {
+    console.log("Sending confirmation for Gift ID:", giftId, "with code:", giftCode);
+
+    const response = await axios.post(
+      `${BASE_URL}/gift/${giftId}/confirm-gift`,
+      { code: giftCode }, // Make sure the backend expects this key
+      {
+        headers: {
+          "Content-Type": "application/json",
+          // Authorization: `Bearer ${token}`, // If needed
+        },
+      }
+    );
+
+    setMessage(response.data.msg || "Confirmed successfully.");
+    setIsSuccess(true);
+  } catch (err: any) {
+    console.error("Confirmation error:", err.response || err);
+    setMessage(err.response?.data?.msg || "Something went wrong.");
+    setIsSuccess(false);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="p-4 bg-white shadow rounded max-w-sm mx-auto mt-10">

@@ -2,22 +2,13 @@ import { useState } from "react";
 import BASE_URL from "../../../api/api";
 
 const categories = [
-  "Wellness",
-  "Aesthetician",
-  "Medical",
-  "Lifestyle",
-  "Hotel Rooms",
-  "Products",
+  "Wanaw Package",
+  "Family Package",
+  "Premium Package",
+  "Comunity Package",
 ];
 
-const icons = {
-  Wellness: "💆",
-  Aesthetician: "💄",
-  Medical: "🏥",
-  Lifestyle: "🌸",
-  Hotel: "🏨",
-  Products: "🧴",
-};
+
 
 export default function AdminAddProgram() {
   const [title, setTitle] = useState("");
@@ -26,6 +17,7 @@ export default function AdminAddProgram() {
   const [services, setServices] = useState<string[]>([""]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const handleServiceChange = (index: number, value: string) => {
     const updated = [...services];
@@ -98,21 +90,38 @@ export default function AdminAddProgram() {
           className="w-full p-2 border text-gray-500 rounded border-gray-300"
         >
           <option value="">Select Category</option>
-          {categories.map((cat) => (
-            <option key={cat} value={cat}>
-              {icons[cat as keyof typeof icons] || "•"} {cat}
-            </option>
-          ))}
+         {categories.map((cat) => (
+  <option key={cat} value={cat}>
+    {cat}
+  </option>
+))}
+
         </select>
 
         {/* Image File Upload */}
-       <input
+  <input
   type="file"
   accept="image/*"
   required
-  onChange={(e) => setImage(e.target.files?.[0] || null)}
+  onChange={(e) => {
+    const file = e.target.files?.[0] || null;
+    setImage(file);
+    if (file) {
+      setImagePreview(URL.createObjectURL(file));
+    } else {
+      setImagePreview(null);
+    }
+  }}
   className="w-full p-2 border text-gray-500 rounded border-gray-300"
 />
+{imagePreview && (
+  <img
+    src={imagePreview}
+    alt="Preview"
+    className="w-full max-h-64 object-contain mt-2 rounded"
+  />
+)}
+
 
 
         <div>

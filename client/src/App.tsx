@@ -30,20 +30,21 @@ import BlogList from "./components/Dashbords/Admin/BlogList";
 import BlogDetail from "./components/pages/BlogDetail";
 import AdminSupportRequests from "./components/Dashbords/Admin/AdminSupportRequests";
 import AdminUserList from "./components/Dashbords/Admin/AdminUserList";
-import ProviderDashbord from "./components/Dashbords/providor/ProviderDashbord";
+
 import IndividualDashboard from "./components/Dashbords/individual/IndividualDashboard";
 import PaymentOptions from "./components/pages/PaymentOptions";
 import ForgotPassword from "./components/Auth/ForgotPassword";
 import ResetPassword from "./components/Auth/ResetPassword";
 import WanawCommunityMembership from "./components/WanawCommunityMembership";
-
 import PartnerWithUs from "./components/PartnerWithUs";
+import Unauthorized from "./components/Unauthorized"; // Create this
+import ProviderDashboard from "./components/Dashbords/providor/ProviderDashbord";
+
 
 // Wrapper to conditionally render Navbar
 const AppWrapper = () => {
   const location = useLocation();
-  const hideNavbarPaths = ["/login", "/register","/dashboard"];
- 
+  const hideNavbarPaths = ["/login", "/register", "/dashboard"];
 
   return (
     <>
@@ -53,61 +54,114 @@ const AppWrapper = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
-         <Route path="/oauth-success" element={<OAuthSuccessRedirect />} />
+        <Route path="/oauth-success" element={<OAuthSuccessRedirect />} />
         <Route path="/gifting-options" element={<GiftingOptions />} />
         <Route path="/services" element={<ServiceList />} />
         <Route path="/membership" element={<SelectMembership />} />
-       <Route path="/provider-dashboard" element={<ProviderDashbord />} />
-        <Route path="/admin/add-service" element={<AddService />} />
+        
         <Route path="/cart" element={<CartPage />} />
         <Route path="/send-gift" element={<SendGiftForm />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/terms" element={<TermsAndConditions />} />
-       <Route path="/gifts/:slug" element={<GiftDetails />} />
-       <Route path="/support" element={<SupportPage />} />
-       <Route path="/company" element={<CompanyInfo />} />
-       <Route path="/programs" element={<Programs />} />
-       <Route path="admin/manage-membership" element={<ManageMemberships />} />
-       <Route path="/admin/manage-services" element={<ManageServices/>} />
-       <Route path="admin/add-program" element={<AdminAddProgram/>} />
-       <Route path="admin/add-gift" element={<AdminAddGift />} />
-       <Route path="/admin/blog-create" element={<BlogCreate />} />
-       <Route path="/admin/blog-list" element={<BlogList />} />
-       <Route path="/admin/user-lists" element={<AdminUserList />} />
-       <Route path="/individual-dashboard" element={<IndividualDashboard />} />
-       <Route path="/payment-options" element={<PaymentOptions />} />
-       <Route path="/forgot-password" element={<ForgotPassword />} />
-<Route path="/reset-password" element={<ResetPassword />} />
-<Route path="/community-membership" element={<WanawCommunityMembership/>} />
-<Route path="/partner-with-us" element={<PartnerWithUs/>} />
+        <Route path="/gifts/:slug" element={<GiftDetails />} />
+        <Route path="/support" element={<SupportPage />} />
+        <Route path="/company" element={<CompanyInfo />} />
+        <Route path="/programs" element={<Programs />} />
+        <Route path="/blogs/:slug" element={<BlogDetail />} />
+        <Route path="/individual-dashboard" element={<IndividualDashboard />} />
+        <Route path="/provider-dashboard" element={<ProviderDashboard />} />
 
+        <Route path="/payment-options" element={<PaymentOptions />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/community-membership" element={<WanawCommunityMembership />} />
+        <Route path="/partner-with-us" element={<PartnerWithUs />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
 
-
-
-
-
-      
-
-      
-       <Route path="/blogs/:slug" element={<BlogDetail />} />
-<Route path="/admin/support-requests" element={<AdminSupportRequests />} />
-
-
-
-
-      
-
-
-
-
-
-
-
+        {/* 🔐 Protected dashboard route */}
         <Route
           path="/dashboard"
           element={
             <PrivateRoute>
               <Dashboard />
+            </PrivateRoute>
+          }
+        />
+
+        {/* 🔐 Admin-only routes */}
+        <Route
+          path="/admin/manage-membership"
+          element={
+            <PrivateRoute requiredRole="admin">
+              <ManageMemberships />
+            </PrivateRoute>
+          }
+        />
+       
+        
+        <Route
+          path="/admin/manage-services"
+          element={
+            <PrivateRoute requiredRole="admin">
+              <ManageServices />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/add-program"
+          element={
+            <PrivateRoute requiredRole="admin">
+              <AdminAddProgram />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/add-gift"
+          element={
+            <PrivateRoute requiredRole="admin">
+              <AdminAddGift />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/blog-create"
+          element={
+            <PrivateRoute requiredRole="admin">
+              <BlogCreate />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/blog-list"
+          element={
+            <PrivateRoute requiredRole="admin">
+              <BlogList />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/user-lists"
+          element={
+            <PrivateRoute requiredRole="admin">
+              <AdminUserList />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/support-requests"
+          element={
+            <PrivateRoute requiredRole="admin">
+              <AdminSupportRequests />
+            </PrivateRoute>
+          }
+        />
+
+        {/* 🧪 Optional: Protect Add Service (if admin only) */}
+        <Route
+          path="/admin/add-service"
+          element={
+            <PrivateRoute requiredRole="admin">
+              <AddService />
             </PrivateRoute>
           }
         />
@@ -125,3 +179,4 @@ function App() {
 }
 
 export default App;
+

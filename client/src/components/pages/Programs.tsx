@@ -6,10 +6,10 @@ import BASE_URL from "../../api/api";
 
 const categories = [
   "All",
-  "Wellness",
-  "Medical",
-  "Home Based/Mobile Services",
-  "Hotel Rooms",
+  "Wanaw Package",
+  "Premium Package",
+  "Family Package",
+  "Community Package",
   
 ];
 

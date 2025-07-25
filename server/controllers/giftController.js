@@ -139,10 +139,11 @@ exports.assignDeliveryCode = async (req, res) => {
     const notification = new GiftNotification({
       service,
       giftId,
-      deliveryCode: code, // keep field name as-is if your DB uses deliveryCode
+      giftCode: code,   // <-- updated here to match schema
       recipient,
       status: "pending",
     });
+
 
     await notification.save();
     console.log("✅ Gift notification saved to database.");
@@ -210,9 +211,11 @@ exports.confirmGiftCode = async (req, res) => {
     }
 
     // ✅ Find by ID and compare with giftCode
-    const notification = await GiftNotification.findById(giftId);
+    const notification = await GiftNotification.findOne({ giftId, deliveryCode: code });
+
 
     if (!notification || notification.giftCode !== code) {
+
       console.log("❌ Invalid gift code or gift ID.");
       return res.status(400).json({ msg: "Invalid gift code or gift ID" });
     }

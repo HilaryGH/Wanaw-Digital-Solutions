@@ -286,7 +286,7 @@ const handleChange = (
 
         <button
           type="submit"
-          className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+          className="mt-4 px-6 py-2 bg-green text-gold rounded hover:bg-blue-700 transition"
         >
           Submit
         </button>

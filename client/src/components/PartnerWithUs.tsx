@@ -79,7 +79,7 @@ alert("🎉 Partner request submitted successfully!");
             onClick={() => setTab(role as "Investor" | "Strategic Partner")}
             className={`px-4 py-2 rounded ${
               tab === role
-                ? "bg-blue-600 text-white"
+                ? "bg-green text-white"
                 : "bg-gray-200 text-gray-700"
             }`}
           >
@@ -96,7 +96,7 @@ alert("🎉 Partner request submitted successfully!");
             <label className="block mb-1 text-sm font-medium">Investment Type</label>
             <select
               name="investmentType"
-              className="w-full border p-2 rounded"
+              className="w-full border  p-2 rounded"
               onChange={handleChange}
               value={formData.investmentType}
             >
@@ -150,7 +150,6 @@ alert("🎉 Partner request submitted successfully!");
         {/* Strategic Partner Uploads */}
         {tab === "Strategic Partner" && (
           <div className="sm:col-span-2 mt-4">
-            <label className="block mb-2 font-medium text-sm">To be attached:</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
                 { label: "Project / Business Proposal", name: "businessProposal" },
@@ -188,7 +187,7 @@ alert("🎉 Partner request submitted successfully!");
         <div className="sm:col-span-2 text-center mt-4">
           <button
             type="submit"
-            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
+            className="bg-green text-gold px-6 py-2 rounded hover:bg-blue-700 transition"
           >
             Submit
           </button>
