@@ -1,13 +1,27 @@
 import { useEffect, useState } from "react";
 import BASE_URL from "../../../api/api";
 
-const MembersTable = () => {
-  const [members, setMembers] = useState([]);
+
+type Member = {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  location: string;
+  specialization: string;
+  memberType: string;
+  cvUrl?: string;
+  credentialsUrl?: string;
+};
+
+const CommunityList = () => {
+ const [members, setMembers] = useState<Member[]>([]);
+
 
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/community-members`);
+        const res = await fetch(`${BASE_URL}/community`);
         const data = await res.json();
         setMembers(data);
       } catch (err) {
@@ -37,7 +51,7 @@ const MembersTable = () => {
         </thead>
         <tbody>
           {members.map((member, index) => (
-            <tr key={member._id}>
+            <tr key={member._id || index}>
               <td className="border p-2 text-center">{index + 1}</td>
               <td className="border p-2">{member.name}</td>
               <td className="border p-2">{member.email}</td>
@@ -46,14 +60,20 @@ const MembersTable = () => {
               <td className="border p-2">{member.specialization}</td>
               <td className="border p-2">{member.memberType}</td>
               <td className="border p-2 text-blue-600">
-                <a href={member.cvUrl} target="_blank" rel="noopener noreferrer">
-                  View
-                </a>
+                {member.cvUrl ? (
+                  <a href={member.cvUrl} target="_blank" rel="noopener noreferrer">View CV</a>
+
+                ) : (
+                  "N/A"
+                )}
               </td>
               <td className="border p-2 text-blue-600">
-                <a href={member.credentialsUrl} target="_blank" rel="noopener noreferrer">
-                  View
-                </a>
+                {member.credentialsUrl ? (
+                  <a href={member.credentialsUrl} target="_blank" rel="noopener noreferrer">View Credentials</a>
+
+                ) : (
+                  "N/A"
+                )}
               </td>
             </tr>
           ))}
@@ -63,4 +83,4 @@ const MembersTable = () => {
   );
 };
 
-export default MembersTable;
+export default CommunityList;

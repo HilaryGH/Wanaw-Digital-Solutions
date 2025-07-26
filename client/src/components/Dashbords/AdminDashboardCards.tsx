@@ -59,7 +59,7 @@ export default function AdminDashboardCards() {
      {
       title: "Membership Lists ",
       description: "View and respond to registered users.",
-      route: "/admin/Membership-lists",
+      route: "/admin/community-list",
       color: "bg-pink-100",
     },
   ];

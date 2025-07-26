@@ -1,5 +1,6 @@
 import  { useState,  } from "react";
-import type { FormEvent} from "react"
+import type { FormEvent} from "react";
+import BASE_URL from "../api/api";
 
 
 const healthcareSpecializations = [
@@ -74,15 +75,42 @@ const handleChange = (
 
 
 
+const handleSubmit = async (e: FormEvent) => {
+  e.preventDefault();
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    // For demo: just log data
-    console.log("Submitted data:", formData);
+  try {
+    const form = new FormData();
+    form.append("name", formData.name);
+    form.append("email", formData.email);
+    form.append("phone", formData.phone);
+    form.append("whatsapp", formData.whatsapp);
+    form.append("location", formData.location);
+    form.append("specialization", formData.specialization);
+    form.append("internshipPeriod", formData.internshipPeriod);
+    form.append("memberType", memberType);
+    if (formData.cv) form.append("cv", formData.cv);
+    if (formData.credentials) form.append("credentials", formData.credentials);
 
-    // TODO: Add your API call or backend integration here
-    alert("Form submitted! Check console for data.");
-  };
+    const res = await fetch(`${BASE_URL}/community`, {
+      method: "POST",
+      body: form,
+    });
+
+    const result = await res.json();
+
+    if (res.ok) {
+      alert("🎉 Membership submitted successfully!");
+      console.log("✅ Response:", result);
+    } else {
+      alert(`❌ Submission failed: ${result.message}`);
+      console.error("❌ Server error:", result);
+    }
+  } catch (err) {
+    console.error("❌ Submission error:", err);
+    alert("❌ Something went wrong while submitting.");
+  }
+};
+
 
   const specializations =
     memberType === "healthcare"

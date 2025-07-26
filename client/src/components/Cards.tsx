@@ -14,7 +14,7 @@ export default function Cards() {
   return (
     <div className="py-12 px-4 md:px-10 bg-gray-50">
       <h2 className="text-3xl font-extrabold text-center text-[#1c2b21] mb-10">
-        Get Involved with <span className="text-gold">Wanaw</span>
+        Work with <span className="text-gold">Wanaw</span>
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">

@@ -39,6 +39,7 @@ import WanawCommunityMembership from "./components/WanawCommunityMembership";
 import PartnerWithUs from "./components/PartnerWithUs";
 import Unauthorized from "./components/Unauthorized"; // Create this
 import ProviderDashboard from "./components/Dashbords/providor/ProviderDashbord";
+import CommunityList from "./components/Dashbords/Admin/CommunityList ";
 
 
 // Wrapper to conditionally render Navbar
@@ -76,6 +77,7 @@ const AppWrapper = () => {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/community-membership" element={<WanawCommunityMembership />} />
         <Route path="/partner-with-us" element={<PartnerWithUs />} />
+        
         <Route path="/unauthorized" element={<Unauthorized />} />
 
         {/* 🔐 Protected dashboard route */}
@@ -94,6 +96,15 @@ const AppWrapper = () => {
           element={
             <PrivateRoute requiredRole="admin">
               <ManageMemberships />
+            </PrivateRoute>
+          }
+        />
+
+         <Route
+          path="/admin/community-list"
+          element={
+            <PrivateRoute requiredRole="admin">
+              <CommunityList />
             </PrivateRoute>
           }
         />

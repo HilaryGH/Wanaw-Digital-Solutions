@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const upload = require("../middleware/multer");
-const { createMember } = require("../controllers/communityController");
+const { createMember, getAllMembers, } = require("../controllers/communityController");
+
+const isAdmin = require("../middleware/isAdmin");
 
 router.post(
   "/",
@@ -11,5 +13,6 @@ router.post(
   ]),
   createMember
 );
+router.get("/", getAllMembers);
 
 module.exports = router;
