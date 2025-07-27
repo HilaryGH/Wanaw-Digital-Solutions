@@ -45,7 +45,7 @@ const Footer = () => {
               </li>
               <li>
                 <a href="/support" className="hover:underline">
-                  Support
+                  Customer Support & Help Center
                 </a>
               </li>
             </ul>

@@ -65,7 +65,7 @@ const GiftingOptions = () => {
         </h1>
         <p className="text-gray-600 text-lg mb-14">
           Whether you're honoring a corporate milestone, celebrating a personal
-          memory, or surprising loved ones abroad, we've got something special
+          memory, or surprising loved ones in Ethiopia, we've got something special
           for every occasion.
         </p>
 
@@ -163,7 +163,7 @@ const GiftingOptions = () => {
               Ethiopian&nbsp;Diaspora
             </h3>
             <p className="text-[#FDF6E3]/80 text-sm mb-6 text-center">
-              Send a taste of home to friends and family around the world —
+              Send a taste of home to friends and family in Ethiopia —
               crafted with love and Ethiopian pride.
             </p>
 

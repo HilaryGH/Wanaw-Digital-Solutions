@@ -25,7 +25,7 @@ export default function Cards() {
         >
           <h3 className="text-xl font-semibold text-[#1c2b21] mb-2">Invest/Partner With Us</h3>
           <p className="text-sm text-gray-600">
-            Are you a service provider, health center, or volunteer? Join Wanaw to grow together.
+            Are you investor,VC,Business Company,Healthcare Service Provider,Technology Solutions Provider.Join Wanaw to grow together.
           </p>
           <button className="mt-4 text-[#1c2b21] font-medium hover:underline">
             Become a Partner →
@@ -36,7 +36,7 @@ export default function Cards() {
         <div className="bg-white border-l-4  border-[#D4AF37] rounded-md p-6 shadow hover:shadow-lg transition duration-300">
           <h3 className="text-xl font-semibold text-[#1c2b21] mb-2">Join the Community</h3>
           <p className="text-sm text-gray-600">
-            Are you a healthcare professional or fresh graduate? Apply for internships and be part of the Wanaw community.
+            Are you a healthcare professionals,join Wanaw Community for various opportunities and fresh graduates for internship Program.
           </p>
           <Link
             to="/community-membership"
