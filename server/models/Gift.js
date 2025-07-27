@@ -9,7 +9,11 @@ const giftSchema = new mongoose.Schema({
   imageUrl: { type: String },
   tags: [String],
   isActive: { type: Boolean, default: true },
-
+ providerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User", // or "Provider" if you have a separate Provider model
+    required: true,
+  },
 
 }, { timestamps: true });
 

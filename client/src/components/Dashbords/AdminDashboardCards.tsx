@@ -62,6 +62,12 @@ export default function AdminDashboardCards() {
       route: "/admin/community-list",
       color: "bg-pink-100",
     },
+    {
+      title: "Job Posting",
+      description: "View and respond to registered users.",
+      route: "/admin/job-posting",
+      color: "bg-pink-100",
+    },
   ];
 
   return (

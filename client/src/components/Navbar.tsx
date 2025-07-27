@@ -367,7 +367,7 @@ const menuSections: MenuSection[] = [
 )}
 
       <Link to="/support">
-              Support
+              Customer Support & Help Center
             </Link>
 
            
@@ -577,7 +577,7 @@ setFilteredResults(
     </div>
   )
 ))}
-  <Link to="/support" className="text-lg font-medium py-2 border-b" onClick={() => setMenuOpen(false)}>Support</Link>
+  <Link to="/support" className="text-lg font-medium py-2 border-b" onClick={() => setMenuOpen(false)}>Customer Support & Help Center</Link>
 
               <div className="flex gap-4 mt-6 text-[#1c2b21]">
   <a href="https://www.facebook.com/share/14JxGfvVv4C/" target="_blank" rel="noopener noreferrer">

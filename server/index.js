@@ -86,7 +86,14 @@ app.use("/api/services", serviceRouter);
 const communityRoutes = require("./routes/communityRoutes");
 app.use("/api/community", communityRoutes);
 
+const jobRoutes = require('./routes/jobRoutes');
+app.use('/api/jobs', jobRoutes);
 
+const applicationRoutes = require('./routes/applicationRoutes');
+
+app.use('/api/applications', applicationRoutes);
+
+// Adjust path as needed
 
 
 // ✅ Start the server

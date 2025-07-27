@@ -12,6 +12,7 @@ import ServiceList from "./components/Services/ServiceList";
 import SelectMembership from "./components/SelectMembership";
 import AddService from "./components/Services/AddServiceForm";
 
+
 import CartPage from "./components/Services/CartPage";
 import SendGiftForm from "./components/Services/SendGiftForm";
 import PaymentSuccess from "./components/pages/PaymentSuccess";
@@ -40,12 +41,18 @@ import PartnerWithUs from "./components/PartnerWithUs";
 import Unauthorized from "./components/Unauthorized"; // Create this
 import ProviderDashboard from "./components/Dashbords/providor/ProviderDashbord";
 import CommunityList from "./components/Dashbords/Admin/CommunityList ";
+import AdminJobPost from "./components/Dashbords/Admin/AdminJobPost";
+import ApplyForm from "./components/ApplyForm";
+import JobsList from "./components/JobsList";
+
+
 
 
 // Wrapper to conditionally render Navbar
 const AppWrapper = () => {
   const location = useLocation();
   const hideNavbarPaths = ["/login", "/register", "/dashboard"];
+  
 
   return (
     <>
@@ -77,6 +84,16 @@ const AppWrapper = () => {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/community-membership" element={<WanawCommunityMembership />} />
         <Route path="/partner-with-us" element={<PartnerWithUs />} />
+       <Route path="/career/:jobId" element={<ApplyForm />} />
+
+
+        <Route path="/careers" element={<JobsList/>} />
+
+
+         
+       
+
+       
         
         <Route path="/unauthorized" element={<Unauthorized />} />
 
@@ -108,6 +125,16 @@ const AppWrapper = () => {
             </PrivateRoute>
           }
         />
+         <Route
+          path="/admin/job-posting"
+          element={
+            <PrivateRoute requiredRole="admin">
+              <AdminJobPost/>
+            </PrivateRoute>
+          }
+        />
+
+      
        
         
         <Route

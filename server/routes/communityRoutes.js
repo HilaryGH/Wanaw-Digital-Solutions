@@ -3,7 +3,6 @@ const router = express.Router();
 const upload = require("../middleware/multer");
 const { createMember, getAllMembers, } = require("../controllers/communityController");
 
-const isAdmin = require("../middleware/isAdmin");
 
 router.post(
   "/",

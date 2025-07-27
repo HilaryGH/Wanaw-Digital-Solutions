@@ -1,8 +1,8 @@
 import { useState } from "react";
 import Navbar from "../Navbar";
 import AddServiceForm from "../../Services/AddServiceForm";
-import GiftListAndConfirm from "../../GiftListAndConfirm";
 import { Plus, Gift } from "lucide-react";
+import GiftListForProvider from "./GiftListForProvider";
 
 const ProviderDashboard = () => {
   const [activeSection, setActiveSection] = useState<"add" | "confirm" | null>(null);
@@ -52,7 +52,7 @@ const ProviderDashboard = () => {
           {activeSection === "confirm" && (
             <div className="bg-white rounded-xl shadow p-6">
               <h3 className="text-lg font-semibold mb-4 text-[#1c2b21]">Confirm Gift Delivery</h3>
-              <GiftListAndConfirm />
+              <GiftListForProvider/>
             </div>
           )}
         </div>

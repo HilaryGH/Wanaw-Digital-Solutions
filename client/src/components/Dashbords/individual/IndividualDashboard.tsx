@@ -1,8 +1,5 @@
 
 import Navbar from "../Navbar";
-
-
-
 const IndividualDashboard = () => {
   
   return (

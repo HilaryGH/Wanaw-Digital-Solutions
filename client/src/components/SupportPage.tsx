@@ -74,7 +74,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       <div className="absolute -top-20 right-0 w-32 h-32 bg-[#D4AF37] rotate-45 rounded-lg opacity-50  z-0"></div>
       {/* Login Card */}
       <div className="max-w-xl mx-auto bg-green rounded-2xl z-10 shadow-md p-8">
-        <h1 className="text-3xl font-bold text-center mb-6 text-gold">Support & Help Center</h1>
+        <h1 className="text-3xl font-bold text-center mb-6 text-gold">Customer Support & Help Center</h1>
 
          {/* Contact Info */}
           <div className="grid md:grid-cols-4 gap-2 mb-8 text-center">
