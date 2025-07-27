@@ -35,8 +35,7 @@ const Home = () => {
               Wanaw Health and Wellness Digital Solution
             </h1>
             <p className="text-sm sm:text-base md:text-lg text-gray-700 text-center max-w-md">
-              Book, gift, and Manage Health,Wellness & Hotel room services — All in one
-              platform.
+              Book, gift, and manage health, wellness, and hotel room services — all in one platform.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
