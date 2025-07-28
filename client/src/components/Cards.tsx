@@ -3,63 +3,81 @@ import { Link, useNavigate } from "react-router-dom";
 export default function Cards() {
   const navigate = useNavigate();
 
-  const handlePartnerClick = () => {
-    navigate("/partner-with-us");
-  };
-
-  const handleCareerClick = () => {
-    navigate("/careers");
-  };
+  const handlePartnerClick = () => navigate("/partner-with-us");
+  const handleCareerClick = () => navigate("/careers");
 
   return (
-    <div className="py-12 px-4 md:px-10 bg-gray-50">
-      <h2 className="text-3xl font-extrabold text-center text-[#1c2b21] mb-10">
-        Work with <span className="text-gold">Wanaw</span>
+    <section className="py-16 px-4 md:px-10 bg-gradient-to-br from-white via-gray-50 to-gray-100">
+      <h2 className="text-4xl font-bold text-center text-[#1c2b21] mb-14">
+        Work with <span className="text-yellow-500">Wanaw</span>
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-7xl mx-auto">
         {/* Partner With Us */}
         <div
           onClick={handlePartnerClick}
-          className="cursor-pointer bg-white border-l-4 border-[#1c2b21] rounded-md p-6 shadow hover:shadow-lg transition duration-300"
+          className="group cursor-pointer bg-white border-l-4 border-[#1c2b21] rounded-2xl p-8 shadow-lg hover:shadow-xl transition-transform transform hover:-translate-y-1"
         >
-          <h3 className="text-xl font-semibold text-[#1c2b21] mb-2">Invest/Partner With Us</h3>
-          <p className="text-sm text-gray-600">
-            Are you investor,VC,Business Company,Healthcare Service Provider,Technology Solutions Provider.Join Wanaw to grow together.
+          <h3 className="text-2xl font-semibold text-[#1c2b21] mb-3 group-hover:text-yellow-500 transition-colors">
+            Invest/Partner With Us
+          </h3>
+          <p className="text-gray-600 leading-relaxed">
+            Are you an investor, VC, business company, healthcare service provider, or technology solutions provider? Join Wanaw to grow together.
           </p>
-          <button className="mt-4 text-[#1c2b21] font-medium hover:underline">
+          <button className="mt-5 text-[#1c2b21] font-medium hover:text-yellow-500 transition-colors">
             Become a Partner →
           </button>
         </div>
 
         {/* Membership */}
-        <div className="bg-white border-l-4  border-[#D4AF37] rounded-md p-6 shadow hover:shadow-lg transition duration-300">
-          <h3 className="text-xl font-semibold text-[#1c2b21] mb-2">Join the Community</h3>
-          <p className="text-sm text-gray-600">
-            Are you a healthcare professionals,join Wanaw Community for various opportunities and fresh graduates for internship Program.
+        <div className="bg-white border-l-4 border-yellow-500 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-transform transform hover:-translate-y-1">
+          <h3 className="text-2xl font-semibold text-[#1c2b21] mb-3 hover:text-yellow-500 transition-colors">
+            Join the Community
+          </h3>
+          <p className="text-gray-600 leading-relaxed">
+            Are you a healthcare professional? Join the Wanaw Community for various strategic opportunities, partnerships, and internship programs for fresh graduates.
           </p>
           <Link
             to="/community-membership"
-            className="mt-4 inline-block text-[#D4AF37] font-medium hover:underline"
+            className="mt-5 inline-block text-yellow-500 font-semibold hover:underline"
           >
             Become a Member →
           </Link>
+          <a
+            href="https://www.linkedin.com/company/wanaw-health-and-wellness-digital-solution/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block mt-3 text-sm text-blue-600 hover:underline"
+          >
+            Follow us on LinkedIn
+          </a>
         </div>
 
         {/* Career Openings */}
         <div
           onClick={handleCareerClick}
-          className="cursor-pointer bg-white border-l-4  border-[#1c2b21] rounded-md p-6 shadow hover:shadow-lg transition duration-300"
+          className="group cursor-pointer bg-white border-l-4 border-[#1c2b21] rounded-2xl p-8 shadow-lg hover:shadow-xl transition-transform transform hover:-translate-y-1"
         >
-          <h3 className="text-xl font-semibold text-[#1c2b21] mb-2">Career Openings</h3>
-          <p className="text-sm text-gray-600">
+          <h3 className="text-2xl font-semibold text-[#1c2b21] mb-3 group-hover:text-yellow-500 transition-colors">
+            Career Openings
+          </h3>
+          <p className="text-gray-600 leading-relaxed">
             Looking for a full-time or freelance opportunity? Explore open roles and join our team.
           </p>
-          <button className="mt-4 text-[#1c2b21] font-medium hover:underline">
+          <button className="mt-5 text-[#1c2b21] font-medium hover:text-yellow-500 transition-colors">
             View Openings →
           </button>
+          <a
+            href="https://www.linkedin.com/company/wanaw-health-and-wellness-digital-solution/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block mt-3 text-sm text-blue-600 hover:underline"
+          >
+            See jobs on LinkedIn
+          </a>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
+

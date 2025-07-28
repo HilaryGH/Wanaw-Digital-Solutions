@@ -44,6 +44,11 @@ import CommunityList from "./components/Dashbords/Admin/CommunityList ";
 import AdminJobPost from "./components/Dashbords/Admin/AdminJobPost";
 import ApplyForm from "./components/ApplyForm";
 import JobsList from "./components/JobsList";
+import ApplicationsList from "./components/ApplicationsList";
+import MarketingDashboard from "./components/Dashbords/Admin/MarketingDashboard";
+import CustomerSupportDashboard from "./components/Dashbords/Admin/CustomerSupportDashboard";
+import SuperAdminDashboard from "./components/Dashbords/Admin/SuperAdminDashboard";
+import GiftListAndConfirm from "./components/GiftListAndConfirm";
 
 
 
@@ -107,103 +112,155 @@ const AppWrapper = () => {
           }
         />
 
+        <Route
+  path="/marketing-dashboard"
+  element={
+    <PrivateRoute requiredRole="marketing_admin">
+      <MarketingDashboard />
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="/support-dashboard"
+  element={
+    <PrivateRoute requiredRole="customer_support_admin">
+      <CustomerSupportDashboard />
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="/admin-dashboard"
+  element={
+    <PrivateRoute requiredRole="super_admin">
+      <SuperAdminDashboard />
+    </PrivateRoute>
+  }
+/>
+
+
         {/* 🔐 Admin-only routes */}
-        <Route
-          path="/admin/manage-membership"
-          element={
-            <PrivateRoute requiredRole="admin">
-              <ManageMemberships />
-            </PrivateRoute>
-          }
-        />
+    {/* 🔐 Super Admin Only */}
+<Route
+  path="/admin/manage-membership"
+  element={
+    <PrivateRoute requiredRole="super_admin">
+      <ManageMemberships />
+    </PrivateRoute>
+  }
+/>
 
-         <Route
-          path="/admin/community-list"
-          element={
-            <PrivateRoute requiredRole="admin">
-              <CommunityList />
-            </PrivateRoute>
-          }
-        />
-         <Route
-          path="/admin/job-posting"
-          element={
-            <PrivateRoute requiredRole="admin">
-              <AdminJobPost/>
-            </PrivateRoute>
-          }
-        />
+<Route
+  path="/admin/community-list"
+  element={
+    <PrivateRoute requiredRole="super_admin">
+      <CommunityList />
+    </PrivateRoute>
+  }
+/>
 
-      
-       
-        
-        <Route
-          path="/admin/manage-services"
-          element={
-            <PrivateRoute requiredRole="admin">
-              <ManageServices />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/admin/add-program"
-          element={
-            <PrivateRoute requiredRole="admin">
-              <AdminAddProgram />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/admin/add-gift"
-          element={
-            <PrivateRoute requiredRole="admin">
-              <AdminAddGift />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/admin/blog-create"
-          element={
-            <PrivateRoute requiredRole="admin">
-              <BlogCreate />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/admin/blog-list"
-          element={
-            <PrivateRoute requiredRole="admin">
-              <BlogList />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/admin/user-lists"
-          element={
-            <PrivateRoute requiredRole="admin">
-              <AdminUserList />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/admin/support-requests"
-          element={
-            <PrivateRoute requiredRole="admin">
-              <AdminSupportRequests />
-            </PrivateRoute>
-          }
-        />
+<Route
+  path="/admin/manage-services"
+  element={
+    <PrivateRoute requiredRole="super_admin">
+      <ManageServices />
+    </PrivateRoute>
+  }
+/>
 
-        {/* 🧪 Optional: Protect Add Service (if admin only) */}
-        <Route
-          path="/admin/add-service"
-          element={
-            <PrivateRoute requiredRole="admin">
-              <AddService />
-            </PrivateRoute>
-          }
-        />
+<Route
+  path="/admin/add-program"
+  element={
+    <PrivateRoute requiredRole="super_admin">
+      <AdminAddProgram />
+    </PrivateRoute>
+  }
+/>
+
+<Route
+  path="/admin/user-lists"
+  element={
+    <PrivateRoute requiredRole="super_admin">
+      <AdminUserList />
+    </PrivateRoute>
+  }
+/>
+
+<Route
+  path="/admin/add-service"
+  element={
+    <PrivateRoute requiredRole="super_admin">
+      <AddService />
+    </PrivateRoute>
+  }
+/>
+
+{/* 🎯 Marketing Admin + Super Admin */}
+<Route
+  path="/admin/add-gift"
+  element={
+    <PrivateRoute requiredRole="marketing_admin">
+      <AdminAddGift />
+    </PrivateRoute>
+  }
+/>
+
+<Route
+  path="/admin/blog-create"
+  element={
+    <PrivateRoute requiredRole="marketing_admin">
+      <BlogCreate />
+    </PrivateRoute>
+  }
+/>
+
+<Route
+  path="/admin/blog-list"
+  element={
+    <PrivateRoute requiredRole="marketing_admin">
+      <BlogList />
+    </PrivateRoute>
+  }
+/>
+
+<Route
+  path="/admin/job-posting"
+  element={
+    <PrivateRoute requiredRole="marketing_admin">
+      <AdminJobPost />
+    </PrivateRoute>
+  }
+/>
+
+{/* 🛎️ Customer Support Admin + Super Admin */}
+<Route
+  path="/admin/support-requests"
+  element={
+    <PrivateRoute requiredRole="customer_support_admin">
+      <AdminSupportRequests />
+    </PrivateRoute>
+  }
+/>
+
+<Route
+  path="/admin/applicant-list"
+  element={
+    <PrivateRoute requiredRole="customer_support_admin">
+      <ApplicationsList />
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="/admin/gift-list & confirm"
+  element={
+    <PrivateRoute requiredRole="customer_support_admin">
+      <GiftListAndConfirm />
+    </PrivateRoute>
+  }
+/>
+
+
       </Routes>
+        
     </>
   );
 };

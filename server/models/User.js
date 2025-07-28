@@ -8,7 +8,8 @@ const userSchema = new mongoose.Schema(
     password: { type: String }, // nullable for Google users
     role: {
       type: String,
-      enum: ["individual", "provider", "corporate", "diaspora", "admin"],
+      enum: ["individual", "provider", "corporate", "diaspora", "admin", "super_admin",
+        "marketing_admin", "customer_support_admin"],
 
       default: "individual",
     },

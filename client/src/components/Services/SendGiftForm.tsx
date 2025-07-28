@@ -183,8 +183,14 @@ const recipientPayload = {
 const assignRes = await fetch(`${BASE_URL}/gift/${service._id}/assign-delivery-code`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ recipient: recipientPayload }),
+  body: JSON.stringify({
+    recipient: recipientPayload,
+    senderName,
+    message,
+    service, // include full service object
+  }),
 });
+
 
 
 if (!assignRes.ok) {

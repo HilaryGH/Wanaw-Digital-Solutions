@@ -24,7 +24,10 @@ const giftNotificationSchema = new mongoose.Schema(
     giftCode: String, // 🔁 renamed from deliveryCode
     deliveryStatus: { type: String, enum: ["pending", "delivered"], default: "pending" },
     deliveredAt: Date,
-    serviceProvider: mongoose.Types.ObjectId,
+    providerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // or "Provider", depending on your setup
+    },
   },
   { timestamps: true }
 );

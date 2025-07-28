@@ -37,6 +37,10 @@ const handleLogin = async (e: React.FormEvent) => {
     else if (role === "corporate") navigate("/corporate-dashboard");
     else if (role === "diaspora") navigate("/diaspora-dashboard");
     else if (role === "individual") navigate("/individual-dashboard");
+    else if (role === "marketing_admin") navigate("/marketing-dashboard");
+    else if (role === "customer_support_admin") navigate("/support-dashboard");
+    else if (role === "super_admin") navigate("/admin-dashboard");
+
   } catch (err) {
     console.error(err);
     setError("Something went wrong. Please try again.");

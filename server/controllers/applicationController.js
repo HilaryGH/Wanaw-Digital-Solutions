@@ -1,8 +1,7 @@
 const Application = require('../models/Application');
 
-// Create a new application
 const createApplication = async (req, res) => {
-  const { fullName, email, phone, coverLetter, credentialsLink } = req.body;
+  const { fullName, email, phone, currentLocation, specialization, employmentModel } = req.body;
   const jobId = req.params.jobId;
 
   if (!fullName || !email || !jobId) {
@@ -14,20 +13,28 @@ const createApplication = async (req, res) => {
       fullName,
       email,
       phone,
-      coverLetter,
-      credentialsLink,
+      currentLocation,
+      specialization,
+      employmentModel,
       job: jobId,
+      cvPath: req.files?.cv?.[0]?.path || null,
+      credentialsPath: req.files?.credentials?.[0]?.path || null,
     });
 
     await newApplication.save();
-    res.status(201).json({ msg: 'Application submitted successfully', application: newApplication });
+
+    res.status(201).json({
+      msg: 'Application submitted successfully',
+      application: newApplication,
+    });
   } catch (err) {
-    console.error(err);
+    console.error('❌ Error submitting application:', err);
     res.status(500).json({ msg: 'Server error submitting application' });
   }
 };
 
 // Get applications by job ID
+
 const getApplicationsByJob = async (req, res) => {
   const jobId = req.params.jobId;
 
@@ -39,7 +46,6 @@ const getApplicationsByJob = async (req, res) => {
     res.status(500).json({ msg: 'Failed to fetch applications' });
   }
 };
-
 module.exports = {
   createApplication,
   getApplicationsByJob,

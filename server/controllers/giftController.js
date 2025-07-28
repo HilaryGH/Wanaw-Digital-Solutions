@@ -43,6 +43,12 @@ const Gift = require("../models/Gift");
 exports.createGift = async (req, res) => {
   const { title, category, occasion, description, imageUrl } = req.body;
 
+  // Check if user exists and is an admin
+  const user = req.user;
+  if (!user || user.role !== "admin") {
+    return res.status(403).json({ msg: "Unauthorized: Only admins can add gifts" });
+  }
+
   if (!title || !category) {
     return res.status(400).json({ msg: "Title and category are required" });
   }
@@ -53,16 +59,19 @@ exports.createGift = async (req, res) => {
       category,
       occasion,
       description,
-      imageUrl: imageUrl || "", // fallback if imageUrl is not provided
+      imageUrl: imageUrl || "",
+      providerId: user._id, // still saving the admin's ID as providerId for tracking
     });
 
     await newGift.save();
-    res.status(201).json({ msg: "Gift added successfully", gift: newGift });
+    return res.status(201).json({ msg: "Gift added successfully", gift: newGift });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: "Failed to add gift" });
+    console.error("Error saving gift:", err.message, err);
+    return res.status(500).json({ msg: "Failed to add gift", error: err.message });
   }
 };
+
+
 
 
 
@@ -97,14 +106,31 @@ exports.sendProductGift = async (req, res) => {
 };
 // Get all gifts
 exports.getGifts = async (req, res) => {
+  const { providerId } = req.query;
+
   try {
-    const gifts = await Gift.find();
+    const query = providerId ? { providerId } : {};
+    const gifts = await Gift.find(query).sort({ createdAt: -1 });
+
     res.status(200).json(gifts);
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: "Failed to fetch gifts" });
+    console.error("❌ Error fetching gifts:", err);
+    res.status(500).json({ msg: "Server error fetching gifts" });
   }
 };
+
+exports.getGiftsByProvider = async (req, res) => {
+  try {
+    const { providerId } = req.params;
+    const gifts = await Gift.find({ providerId });
+    res.json(gifts);
+  } catch (err) {
+    console.error("❌ Error fetching provider gifts:", err);
+    res.status(500).json({ msg: "Server error" });
+  }
+};
+
 
 // Delete a gift by ID
 exports.deleteGift = async (req, res) => {
@@ -142,6 +168,7 @@ exports.assignDeliveryCode = async (req, res) => {
       giftCode: code,   // <-- updated here to match schema
       recipient,
       status: "pending",
+      providerId: service?.providerId, // ← Make sure this exists
     });
 
 
@@ -206,25 +233,25 @@ exports.confirmGiftCode = async (req, res) => {
     const { code } = req.body;
 
     if (!giftId || !code) {
-      console.log("❌ Missing gift ID or code in request.");
       return res.status(400).json({ msg: "Gift ID and code are required" });
     }
 
-    // ✅ Find by ID and compare with giftCode
-    const notification = await GiftNotification.findOne({ giftId, deliveryCode: code });
+    const notification = await GiftNotification.findOne({ giftId, giftCode: code });
 
-
-    if (!notification || notification.giftCode !== code) {
-
-      console.log("❌ Invalid gift code or gift ID.");
+    if (!notification) {
       return res.status(400).json({ msg: "Invalid gift code or gift ID" });
     }
 
     if (notification.deliveryStatus === "delivered") {
-      return res.status(200).json({ msg: "Gift already confirmed", status: "delivered" });
+      return res.status(200).json({
+        msg: "Gift already confirmed",
+        status: "delivered",
+        service: notification.service,
+        recipient: notification.recipient,
+      });
     }
 
-    // ✅ Update status and save
+    // ✅ Mark as delivered
     notification.deliveryStatus = "delivered";
     notification.deliveredAt = new Date();
     await notification.save();
@@ -243,3 +270,4 @@ exports.confirmGiftCode = async (req, res) => {
     res.status(500).json({ msg: "Server error confirming gift code" });
   }
 };
+

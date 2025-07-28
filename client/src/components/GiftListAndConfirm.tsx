@@ -5,7 +5,12 @@ import BASE_URL from "../api/api";
 
 type Gift = {
   _id: string;
-  title: string;
+  title?: string; // only if directly available
+  service?: {
+    title?: string;
+    price?: number;
+    // etc.
+  };
   recipient?: {
     name?: string;
     email?: string;
@@ -13,6 +18,7 @@ type Gift = {
   };
   senderName?: string;
 };
+
 
 const GiftListAndConfirm = () => {
   const [gifts, setGifts] = useState<Gift[]>([]);
@@ -36,13 +42,17 @@ const GiftListAndConfirm = () => {
   }, []);
 
   const filteredGifts = gifts.filter((gift) =>
-    gift.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    gift.recipient?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    gift.senderName?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  (gift.title || gift.service?.title || "")
+    .toLowerCase()
+    .includes(searchTerm.toLowerCase()) ||
+  gift.recipient?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  gift.senderName?.toLowerCase().includes(searchTerm.toLowerCase())
+);
 
   if (loading) return <p className="text-center py-6">Loading gifts...</p>;
   if (error) return <p className="text-red-600 text-center">{error}</p>;
+  console.log("🧪 Loaded gifts:", gifts);
+
 
   return (
     <div className="px-4 max-w-3xl mx-auto">
@@ -68,8 +78,9 @@ const GiftListAndConfirm = () => {
               className="bg-white shadow-lg rounded-lg p-4 border"
             >
               <h3 className="text-lg font-semibold text-blue-800">
-                {gift.title}
-              </h3>
+  {gift.service?.title || "Untitled"}
+</h3>
+
               <p className="text-sm text-gray-600 mt-1">
                 🎁 Sender: {gift.senderName || "Unknown"}
               </p>

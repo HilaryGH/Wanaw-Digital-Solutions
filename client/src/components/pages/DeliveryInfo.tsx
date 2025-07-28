@@ -1,5 +1,5 @@
 // src/pages/DeliveryInfo.tsx
-import DeliveryMap from "../DeliveryMap";
+import DeliveryMap from "../Map";
 
 const DeliveryInfo = () => (
   <div className="p-6 max-w-5xl mx-auto">

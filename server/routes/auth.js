@@ -3,11 +3,12 @@ const multer = require("multer");
 const fs = require("fs");
 const router = express.Router();
 const passport = require("passport");
-const { register, login } = require("../controllers/authController");
+const { register, login, sendPromo, resolveSupportIssue } = require("../controllers/authController");
 const { getAllUsers } = require("../controllers/userController");
 const verifyToken = require("../middleware/verifyToken");
 const isAdmin = require("../middleware/isAdmin");
 const authController = require("../controllers/authController");
+const checkRole = require("../middleware/checkRole");
 
 
 
@@ -62,7 +63,11 @@ router.post("/forgot-password", authController.forgotPassword);
 router.post("/reset-password/:token", authController.resetPassword);
 
 
+router.get("/all-users", verifyToken, checkRole(["super_admin", "admin"]), getAllUsers);
 
+router.post("/send-promo", verifyToken, checkRole(["marketing_admin", "super_admin"]), sendPromo);
+
+router.post("/resolve-issue", verifyToken, checkRole(["customer_support_admin", "super_admin"]), resolveSupportIssue);
 
 
 

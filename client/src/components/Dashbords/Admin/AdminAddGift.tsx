@@ -1,5 +1,5 @@
-import { useState,} from "react";
-import type { ChangeEvent, FormEvent } from "react";
+import { useState} from "react";
+import type {ChangeEvent, FormEvent } from "react";
 import BASE_URL from "../../../api/api";
 
 const AdminAddGift = () => {
@@ -29,75 +29,83 @@ const AdminAddGift = () => {
     }
   };
 
-const handleSubmit = async (e: FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
 
-  try {
-    let imageUrl = "";
+    try {
+      let imageUrl = "";
 
-    // Step 1: Upload to Cloudinary if there's an image
-    if (imageFile) {
-      const formData = new FormData();
-      formData.append("file", imageFile);
-      formData.append("upload_preset", "wanaw_unsigned"); // 👈 use actual preset
-      formData.append("cloud_name", "dgmqbwdzg"); // 👈 replace with actual cloud name
+      // Upload image to Cloudinary if present
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append("file", imageFile);
+        formData.append("upload_preset", "wanaw_unsigned");
+        formData.append("cloud_name", "dgmqbwdzg");
 
-      const cloudinaryRes = await fetch(
-        "https://api.cloudinary.com/v1_1/dgmqbwdzg/image/upload", // 👈 replace
-        {
-          method: "POST",
-          body: formData,
+        const cloudinaryRes = await fetch(
+          "https://api.cloudinary.com/v1_1/dgmqbwdzg/image/upload",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        const cloudinaryData = await cloudinaryRes.json();
+
+        if (!cloudinaryData.secure_url) {
+          throw new Error("Failed to upload image to Cloudinary");
         }
-      );
 
-      const cloudinaryData = await cloudinaryRes.json();
-
-      if (!cloudinaryData.secure_url) {
-        throw new Error("Failed to upload image to Cloudinary");
+        imageUrl = cloudinaryData.secure_url;
       }
 
-      imageUrl = cloudinaryData.secure_url;
-    }
+      // Prepare gift data
+      const giftData = {
+        ...gift,
+        imageUrl,
+      };
 
-    // Step 2: Send data to your backend
-    const giftData = {
-      ...gift,
-      imageUrl,
-    };
+      // Get token from localStorage (fix here!)
+      const token = localStorage.getItem("token");
 
-    const res = await fetch(`${BASE_URL}/gift`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(giftData),
-    });
+      if (!token) {
+        setMessage("❌ You must be logged in to add a gift.");
+        setSuccess(false);
+        return;
+      }
 
-    const data = await res.json();
+      // Send gift data to backend
+      const res = await fetch(`${BASE_URL}/gift`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Use token directly here
+        },
+        body: JSON.stringify(giftData),
+      });
 
-    if (res.ok) {
-      setMessage("✅ Gift added successfully!");
-      setSuccess(true);
-      setGift({ title: "", category: "corporate", occasion: "", description: "" });
-      setImageFile(null);
-      setPreviewUrl(null);
-    } else {
-      setMessage(`❌ ${data.msg}`);
+      const data = await res.json();
+
+      if (res.ok) {
+        setMessage("✅ Gift added successfully!");
+        setSuccess(true);
+        setGift({ title: "", category: "corporate", occasion: "", description: "" });
+        setImageFile(null);
+        setPreviewUrl(null);
+      } else {
+        setMessage(`❌ ${data.msg || "Failed to add gift"}`);
+        setSuccess(false);
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage("❌ Server error");
       setSuccess(false);
     }
-  } catch (err) {
-    console.error(err);
-    setMessage("❌ Server error");
-    setSuccess(false);
-  }
-};
-
+  };
 
   return (
     <div className="max-w-xl mx-auto bg-white shadow-xl rounded-xl p-8 mt-12 border border-gray-100">
-      <h2 className="text-3xl font-bold text-center text-[#1c2b21] mb-6">
-         Add a New Gift
-      </h2>
+      <h2 className="text-3xl font-bold text-center text-[#1c2b21] mb-6">Add a New Gift</h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Title */}
@@ -194,5 +202,6 @@ const handleSubmit = async (e: FormEvent) => {
 };
 
 export default AdminAddGift;
+
 
 

@@ -5,7 +5,7 @@ const IndividualDashboard = () => {
   return (
     <>
     <Navbar/>
-   
+  
     </>
   );
 };

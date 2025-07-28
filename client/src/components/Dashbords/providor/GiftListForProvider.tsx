@@ -41,13 +41,15 @@ const GiftListForProvider = () => {
 
 
   const filteredGifts = gifts.filter((gift) =>
-    gift.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    gift.recipient?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    gift.senderName?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  (gift.title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+  gift.recipient?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  gift.senderName?.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
 
   if (loading) return <p className="text-center py-6">Loading gifts...</p>;
   if (error) return <p className="text-red-600 text-center">{error}</p>;
+  console.log("🧪 Loaded gifts:", gifts);
 
   return (
     <div className="px-4 max-w-3xl mx-auto">

@@ -10,7 +10,7 @@ const { sendEmail } = require("../utils/notification");
 
 
 /* ────── role sets ────── */
-const allowedRoles = ["individual", "provider", "corporate", "diaspora", "admin"];
+const allowedRoles = ["individual", "provider", "corporate", "diaspora", "admin", "super_admin", "marketing_admin", "customer_support_admin"];
 const providerRoles = ["provider", "corporate"];
 
 /* ─────────────────── REGISTER ─────────────────── */
@@ -211,3 +211,27 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 };
+exports.sendPromo = async (req, res) => {
+  try {
+    // Logic to send promo (e.g., via email or notifications)
+    const { message, recipients } = req.body;
+
+    // Dummy example
+    console.log("Sending promo to:", recipients);
+    console.log("Message:", message);
+
+    res.status(200).json({ msg: "Promotion sent successfully." });
+  } catch (err) {
+    console.error("Promo Error:", err);
+    res.status(500).json({ msg: "Failed to send promotion." });
+  }
+};
+exports.resolveSupportIssue = async (req, res) => {
+  try {
+    // Your logic here
+    res.status(200).json({ msg: "Issue resolved." });
+  } catch (err) {
+    res.status(500).json({ msg: "Failed to resolve issue." });
+  }
+};
+

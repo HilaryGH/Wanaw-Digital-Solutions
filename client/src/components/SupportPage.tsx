@@ -3,7 +3,7 @@ import { FaPhoneAlt, FaEnvelope,FaWhatsapp, } from "react-icons/fa";
 import BASE_URL from "../api/api";
 
 import { SiTelegram } from "react-icons/si";
-import DeliveryMap from "./DeliveryMap";
+import Map from "./Map";
 
 
 const SupportPage = () => {
@@ -169,7 +169,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         </div>
       </div>
     </div>
-    <DeliveryMap/>
+    <Map/>
     </>
   );
 };

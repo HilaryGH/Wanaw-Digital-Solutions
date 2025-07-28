@@ -24,7 +24,6 @@ const GiftingOptions = () => {
       if (!res.ok) throw new Error("Failed to fetch gifts");
       const data: Gift[] = await res.json();
 
-      // Deduplicate by title
       const getUniqueByTitle = (gifts: Gift[]) => {
         const seen = new Set<string>();
         return gifts.filter(g => (seen.has(g.title) ? false : seen.add(g.title)));
@@ -34,16 +33,15 @@ const GiftingOptions = () => {
         return gifts.sort((a, b) => a.title.localeCompare(b.title));
       };
 
+      const safeFilter = (gifts: Gift[], category: string) =>
+        gifts.filter(g => g.category?.toLowerCase() === category);
+
       setCorporateGifts(
-        sortByTitle(
-          getUniqueByTitle(data.filter(g => g.category.toLowerCase() === "corporate"))
-        )
+        sortByTitle(getUniqueByTitle(safeFilter(data, "corporate")))
       );
 
       setIndividualGifts(
-        sortByTitle(
-          getUniqueByTitle(data.filter(g => g.category.toLowerCase() === "individual"))
-        )
+        sortByTitle(getUniqueByTitle(safeFilter(data, "individual")))
       );
     } catch (err) {
       console.error("Error fetching gifts:", err);
@@ -52,6 +50,7 @@ const GiftingOptions = () => {
 
   fetchGifts();
 }, []);
+
 
 
   const slugify = (text: string) =>
@@ -88,7 +87,7 @@ const GiftingOptions = () => {
               id="corporateGift"
               value={selectedCorporateGift}
               onChange={e => setSelectedCorporateGift(e.target.value)}
-              className="w-full mt-1 mb-6 px-4 py-2.5 rounded-lg text-[13px] md:text-sm text-gray-700 bg-white border border-gray-300 focus:ring-2 focus:ring-green-400 focus:border-green-500 shadow-sm transition-all duration-200 ease-in-out"
+              className="w-full mt-1 mb-2 px-2 py-1 rounded-lg text-[13px] md:text-sm text-gray-700 bg-white border border-gray-300 focus:ring-2 focus:ring-green-400 focus:border-green-500 shadow-sm transition-all duration-200 ease-in-out"
               style={{ minHeight: "50px" }}
             >
               <option value="">-- Choose Corporate Gift --</option>
@@ -124,14 +123,14 @@ const GiftingOptions = () => {
               hand‑picked, heartfelt gifts.
             </p>
 
-            <label htmlFor="individualGift" className="block mb-2 text-sm font-medium">
+            <label htmlFor="individualGift" className="block mb-1 text-sm font-medium">
               Select a Gift:
             </label>
             <select
               id="individualGift"
               value={selectedIndividualGift}
               onChange={e => setSelectedIndividualGift(e.target.value)}
-              className="w-full mt-1 mb-6 px-4 py-2.5 rounded-lg text-[13px] md:text-sm text-gray-700 bg-white border border-gray-300 focus:ring-2 focus:ring-green-400 focus:border-green-500 shadow-sm transition-all duration-200 ease-in-out"
+              className="w-full mt-1 mb-1 px-1 py-1 rounded-lg text-[12px] md:text-sm text-gray-700 bg-white border border-gray-300 focus:ring-2 focus:ring-green-400 focus:border-green-500 shadow-sm transition-all duration-200 ease-in-out"
               style={{ minHeight: "50px" }}
             >
               <option value="">-- Choose Individual Gift --</option>
@@ -149,7 +148,7 @@ const GiftingOptions = () => {
                 </p>
                 <button
                   onClick={() => navigate(`/gifts/${slugify(selectedIndividualGift)}`)}
-                  className="mt-5 w-full bg-[#1c2b21] text-gold py-2.5 rounded-full shadow-md hover:rounded-md font-semibold transition duration-300"
+                  className="mt-1 mb-2 px-2 py-1 w-full bg-[#1c2b21] text-gold  rounded-full shadow-md hover:rounded-md font-semibold transition duration-300"
                 >
                   Continue to Details
                 </button>
@@ -158,7 +157,7 @@ const GiftingOptions = () => {
           </div>
 
           {/* ─── Ethiopian Diaspora (re‑uses individual list) ─── */}
-          <div className="bg-[#254E70] text-[#FDF6E3] p-10 rounded-3xl shadow-xl hover:shadow-2xl transition duration-300 transform hover:scale-[1.015] relative z-10">
+          <div className="bg-green text-gold p-10 rounded-3xl shadow-xl hover:shadow-2xl transition duration-300 transform hover:scale-[1.015] relative z-10">
             <h3 className="text-2xl font-semibold mb-3 text-center">
               Ethiopian&nbsp;Diaspora
             </h3>
@@ -167,14 +166,14 @@ const GiftingOptions = () => {
               crafted with love and Ethiopian pride.
             </p>
 
-            <label htmlFor="diasporaGift" className="block mb-2 text-sm font-medium">
+            <label htmlFor="diasporaGift" className="block mb-1 text-sm font-medium">
               Select a Gift:
             </label>
             <select
               id="diasporaGift"
               value={selectedDiasporaGift}
               onChange={e => setSelectedDiasporaGift(e.target.value)}
-              className="w-full mt-1 mb-6 px-4 py-2.5 rounded-lg text-[13px] md:text-sm text-gray-700 bg-white border border-gray-300 focus:ring-2 focus:ring-green-400 focus:border-green-500 shadow-sm transition-all duration-200 ease-in-out"
+              className="w-full mt-1 mb-1 px-1 py-1 rounded-lg text-[12px] md:text-sm text-gray-700 bg-white border border-gray-300 focus:ring-2 focus:ring-green-400 focus:border-green-500 shadow-sm transition-all duration-200 ease-in-out"
               style={{ minHeight: "50px" }}
             >
               <option value="">-- Choose Diaspora Gift --</option>
