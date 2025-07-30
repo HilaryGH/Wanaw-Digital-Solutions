@@ -79,7 +79,7 @@ const CartPage = () => {
       </div>
 
       {/* 🛍️ Cart Items */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {cart.map((item, index) => (
           <div
             key={index}

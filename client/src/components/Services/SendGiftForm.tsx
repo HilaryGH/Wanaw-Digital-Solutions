@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Gift as GiftIcon, ChevronDown, ChevronUp } from "lucide-react";
+
 import BASE_URL from "../../api/api";
 
 type Recipient = {
@@ -10,7 +11,6 @@ type Recipient = {
   whatsapp: string;
   telegram: string;
 };
-
 
 const SendGiftForm = () => {
   const { state } = useLocation();
@@ -57,7 +57,7 @@ const SendGiftForm = () => {
     }
   }, [senderNameInput, senderEmailInput, isLoggedIn]);
 
-  const [recipients, setRecipients] = useState([
+  const [recipients, setRecipients] = useState<Recipient[]>([
     { name: "", email: "", phone: "", whatsapp: "", telegram: "" },
   ]);
 
@@ -71,17 +71,16 @@ const SendGiftForm = () => {
   const senderEmail = loggedInUser?.email || senderEmailInput;
 
   const handleRecipientChange = (
-  index: number,
-  field: keyof Recipient,
-  value: string
-) => {
-  const updated = [...recipients];
-  updated[index][field] = value;
-  setRecipients(updated);
-};
+    index: number,
+    field: keyof Recipient,
+    value: string
+  ) => {
+    const updated = [...recipients];
+    updated[index][field] = value;
+    setRecipients(updated);
+  };
 
-
-  const notifyAllChannels = async (deliveryCode: string, recipient: any) => {
+  const notifyAllChannels = async (deliveryCode: string, recipient: Recipient) => {
     const payload = {
       buyerName: senderName,
       buyerEmail: senderEmail,
@@ -101,7 +100,7 @@ const SendGiftForm = () => {
       deliveryCode,
     };
 
-     await fetch(`${BASE_URL}/notifications/send`, {
+    await fetch(`${BASE_URL}/notifications/send`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -133,34 +132,61 @@ const SendGiftForm = () => {
 
       if (!purchaseRes.ok) throw new Error("Failed to register gift");
 
+      let successfulRecipients = 0;
+
       for (const recipient of recipients) {
-        const assignRes = await fetch(`${BASE_URL}/gift/${service._id}/assign-delivery-code`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ recipient, senderName, message, service }),
-        });
+        try {
+          const assignRes = await fetch(`${BASE_URL}/gift/${service._id}/assign-delivery-code`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ recipient, senderName, message, service }),
+          });
 
-        if (!assignRes.ok) continue;
+          if (!assignRes.ok) {
+            console.warn("Failed to assign delivery code to:", recipient);
+            continue;
+          }
 
-        const { code: deliveryCode } = await assignRes.json();
-        await notifyAllChannels(deliveryCode, recipient);
+          const { code: deliveryCode } = await assignRes.json();
+          await notifyAllChannels(deliveryCode, recipient);
+          successfulRecipients++;
+        } catch (err) {
+          console.error("Error assigning or notifying recipient:", err);
+        }
+      }
+
+      if (successfulRecipients === 0) {
+        alert("❌ Failed to send gift. Please check recipient details.");
+        return;
       }
 
       alert("🎉 Gift sent and purchase recorded!");
-const totalAmount = (service.price || 0) * recipients.length;
 
-navigate("/payment-options", {
-  state: {
-    service,
-    senderName,
-    senderEmail,
-    amount: totalAmount,
-    recipients,
-    occasion,
-    notifyProvider,
-    providerMessage,
-  },
-});
+      const totalAmount = (service.price || 0) * successfulRecipients;
+
+      console.log("Navigating to payment-options with:", {
+        service,
+        senderName,
+        senderEmail,
+        amount: totalAmount,
+        recipients,
+        occasion,
+        notifyProvider,
+        providerMessage,
+      });
+
+      navigate("/payment-options", {
+        state: {
+          service,
+          senderName,
+          senderEmail,
+          amount: totalAmount,
+          recipients,
+          occasion,
+          notifyProvider,
+          providerMessage,
+        },
+      });
 
     } catch (error) {
       console.error("Send gift error:", error);
@@ -177,9 +203,10 @@ navigate("/payment-options", {
         </h2>
 
         {occasion && (
-          <p className="text-sm text-gray-600 mb-6">
-            Occasion: <span className="font-medium">{occasion.title}</span>
-          </p>
+          <div className="text-sm text-gray-600 mb-6">
+            <p>Occasion: <span className="font-medium">{occasion.title}</span></p>
+            <p>Category: <span className="text-[#1c2b21] font-semibold">{occasion.category}</span></p>
+          </div>
         )}
 
         {!isLoggedIn && (
@@ -203,41 +230,11 @@ navigate("/payment-options", {
 
         {recipients.map((r, index) => (
           <div key={index} className="mb-6 border p-4 rounded bg-gray-50">
-            <input
-              type="text"
-              placeholder="Recipient Name"
-              value={r.name}
-              onChange={(e) => handleRecipientChange(index, "name", e.target.value)}
-              className="w-full p-2 border mb-2 rounded"
-            />
-            <input
-              type="email"
-              placeholder="Recipient Email"
-              value={r.email}
-              onChange={(e) => handleRecipientChange(index, "email", e.target.value)}
-              className="w-full p-2 border mb-2 rounded"
-            />
-            <input
-              type="tel"
-              placeholder="Phone"
-              value={r.phone}
-              onChange={(e) => handleRecipientChange(index, "phone", e.target.value)}
-              className="w-full p-2 border mb-2 rounded"
-            />
-            <input
-              type="tel"
-              placeholder="WhatsApp"
-              value={r.whatsapp}
-              onChange={(e) => handleRecipientChange(index, "whatsapp", e.target.value)}
-              className="w-full p-2 border mb-2 rounded"
-            />
-            <input
-              type="text"
-              placeholder="Telegram"
-              value={r.telegram}
-              onChange={(e) => handleRecipientChange(index, "telegram", e.target.value)}
-              className="w-full p-2 border mb-2 rounded"
-            />
+            <input type="text" placeholder="Recipient Name" value={r.name} onChange={(e) => handleRecipientChange(index, "name", e.target.value)} className="w-full p-2 border mb-2 rounded" />
+            <input type="email" placeholder="Recipient Email" value={r.email} onChange={(e) => handleRecipientChange(index, "email", e.target.value)} className="w-full p-2 border mb-2 rounded" />
+            <input type="tel" placeholder="Phone" value={r.phone} onChange={(e) => handleRecipientChange(index, "phone", e.target.value)} className="w-full p-2 border mb-2 rounded" />
+            <input type="tel" placeholder="WhatsApp" value={r.whatsapp} onChange={(e) => handleRecipientChange(index, "whatsapp", e.target.value)} className="w-full p-2 border mb-2 rounded" />
+            <input type="text" placeholder="Telegram" value={r.telegram} onChange={(e) => handleRecipientChange(index, "telegram", e.target.value)} className="w-full p-2 border mb-2 rounded" />
           </div>
         ))}
 
@@ -305,7 +302,6 @@ navigate("/payment-options", {
 };
 
 export default SendGiftForm;
-
 
 
 

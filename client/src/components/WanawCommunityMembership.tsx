@@ -31,6 +31,7 @@ interface FormData {
   whatsapp: string;
   location: string;
   specialization: string;
+  linkedin: string;
   internshipPeriod: string;
   cv: File | null;
   credentials: File | null;
@@ -47,6 +48,7 @@ export default function WanawCommunityMembership() {
     location: "",
     specialization: "",
     internshipPeriod: "",
+    linkedin: "",
     cv: null,
     credentials: null,
   });
@@ -193,6 +195,7 @@ const handleSubmit = async (e: FormEvent) => {
           />
         </div>
 
+
         {/* WhatsApp */}
         <div>
           <label htmlFor="whatsapp" className="block font-semibold mb-1">
@@ -207,6 +210,22 @@ const handleSubmit = async (e: FormEvent) => {
             className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+        {/* LinkedIn Profile */}
+<div>
+  <label htmlFor="linkedin" className="block font-semibold mb-1">
+    LinkedIn Profile
+  </label>
+  <input
+    id="linkedin"
+    name="linkedin"
+    type="url"
+    placeholder="https://linkedin.com/in/yourname"
+    value={formData.linkedin}
+    onChange={handleChange}
+    className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+  />
+</div>
+
 
         {/* Current Location */}
         <div>
@@ -249,7 +268,25 @@ const handleSubmit = async (e: FormEvent) => {
         </div>
 
         {/* Internship Period */}
-       
+       {/* Internship Period - only for fresh graduates */}
+{memberType === "freshGraduate" && (
+  <div>
+    <label htmlFor="internshipPeriod" className="block font-semibold mb-1">
+      Internship Period <span className="text-red-600">*</span>
+    </label>
+    <input
+      id="internshipPeriod"
+      name="internshipPeriod"
+      type="text"
+      required={memberType === "freshGraduate"}
+      value={formData.internshipPeriod}
+      onChange={handleChange}
+      placeholder="e.g. June 2025 - August 2025"
+      className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+)}
+
 
         {/* Upload CV */}
         <div>
