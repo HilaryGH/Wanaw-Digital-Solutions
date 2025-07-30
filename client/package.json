@@ -19,6 +19,7 @@
     "aos": "^2.3.4",
     "axios": "^1.11.0",
     "canvas-confetti": "^1.9.3",
+    "html2pdf.js": "^0.10.3",
     "i18next": "^25.3.2",
     "jwt-decode": "^4.0.0",
     "leaflet": "^1.9.4",

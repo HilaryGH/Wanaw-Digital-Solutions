@@ -1,43 +1,61 @@
-// src/pages/PaymentOptions.tsx
 import { useLocation } from "react-router-dom";
 import BASE_URL from "../../api/api";
+import DownloadableInvoice from "../Services/DownloadableInvoice";
+
 
 const PaymentOptions = () => {
   const { state } = useLocation();
   const {
     service,
-    recipientEmail,
-    recipientPhone,
-    recipientWhatsApp,
+    recipients = [],
+    amount,
     occasion,
     notifyProvider = false,
     providerMessage = "",
+    cart,
+    total,
+    email,
+    fullName,
+    phone,
+    buyerId,
   } = state || {};
 
+  const isCartPayment = Array.isArray(cart) && cart.length > 0;
+
   const handleChapaPayment = async () => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
     const token = localStorage.getItem("token");
 
-    const payload = {
-      amount: service?.price || 0,
-      email: recipientEmail || user.email || "",
-      phone_number: recipientPhone || "",
-      whatsapp_number: recipientWhatsApp || "",
-      first_name: user.fullName?.split(" ")[0] || "User",
-      last_name: user.fullName?.split(" ")[1] || "Wanaw",
-      serviceId: service?._id,
-      occasionId: occasion?._id || null,
-      notifyProvider,
-      providerMessage,
-      providerContact: service?.provider || null,
-    };
+    const payload = isCartPayment
+      ? {
+          amount: total || 0,
+          email,
+          first_name: fullName?.split(" ")[0] || "User",
+          last_name: fullName?.split(" ")[1] || "Wanaw",
+          phone_number: phone || "0910000000",
+          cart,
+          buyerId,
+        }
+      : {
+          amount: amount || 0,
+          quantity: recipients.length,
+          email: recipients[0]?.email || "",
+          phone_number: recipients[0]?.phone || "",
+          whatsapp_number: recipients[0]?.whatsapp || "",
+          first_name: fullName?.split(" ")[0] || "User",
+          last_name: fullName?.split(" ")[1] || "Wanaw",
+          serviceId: service?._id,
+          occasionId: occasion?._id || null,
+          notifyProvider,
+          providerMessage,
+          providerContact: service?.provider || null,
+        };
 
     try {
       const res = await fetch(`${BASE_URL}/payment/pay`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          ...(token && { Authorization: `Bearer ${token}` }),
         },
         body: JSON.stringify(payload),
       });
@@ -57,19 +75,44 @@ const PaymentOptions = () => {
   };
 
   const handleWalletPayment = () => {
-    // Placeholder function – you can replace this with your own wallet logic
-    alert("Wallet payment feature coming soon or under development.");
+    alert("Wallet payment coming soon.");
   };
 
   return (
+    <>
     <div className="max-w-xl mx-auto p-6">
+          <DownloadableInvoice
+  fullName={state.fullName}
+  email={state.email}
+  cart={state.cart}
+  total={state.total}
+/>
+
+
       <h2 className="text-2xl font-bold mb-4">Choose Payment Method</h2>
-      <p className="mb-2">
-        For: <strong>{service?.title}</strong>
-      </p>
-      <p className="mb-4">
-        Amount: <strong>{service?.price} ETB</strong>
-      </p>
+
+      {isCartPayment ? (
+        <>
+          <p className="mb-2">
+            Items in Cart: <strong>{cart.length}</strong>
+          </p>
+          <p className="mb-4">
+            Total Amount: <strong>{total} ETB</strong>
+          </p>
+        </>
+      ) : (
+        <>
+          <p className="mb-2">
+            For: <strong>{service?.title}</strong>
+          </p>
+          <p className="mb-2">
+            Recipients: <strong>{recipients.length}</strong>
+          </p>
+          <p className="mb-4">
+            Total Amount: <strong>{amount} ETB</strong>
+          </p>
+        </>
+      )}
 
       <div className="grid gap-4">
         <button className="p-3 bg-green text-gold rounded">Pay with Telebirr</button>
@@ -90,9 +133,13 @@ const PaymentOptions = () => {
         </button>
       </div>
     </div>
+
+</>
   );
 };
 
 export default PaymentOptions;
+
+
 
 

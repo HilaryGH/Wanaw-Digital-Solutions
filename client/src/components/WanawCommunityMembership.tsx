@@ -21,7 +21,6 @@ const freshGraduateSpecializations = [
   "Sales",
 ];
 
-const internshipPeriods = ["1 Month", "2 Months", "3 Months", "6 Months"];
 
 type MemberType = "healthcare" | "freshGraduate";
 
@@ -250,29 +249,7 @@ const handleSubmit = async (e: FormEvent) => {
         </div>
 
         {/* Internship Period */}
-        <div>
-          <label
-            htmlFor="internshipPeriod"
-            className="block font-semibold mb-1"
-          >
-            Internship Period <span className="text-red-600">*</span>
-          </label>
-          <select
-            id="internshipPeriod"
-            name="internshipPeriod"
-            required
-            value={formData.internshipPeriod}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">-- Select Internship Period --</option>
-            {internshipPeriods.map((period) => (
-              <option key={period} value={period}>
-                {period}
-              </option>
-            ))}
-          </select>
-        </div>
+       
 
         {/* Upload CV */}
         <div>

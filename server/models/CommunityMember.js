@@ -16,7 +16,6 @@ const communityMemberSchema = new mongoose.Schema({
   whatsapp: String,
   location: String,
   specialization: { type: String, required: true },
-  internshipPeriod: { type: String, required: true },
   cvUrl: { type: String, required: true },
   credentialsUrl: { type: String, required: true },
 }, { timestamps: true });

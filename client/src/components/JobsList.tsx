@@ -35,40 +35,43 @@ const JobsList = () => {
     fetchJobs();
   }, []);
 
-  if (loading) return <p>Loading jobs...</p>;
-  if (error) return <p className="text-red-600">{error}</p>;
+  if (loading) return <p className="text-center py-10 text-gray-500">Loading jobs...</p>;
+  if (error) return <p className="text-center text-red-600 py-10">{error}</p>;
 
   return (
-    <div className="p-4">
+    <div className="p-6 md:p-12 max-w-7xl mx-auto">
       {jobs.length === 0 ? (
-        <p>No jobs available</p>
+        <p className="text-center text-gray-600">No jobs available</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {jobs.map((job) => (
             <div
               key={job._id}
-              className="border rounded shadow p-6 flex flex-col justify-between"
+              className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 p-6 flex flex-col justify-between border border-gray-100"
             >
               <div>
-                <h2 className="text-xl font-semibold mb-2">{job.title}</h2>
-                <p>
-                  <strong>Location:</strong> {job.location || "Not specified"}
+                <h2 className="text-2xl font-semibold text-black mb-2">{job.title}</h2>
+                <p className="text-sm text-gray-500 mb-1">
+                  <span className="font-semibold text-gray-700">📍 Location:</span>{" "}
+                  {job.location || "Not specified"}
                 </p>
-                <p>
-                  <strong>Employment:</strong> {job.employmentModel}
+                <p className="text-sm text-gray-500 mb-1">
+                  <span className="font-semibold text-gray-700">🕒 Employment:</span>{" "}
+                  {job.employmentModel}
                 </p>
-                <p>
-                  <strong>Specialization:</strong> {job.specialization}
+                <p className="text-sm text-gray-500 mb-2">
+                  <span className="font-semibold text-gray-700">🎯 Specialization:</span>{" "}
+                  {job.specialization}
                 </p>
-                <p className="mt-2 text-gray-700 text-sm line-clamp-3">
+                <p className="text-gray-600 text-sm line-clamp-3">
                   {job.description || "No description provided"}
                 </p>
               </div>
               <button
-                className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition"
+                className="mt-6 bg-green hover:bg-blue-700 text-gold font-semibold py-2 px-4 rounded-lg transition"
                 onClick={() => navigate(`/career/${job._id}`)}
               >
-                Apply
+                Apply Now
               </button>
             </div>
           ))}
@@ -79,5 +82,6 @@ const JobsList = () => {
 };
 
 export default JobsList;
+
 
 

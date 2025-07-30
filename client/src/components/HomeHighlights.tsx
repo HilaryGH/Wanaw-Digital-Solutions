@@ -52,7 +52,7 @@ const HomeHighlights = () => {
 
       <div className="relative z-10 flex flex-col gap-10">
         {/* Top: Image + Two Highlights */}
-    <div className="text-center mb-14">
+    <div className="text-center mb-10">
   <h2 className="relative inline-block text-3xl md:text-4xl font-extrabold text-white leading-tight tracking-tight">
     <span className="relative z-10">
       Your Seamless Gifting Journey with <span className="text-yellow-300">Wanaw</span>

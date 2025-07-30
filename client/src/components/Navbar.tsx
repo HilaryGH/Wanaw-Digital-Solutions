@@ -197,7 +197,7 @@ const menuSections: MenuSection[] = [
     translationKey: "programs",
     items: [
       {
-        label: "Programs",
+        label: "Pakages",
         path: "/programs",
       },
     ],
