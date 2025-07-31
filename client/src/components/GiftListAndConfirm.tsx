@@ -5,11 +5,10 @@ import BASE_URL from "../api/api";
 
 type Gift = {
   _id: string;
-  title?: string; // only if directly available
+  title?: string;
   service?: {
     title?: string;
-    price?: number;
-    // etc.
+    category?: string;
   };
   recipient?: {
     name?: string;
@@ -17,8 +16,8 @@ type Gift = {
     phone?: string;
   };
   senderName?: string;
+  occasion?: string;
 };
-
 
 const GiftListAndConfirm = () => {
   const [gifts, setGifts] = useState<Gift[]>([]);
@@ -31,7 +30,21 @@ const GiftListAndConfirm = () => {
     const fetchGifts = async () => {
       try {
         const res = await axios.get(`${BASE_URL}/gift`);
-        setGifts(res.data);
+        const processedGifts = res.data.map((gift: Gift) => ({
+          _id: gift._id,
+          senderName: gift.senderName || "Unknown",
+          recipient: gift.recipient || {
+            name: "N/A",
+            email: "N/A",
+            phone: "N/A",
+          },
+          occasion: gift.occasion || "Not specified",
+          service: {
+            title: gift.service?.title || "Untitled",
+            category: gift.service?.category || "Uncategorized",
+          },
+        }));
+        setGifts(processedGifts);
         setLoading(false);
       } catch (err) {
         setError("Failed to load gifts");
@@ -42,26 +55,25 @@ const GiftListAndConfirm = () => {
   }, []);
 
   const filteredGifts = gifts.filter((gift) =>
-  (gift.title || gift.service?.title || "")
-    .toLowerCase()
-    .includes(searchTerm.toLowerCase()) ||
-  gift.recipient?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  gift.senderName?.toLowerCase().includes(searchTerm.toLowerCase())
-);
+    (gift.service?.title || "")
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase()) ||
+    gift.recipient?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    gift.senderName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    gift.occasion?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (loading) return <p className="text-center py-6">Loading gifts...</p>;
   if (error) return <p className="text-red-600 text-center">{error}</p>;
-  console.log("🧪 Loaded gifts:", gifts);
-
 
   return (
-    <div className="px-4 max-w-3xl mx-auto">
+    <div className="px-4 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-4 text-center">Your Gifts</h1>
 
-      {/* Search input */}
+      {/* Search */}
       <input
         type="text"
-        placeholder="Search by gift, sender, or recipient..."
+        placeholder="Search by gift, sender, recipient or occasion..."
         className="w-full mb-6 p-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
@@ -80,19 +92,18 @@ const GiftListAndConfirm = () => {
               <h3 className="text-lg font-semibold text-blue-800">
   {gift.service?.title || "Untitled"}
 </h3>
-
               <p className="text-sm text-gray-600 mt-1">
-                🎁 Sender: {gift.senderName || "Unknown"}
+                🎁 Occasion: {gift.occasion}
               </p>
+             <p className="text-sm text-gray-600">🏷️ Category: {gift.service?.category || "Uncategorized"}</p>
+
               <p className="text-sm text-gray-600">
-                👤 Recipient: {gift.recipient?.name || "N/A"}
+                👤 Sender: {gift.senderName}
               </p>
-              <p className="text-sm text-gray-600">
-                📧 Email: {gift.recipient?.email || "N/A"}
-              </p>
-              <p className="text-sm text-gray-600">
-                📞 Phone: {gift.recipient?.phone || "N/A"}
-              </p>
+              <p className="text-sm text-gray-600">👤 Recipient: {gift.recipient?.name || "N/A"}</p>
+<p className="text-sm text-gray-600">📧 Email: {gift.recipient?.email || "N/A"}</p>
+<p className="text-sm text-gray-600">📞 Phone: {gift.recipient?.phone || "N/A"}</p>
+
               <button
                 onClick={() => setSelectedGiftId(gift._id)}
                 className="mt-3 bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
@@ -122,5 +133,6 @@ const GiftListAndConfirm = () => {
 };
 
 export default GiftListAndConfirm;
+
 
 

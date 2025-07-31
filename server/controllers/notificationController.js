@@ -1,11 +1,16 @@
 /* controllers/notificationController.js */
 
+
 const {
   sendEmail,
   sendSMS,
   sendWhatsApp,
   sendTelegram,
 } = require("../utils/notification");
+const Service = require('../models/Service'); // <-- then use it like below
+
+
+
 
 /* ─── Helper to ensure +E.164 numbers ─── */
 const formatNumber = (n) => {
@@ -27,17 +32,25 @@ exports.sendGiftNotifications = async (req, res) => {
       notifyProvider,
       providerMessage,
       providerContact,
+      providerName,
+      serviceLocation,
+      giftSender, // optional: if not provided, fallback to senderName
     } = req.body;
 
-    /* ---------- Main message ---------- */
+    const senderDisplayName = giftSender || senderName || "Anonymous";
+    const providerDisplayName = providerName || "—";
+    const locationDisplay = serviceLocation || "—";
+
+    /* ---------- Main message to recipient ---------- */
     const finalMessage = `
 🎁 You've received a gift!
 
 🎉 Occasion: ${occasionTitle || "—"}
-
 🛍️ Service: ${serviceTitle || "—"}
+🏢 Provider: ${providerDisplayName}
+📍 Location: ${locationDisplay}
 💬 Message: ${message?.trim() || "—"}
-👤 From: ${senderName || "Anonymous"}
+👤 From: ${senderDisplayName}
     `.trim();
 
     /* --- Send to recipient --- */
@@ -72,8 +85,9 @@ exports.sendGiftNotifications = async (req, res) => {
 🔔 A customer sent a gift related to your service.
 
 🛍️ Service: ${serviceTitle || "—"}
+📍 Location: ${locationDisplay}
 💬 Customer note: ${providerMessage?.trim() || "—"}
-👤 Sender: ${senderName || "Anonymous"}
+👤 Sender: ${senderDisplayName}
       `.trim();
 
       if (providerContact.email)
@@ -108,6 +122,7 @@ exports.sendGiftNotifications = async (req, res) => {
     return res.status(500).json({ error: "Failed to send notifications." });
   }
 };
+
 
 
 

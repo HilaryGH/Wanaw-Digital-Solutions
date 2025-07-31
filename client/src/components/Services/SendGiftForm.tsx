@@ -22,9 +22,17 @@ const SendGiftForm = () => {
       _id: string;
       title: string;
       price?: number;
+      location?: string;
       description?: string;
-      provider?: { name: string; email?: string; phone?: string; whatsapp?: string; telegram?: string };
+      provider?: {
+        name: string;
+        email?: string;
+        phone?: string;
+        whatsapp?: string;
+        telegram?: string;
+      };
       imageUrl?: File;
+      category?: string; // Added category for easier checking
     };
   };
 
@@ -32,7 +40,10 @@ const SendGiftForm = () => {
     return (
       <div className="p-6">
         <p className="text-red-600 mb-4">No service selected.</p>
-        <button onClick={() => navigate(-1)} className="bg-[#1c2b21] text-white px-4 py-2 rounded">
+        <button
+          onClick={() => navigate(-1)}
+          className="bg-[#1c2b21] text-white px-4 py-2 rounded"
+        >
           Go Back
         </button>
       </div>
@@ -53,7 +64,10 @@ const SendGiftForm = () => {
 
   useEffect(() => {
     if (!isLoggedIn) {
-      localStorage.setItem("guestSender", JSON.stringify({ name: senderNameInput, email: senderEmailInput }));
+      localStorage.setItem(
+        "guestSender",
+        JSON.stringify({ name: senderNameInput, email: senderEmailInput })
+      );
     }
   }, [senderNameInput, senderEmailInput, isLoggedIn]);
 
@@ -65,6 +79,11 @@ const SendGiftForm = () => {
   const [notifyProvider, setNotifyProvider] = useState(false);
   const [providerMessage, setProviderMessage] = useState("");
   const [deliveryDate, setDeliveryDate] = useState<string>("");
+
+  // New states for hotel booking
+  const [checkInDate, setCheckInDate] = useState<string>("");
+  const [checkOutDate, setCheckOutDate] = useState<string>("");
+  const [nights, setNights] = useState<number>(1);
 
   const loggedInUser = JSON.parse(localStorage.getItem("user") || "null");
   const senderName = loggedInUser?.fullName || senderNameInput || "Anonymous";
@@ -93,11 +112,20 @@ const SendGiftForm = () => {
       serviceTitle: service.title,
       occasionTitle: occasion?.title || "",
       serviceImageUrl: service.imageUrl,
+
       notifyProvider,
       providerMessage,
       providerContact: service.provider,
+
+      provider: service.provider?.name || "",
+      location: service?.location || "",
+      giftCode: deliveryCode,
       deliveryDate,
-      deliveryCode,
+
+      // Include hotel-specific dates if relevant
+      checkInDate: service.category === "hotel" ? checkInDate : undefined,
+      checkOutDate: service.category === "hotel" ? checkOutDate : undefined,
+      nights: service.category === "hotel" ? nights : undefined,
     };
 
     await fetch(`${BASE_URL}/notifications/send`, {
@@ -108,7 +136,11 @@ const SendGiftForm = () => {
   };
 
   const handlePayAndSend = async () => {
-    if (!recipients.some(r => r.email || r.phone || r.whatsapp || r.telegram)) {
+    if (
+      !recipients.some(
+        (r) => r.email || r.phone || r.whatsapp || r.telegram
+      )
+    ) {
       alert("Please enter at least one recipient contact.");
       return;
     }
@@ -117,18 +149,40 @@ const SendGiftForm = () => {
       return;
     }
 
+    // Validate hotel-specific dates if service is hotel
+    if (service.category === "hotel") {
+      if (!checkInDate || !checkOutDate) {
+        alert("Please select both check-in and check-out dates.");
+        return;
+      }
+      if (new Date(checkOutDate) <= new Date(checkInDate)) {
+        alert("Check-out date must be after check-in date.");
+        return;
+      }
+      const nightsDiff =
+        (new Date(checkOutDate).getTime() - new Date(checkInDate).getTime()) /
+        (1000 * 3600 * 24);
+      setNights(nightsDiff);
+    }
+
     try {
       const purchasePayload = {
         buyerName: senderName,
         buyerEmail: senderEmail,
         deliveryDate,
+        checkInDate: service.category === "hotel" ? checkInDate : undefined,
+        checkOutDate: service.category === "hotel" ? checkOutDate : undefined,
+        nights: service.category === "hotel" ? nights : undefined,
       };
 
-      const purchaseRes = await fetch(`${BASE_URL}/services/${service._id}/purchase`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(purchasePayload),
-      });
+      const purchaseRes = await fetch(
+        `${BASE_URL}/services/${service._id}/purchase`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(purchasePayload),
+        }
+      );
 
       if (!purchaseRes.ok) throw new Error("Failed to register gift");
 
@@ -136,11 +190,14 @@ const SendGiftForm = () => {
 
       for (const recipient of recipients) {
         try {
-          const assignRes = await fetch(`${BASE_URL}/gift/${service._id}/assign-delivery-code`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ recipient, senderName, message, service }),
-          });
+          const assignRes = await fetch(
+            `${BASE_URL}/gift/${service._id}/assign-delivery-code`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ recipient, senderName, message, service }),
+            }
+          );
 
           if (!assignRes.ok) {
             console.warn("Failed to assign delivery code to:", recipient);
@@ -187,7 +244,6 @@ const SendGiftForm = () => {
           providerMessage,
         },
       });
-
     } catch (error) {
       console.error("Send gift error:", error);
       alert("❌ Something went wrong while sending the gift.");
@@ -204,8 +260,13 @@ const SendGiftForm = () => {
 
         {occasion && (
           <div className="text-sm text-gray-600 mb-6">
-            <p>Occasion: <span className="font-medium">{occasion.title}</span></p>
-            <p>Category: <span className="text-[#1c2b21] font-semibold">{occasion.category}</span></p>
+            <p>
+              Occasion: <span className="font-medium">{occasion.title}</span>
+            </p>
+            <p>
+              Category:{" "}
+              <span className="text-[#1c2b21] font-semibold">{occasion.category}</span>
+            </p>
           </div>
         )}
 
@@ -230,29 +291,96 @@ const SendGiftForm = () => {
 
         {recipients.map((r, index) => (
           <div key={index} className="mb-6 border p-4 rounded bg-gray-50">
-            <input type="text" placeholder="Recipient Name" value={r.name} onChange={(e) => handleRecipientChange(index, "name", e.target.value)} className="w-full p-2 border mb-2 rounded" />
-            <input type="email" placeholder="Recipient Email" value={r.email} onChange={(e) => handleRecipientChange(index, "email", e.target.value)} className="w-full p-2 border mb-2 rounded" />
-            <input type="tel" placeholder="Phone" value={r.phone} onChange={(e) => handleRecipientChange(index, "phone", e.target.value)} className="w-full p-2 border mb-2 rounded" />
-            <input type="tel" placeholder="WhatsApp" value={r.whatsapp} onChange={(e) => handleRecipientChange(index, "whatsapp", e.target.value)} className="w-full p-2 border mb-2 rounded" />
-            <input type="text" placeholder="Telegram" value={r.telegram} onChange={(e) => handleRecipientChange(index, "telegram", e.target.value)} className="w-full p-2 border mb-2 rounded" />
+            <input
+              type="text"
+              placeholder="Recipient Name"
+              value={r.name}
+              onChange={(e) => handleRecipientChange(index, "name", e.target.value)}
+              className="w-full p-2 border border-gray-300 mb-2 rounded"
+            />
+            <input
+              type="email"
+              placeholder="Recipient Email"
+              value={r.email}
+              onChange={(e) => handleRecipientChange(index, "email", e.target.value)}
+              className="w-full p-2 border border-gray-300 mb-2 rounded"
+            />
+            <input
+              type="tel"
+              placeholder="Phone"
+              value={r.phone}
+              onChange={(e) => handleRecipientChange(index, "phone", e.target.value)}
+              className="w-full p-2 border border-gray-300 mb-2 rounded"
+            />
+            <input
+              type="tel"
+              placeholder="WhatsApp"
+              value={r.whatsapp}
+              onChange={(e) => handleRecipientChange(index, "whatsapp", e.target.value)}
+              className="w-full p-2 border border-gray-300 mb-2 rounded"
+            />
+            <input
+              type="text"
+              placeholder="Telegram"
+              value={r.telegram}
+              onChange={(e) => handleRecipientChange(index, "telegram", e.target.value)}
+              className="w-full p-2 border border-gray-300 mb-2 rounded"
+            />
           </div>
         ))}
 
         <button
           type="button"
           className="bg-[#1c2b21] text-white px-4 py-1 mb-4 rounded"
-          onClick={() => setRecipients([...recipients, { name: "", email: "", phone: "", whatsapp: "", telegram: "" }])}
+          onClick={() =>
+            setRecipients([
+              ...recipients,
+              { name: "", email: "", phone: "", whatsapp: "", telegram: "" },
+            ])
+          }
         >
           ➕ Add Another Recipient
         </button>
 
-        <label className="block mb-2 font-medium text-[#1c2b21]">Preferred Service Date</label>
-        <input
-          type="date"
-          value={deliveryDate}
-          onChange={(e) => setDeliveryDate(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-lg mb-6"
-        />
+        {/* Conditional date inputs */}
+        {service.category === "Hotel Rooms" ? (
+          <>
+            <label className="block mb-2 font-medium text-[#1c2b21]">Check-in Date</label>
+            <input
+              type="date"
+              value={checkInDate}
+              onChange={(e) => setCheckInDate(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg mb-4"
+            />
+
+            <label className="block mb-2 font-medium text-[#1c2b21]">Check-out Date</label>
+            <input
+              type="date"
+              value={checkOutDate}
+              onChange={(e) => setCheckOutDate(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg mb-6"
+            />
+
+            <label className="block mb-2 font-medium text-[#1c2b21]">Number of Nights</label>
+            <input
+              type="number"
+              min={1}
+              value={nights}
+              readOnly
+              className="w-full p-3 border border-gray-300 rounded-lg mb-6 bg-gray-100 cursor-not-allowed"
+            />
+          </>
+        ) : (
+          <>
+            <label className="block mb-2 font-medium text-[#1c2b21]">Preferred Service Date</label>
+            <input
+              type="date"
+              value={deliveryDate}
+              onChange={(e) => setDeliveryDate(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg mb-6"
+            />
+          </>
+        )}
 
         <textarea
           placeholder="Add a message (optional)"
@@ -268,7 +396,11 @@ const SendGiftForm = () => {
               onClick={() => setNotifyProvider((v) => !v)}
               className="flex items-center text-sm font-medium text-[#1c2b21] mb-2"
             >
-              {notifyProvider ? <ChevronUp className="w-4 h-4 mr-1" /> : <ChevronDown className="w-4 h-4 mr-1" />}
+              {notifyProvider ? (
+                <ChevronUp className="w-4 h-4 mr-1" />
+              ) : (
+                <ChevronDown className="w-4 h-4 mr-1" />
+              )}
               Notify {service.provider.name}
             </button>
 
@@ -302,6 +434,7 @@ const SendGiftForm = () => {
 };
 
 export default SendGiftForm;
+
 
 
 

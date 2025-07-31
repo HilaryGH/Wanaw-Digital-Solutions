@@ -4,6 +4,11 @@ const giftNotificationSchema = new mongoose.Schema(
   {
     occasionId: mongoose.Types.ObjectId,
     serviceId: mongoose.Types.ObjectId,
+
+    senderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // The person who is sending the gift
+    },
     senderName: String,
 
     recipient: {
@@ -20,18 +25,24 @@ const giftNotificationSchema = new mongoose.Schema(
     sentVia: [String], // e.g., ["email", "sms", "whatsapp"]
     status: { type: String, enum: ["pending", "success", "partial", "failed"] },
 
-    // Delivery tracking fields
-    giftCode: String, // 🔁 renamed from deliveryCode
+    // Delivery tracking
+    giftCode: String,
     deliveryStatus: { type: String, enum: ["pending", "delivered"], default: "pending" },
     deliveredAt: Date,
+
     providerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // or "Provider", depending on your setup
+      ref: "User", // Business user offering the service
+    },
+    giftId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Gift'
     },
   },
   { timestamps: true }
 );
 
 module.exports = mongoose.model("GiftNotification", giftNotificationSchema);
+
 
 

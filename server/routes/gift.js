@@ -5,8 +5,6 @@ const verifyToken = require("../middleware/verifyToken");
 
 
 const {
-  sendGift,
-  sendProductGift,
   createGift,
   getGifts,
   deleteGift,
@@ -15,8 +13,8 @@ const {
   getGiftsByProvider,
 } = require("../controllers/giftController");
 
-router.post("/send-gift", sendGift);
-router.post("/send-product-gift", sendProductGift);
+
+
 router.post("/:giftId/assign-delivery-code", assignDeliveryCode);
 router.post("/:giftId/confirm-gift", confirmGiftCode);
 

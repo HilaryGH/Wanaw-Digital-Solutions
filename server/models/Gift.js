@@ -9,12 +9,25 @@ const giftSchema = new mongoose.Schema({
   imageUrl: { type: String },
   tags: [String],
   isActive: { type: Boolean, default: true },
- providerId: {
+
+  senderName: { type: String }, // NEW: Optional sender name
+
+  recipient: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User", // or "Provider" if you have a separate Provider model
-    required: true,
+    ref: "User", // assuming you store recipients in the User collection
   },
 
+  service: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Service", // assuming services are stored separately
+  },
+
+  providerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User", // or "Provider" if separate
+    required: true,
+  },
 }, { timestamps: true });
+
 
 module.exports = mongoose.model("Gift", giftSchema);

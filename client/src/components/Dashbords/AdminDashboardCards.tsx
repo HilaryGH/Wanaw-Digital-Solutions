@@ -94,6 +94,13 @@ export default function AdminDashboardCards() {
       color: "bg-pink-100",
       roles: ["super_admin", "customer_support_admin"],
     },
+     {
+      title: "GiftList and confirm",
+      description: "View and respond to job applicants.",
+      route: "/admin/gift-list & confirm",
+      color: "bg-pink-100",
+      roles: ["super_admin", "customer_support_admin"],
+    },
   ];
 
   const visibleFeatures = features.filter((feature) =>

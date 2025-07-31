@@ -1,49 +1,23 @@
 const sendGiftEmail = require("../services/emailService");
 const GiftNotification = require("../models/GiftNotification");
+const Service = require('../models/Service'); // <-- then use it like below
 
 
-// Send email for a service gift
-exports.sendGift = async (req, res) => {
-  const { recipientEmail, message, service, senderName } = req.body;
-  if (!recipientEmail || !service?.title) {
-    return res.status(400).json({ msg: "Missing recipient or service info" });
-  }
 
-  const subject = `${senderName || "Someone"} sent you a gift!`;
-
-  const html = `
-  <h2>🎁 You've received a gift!</h2>
-  <p><strong>Service:</strong> ${service.title}</p>
-  <p><strong>Category:</strong> ${service.category}</p>
-  <p><strong>Message:</strong> ${message || "No message provided"}</p>
-  <p><strong>Delivery Code:</strong> <span style="font-size: 18px; color: blue;">${gift.deliveryCode}</span></p>
-  <p style="margin-top:20px;">Visit Wanaw to explore more!</p>
-`;
-
-  const text = `
-You've received a gift!
-Service: ${service.title}
-Category: ${service.category}
-Message: ${message || "No message provided"}
-Delivery Code: ${gift.deliveryCode}
-`;
-
-
-  try {
-    await sendGiftEmail({ to: recipientEmail, subject, html, text });
-    res.status(200).json({ msg: "Gift email sent successfully!" });
-  } catch (error) {
-    console.error("Email send error:", error);
-    res.status(500).json({ msg: "Failed to send gift email" });
-  }
-};
+const Gift = require('../models/Gift');
 // controllers/giftController.js
-const Gift = require("../models/Gift");
-
 exports.createGift = async (req, res) => {
-  const { title, category, occasion, description, imageUrl } = req.body;
+  const {
+    title,
+    category,
+    occasion,
+    description,
+    imageUrl,
+    senderName,  // new field
+    recipientId, // expect recipient id as input
+    serviceId    // expect service id as input
+  } = req.body;
 
-  // Check if user exists and is an admin
   const user = req.user;
   if (!user || user.role !== "admin") {
     return res.status(403).json({ msg: "Unauthorized: Only admins can add gifts" });
@@ -54,13 +28,24 @@ exports.createGift = async (req, res) => {
   }
 
   try {
+    // Check if the provided serviceId is valid and exists
+    if (serviceId) {
+      const existingService = await Service.findById(serviceId);
+      if (!existingService) {
+        return res.status(404).json({ msg: "Service not found with the given ID" });
+      }
+    }
+
     const newGift = new Gift({
       title,
       category,
       occasion,
       description,
       imageUrl: imageUrl || "",
-      providerId: user._id, // still saving the admin's ID as providerId for tracking
+      senderName: senderName || user.name || "Admin",
+      recipient: recipientId,
+      service: serviceId,
+      providerId: user._id,
     });
 
     await newGift.save();
@@ -69,40 +54,7 @@ exports.createGift = async (req, res) => {
     console.error("Error saving gift:", err.message, err);
     return res.status(500).json({ msg: "Failed to add gift", error: err.message });
   }
-};
 
-
-
-
-
-
-// Send email for a product gift (gift items)
-exports.sendProductGift = async (req, res) => {
-  const { recipientEmail, message, gift, senderName } = req.body;
-
-  if (!recipientEmail || !gift?.title) {
-    return res.status(400).json({ msg: "Missing recipient or gift info" });
-  }
-
-  const subject = `${senderName || "Someone"} sent you a thoughtful gift from Wanaw!`;
-  const html = `
-    <h2>🎁 You've received a personalized gift!</h2>
-    <p><strong>Gift:</strong> ${gift.title}</p>
-    <p><strong>Category:</strong> ${gift.category}</p>
-    <p><strong>Occasion:</strong> ${gift.occasion || "N/A"}</p>
-    <p><strong>Message:</strong> ${message || "No message provided"}</p>
-    <p style="margin-top:20px;">Visit <a href="https://wanaw.com" target="_blank">Wanaw.com</a> to explore more!</p>
-  `;
-
-  const text = `You’ve been gifted: ${gift.title}\nMessage: ${message}`;
-
-  try {
-    await sendGiftEmail({ to: recipientEmail, subject, html, text });
-    res.status(200).json({ msg: "Gift product email sent successfully!" });
-  } catch (error) {
-    console.error("Gift email error:", error);
-    res.status(500).json({ msg: "Failed to send gift email" });
-  }
 };
 // Get all gifts
 exports.getGifts = async (req, res) => {
@@ -110,10 +62,13 @@ exports.getGifts = async (req, res) => {
 
   try {
     const query = providerId ? { providerId } : {};
-    const gifts = await Gift.find(query).sort({ createdAt: -1 });
+
+    const gifts = await Gift.find(query)
+      .populate("service", "title category")      // populate service with only title & category fields
+      .populate("recipient", "name email phone")  // populate recipient with needed fields
+      .sort({ createdAt: -1 });
 
     res.status(200).json(gifts);
-
   } catch (err) {
     console.error("❌ Error fetching gifts:", err);
     res.status(500).json({ msg: "Server error fetching gifts" });
