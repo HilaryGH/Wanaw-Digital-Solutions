@@ -61,6 +61,7 @@ const SendGiftForm = () => {
       setSenderEmailInput(saved.email || "");
     }
   }, [isLoggedIn]);
+  
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -88,6 +89,17 @@ const SendGiftForm = () => {
   const loggedInUser = JSON.parse(localStorage.getItem("user") || "null");
   const senderName = loggedInUser?.fullName || senderNameInput || "Anonymous";
   const senderEmail = loggedInUser?.email || senderEmailInput;
+ useEffect(() => {
+  if (service.category === "Hotel Rooms" && checkInDate && checkOutDate) {
+    const inDate = new Date(checkInDate);
+    const outDate = new Date(checkOutDate);
+    const diffTime = outDate.getTime() - inDate.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    setNights(diffDays > 0 ? diffDays : 1);
+  }
+}, [checkInDate, checkOutDate, service.category]);
+
+
 
   const handleRecipientChange = (
     index: number,
@@ -123,9 +135,9 @@ const SendGiftForm = () => {
       deliveryDate,
 
       // Include hotel-specific dates if relevant
-      checkInDate: service.category === "hotel" ? checkInDate : undefined,
-      checkOutDate: service.category === "hotel" ? checkOutDate : undefined,
-      nights: service.category === "hotel" ? nights : undefined,
+      checkInDate: service.category === "Hotel Rooms" ? checkInDate : undefined,
+      checkOutDate: service.category === "Hotel Rooms" ? checkOutDate : undefined,
+      nights: service.category === "Hotel Rooms" ? nights : undefined,
     };
 
     await fetch(`${BASE_URL}/notifications/send`, {
@@ -150,7 +162,7 @@ const SendGiftForm = () => {
     }
 
     // Validate hotel-specific dates if service is hotel
-    if (service.category === "hotel") {
+    if (service.category === "Hotel Rooms") {
       if (!checkInDate || !checkOutDate) {
         alert("Please select both check-in and check-out dates.");
         return;
@@ -170,9 +182,9 @@ const SendGiftForm = () => {
         buyerName: senderName,
         buyerEmail: senderEmail,
         deliveryDate,
-        checkInDate: service.category === "hotel" ? checkInDate : undefined,
-        checkOutDate: service.category === "hotel" ? checkOutDate : undefined,
-        nights: service.category === "hotel" ? nights : undefined,
+        checkInDate: service.category === "Hotel Rooms" ? checkInDate : undefined,
+        checkOutDate: service.category === "Hotel Rooms" ? checkOutDate : undefined,
+        nights: service.category === "Hotel Rooms" ? nights : undefined,
       };
 
       const purchaseRes = await fetch(

@@ -124,25 +124,26 @@ const PaymentOptions = () => {
           <p>No payment data available.</p>
         )}
 
-        <div className="grid gap-4">
-          <button className="p-3 bg-green text-gold rounded"><img src="/EthioTel.png" alt="Telebirr" className="h-6 w-auto" />Pay with Telebirr</button>
-          <button className="p-3 bg-green text-gold rounded"><img src="/assets/telebirr.png" alt="Telebirr" className="h-6 w-auto" />Pay with Bank Transfer</button>
-          <button className="p-3 bg-green text-gold rounded"><img src="/assets/telebirr.png" alt="Telebirr" className="h-6 w-auto" />Pay with Card</button>
-          <button className="p-3 bg-green text-gold rounded"><img src="/assets/telebirr.png" alt="Telebirr" className="h-6 w-auto" />Pay with Bank App</button>
-          <button
-            onClick={handleWalletPayment}
-            className="p-3 bg-purple-700 text-white rounded hover:bg-purple-800 transition"
-          > <img src="/assets/telebirr.png" alt="Telebirr" className="h-6 w-auto" />
-            Pay with Wallet
-          </button>
-          <button
-            onClick={handleChapaPayment}
-            className="p-3 bg-green-600 text-white rounded hover:bg-green-700 transition"
-          >
-             <img src="/chapa.png" alt="Telebirr" className="h-6 w-auto" />
-            Pay with Chapa
-          </button>
-        </div>
+      <div className="grid gap-4 grid-cols-1">
+  {[
+    { text: "Pay with Telebirr", img: "/telebirr.png", onClick: null },
+    { text: "Pay with Bank Transfer", img: "/assets/telebirr.png", onClick: null },
+    { text: "Pay with Card", img: "/assets/telebirr.png", onClick: null },
+    { text: "Pay with Bank App", img: "/assets/telebirr.png", onClick: null },
+    { text: "Pay with Wallet", img: "/assets/telebirr.png", onClick: handleWalletPayment, bg: "bg-purple-700", hover: "hover:bg-purple-800", textColor: "text-white" },
+    { text: "Pay with Chapa", img: "/chapa.png", onClick: handleChapaPayment, bg: "bg-green-600", hover: "hover:bg-green-700", textColor: "text-white" },
+  ].map(({ text, img, onClick, bg = "bg-green", hover = "", textColor = "text-gold" }, i) => (
+    <button
+      key={i}
+      onClick={onClick || undefined}
+      className={`payment-button ${bg} ${textColor} ${hover}`}
+    >
+      <img src={img} className="h-6 w-auto mr-2" />
+      {text}
+    </button>
+  ))}
+</div>
+
       </div>
     </>
   );

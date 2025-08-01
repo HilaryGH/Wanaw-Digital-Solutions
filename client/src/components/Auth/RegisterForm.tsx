@@ -44,27 +44,48 @@ const RegisterForm = () => {
     setRole(e.target.value as typeof role);
   };
 
-  const handleUserChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value, files } = e.target;
-    if (files) {
-      setUserForm({ ...userForm, [name]: files[0] });
-    } else {
-      setUserForm({ ...userForm, [name]: value });
-    }
-  };
+const handleUserChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const { name, value, files } = e.target;
 
-  const handleProviderChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, files } = e.target as HTMLInputElement;
-    if (files) {
-      if (name === "servicePhotos") {
-        setProviderForm({ ...providerForm, servicePhotos: Array.from(files) });
-      } else {
-        setProviderForm({ ...providerForm, [name]: files[0] });
-      }
-    } else {
-      setProviderForm({ ...providerForm, [name]: value });
+  if (files) {
+    const file = files[0];
+    if (file && file.size > 200 * 1024 * 1024) {
+      alert("File size exceeds the 200MB limit.");
+      return;
     }
-  };
+    setUserForm({ ...userForm, [name]: file });
+  } else {
+    setUserForm({ ...userForm, [name]: value });
+  }
+};
+
+
+const handleProviderChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const { name, value, files } = e.target as HTMLInputElement;
+
+  if (files) {
+    if (name === "servicePhotos") {
+      const validFiles = Array.from(files).filter(file => {
+        if (file.size > 200 * 1024 * 1024) {
+          alert(`${file.name} exceeds the 200MB limit and was not added.`);
+          return false;
+        }
+        return true;
+      });
+      setProviderForm({ ...providerForm, servicePhotos: validFiles });
+    } else {
+      const file = files[0];
+      if (file && file.size > 200 * 1024 * 1024) {
+        alert("File size exceeds the 200MB limit.");
+        return;
+      }
+      setProviderForm({ ...providerForm, [name]: file });
+    }
+  } else {
+    setProviderForm({ ...providerForm, [name]: value });
+  }
+};
+
 
   // (3) SUBMIT
   const handleSubmit = async (e: FormEvent) => {

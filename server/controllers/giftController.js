@@ -123,7 +123,9 @@ exports.assignDeliveryCode = async (req, res) => {
       giftCode: code,   // <-- updated here to match schema
       recipient,
       status: "pending",
-      providerId: service?.providerId, // ← Make sure this exists
+      providerId: service.provider?._id,
+      providerName: service.provider?.name || "",
+      serviceLocation: service.location || "",
     });
 
 

@@ -34,6 +34,8 @@ const giftNotificationSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", // Business user offering the service
     },
+    providerName: String,             // <-- Add this
+    serviceLocation: String,
     giftId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Gift'

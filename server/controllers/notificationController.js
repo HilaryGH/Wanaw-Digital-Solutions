@@ -34,14 +34,28 @@ exports.sendGiftNotifications = async (req, res) => {
       providerContact,
       providerName,
       serviceLocation,
-      giftSender, // optional: if not provided, fallback to senderName
+      giftSender,
+
+      // 👇 Add these for Hotel-specific data
+      checkInDate,
+      checkOutDate,
+      nights,
     } = req.body;
+
 
     const senderDisplayName = giftSender || senderName || "Anonymous";
     const providerDisplayName = providerName || "—";
     const locationDisplay = serviceLocation || "—";
 
     /* ---------- Main message to recipient ---------- */
+    const hotelDetails = checkInDate && checkOutDate
+      ? `
+🏨 Check-in: ${checkInDate}
+🏁 Check-out: ${checkOutDate}
+🛏️ Nights: ${nights}
+  `.trim()
+      : "";
+
     const finalMessage = `
 🎁 You've received a gift!
 
@@ -51,7 +65,9 @@ exports.sendGiftNotifications = async (req, res) => {
 📍 Location: ${locationDisplay}
 💬 Message: ${message?.trim() || "—"}
 👤 From: ${senderDisplayName}
-    `.trim();
+${hotelDetails ? "\n" + hotelDetails : ""}
+`.trim();
+
 
     /* --- Send to recipient --- */
     if (recipientEmail)
@@ -81,6 +97,14 @@ exports.sendGiftNotifications = async (req, res) => {
 
     /* --- Optional provider notification --- */
     if (notifyProvider && providerContact) {
+      const providerHotelDetails = checkInDate && checkOutDate
+        ? `
+🏨 Check-in: ${checkInDate}
+🏁 Check-out: ${checkOutDate}
+🛏️ Nights: ${nights}
+  `.trim()
+        : "";
+
       const providerNote = `
 🔔 A customer sent a gift related to your service.
 
@@ -88,7 +112,8 @@ exports.sendGiftNotifications = async (req, res) => {
 📍 Location: ${locationDisplay}
 💬 Customer note: ${providerMessage?.trim() || "—"}
 👤 Sender: ${senderDisplayName}
-      `.trim();
+${providerHotelDetails ? "\n" + providerHotelDetails : ""}
+`.trim();
 
       if (providerContact.email)
         await sendEmail({
@@ -122,7 +147,6 @@ exports.sendGiftNotifications = async (req, res) => {
     return res.status(500).json({ error: "Failed to send notifications." });
   }
 };
-
 
 
 
