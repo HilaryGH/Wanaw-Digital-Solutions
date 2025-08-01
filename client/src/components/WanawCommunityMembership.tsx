@@ -53,6 +53,8 @@ export default function WanawCommunityMembership() {
     credentials: null,
   });
 
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB in bytes
+
 const handleChange = (
   e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
 ) => {
@@ -61,9 +63,16 @@ const handleChange = (
   if (target instanceof HTMLInputElement && target.type === "file") {
     const files = target.files;
     if (files && files.length > 0) {
+      const file = files[0];
+      if (file.size > MAX_FILE_SIZE) {
+        alert("File size must not exceed 100MB.");
+        // Optionally clear the input:
+        target.value = ""; // reset input file selection
+        return;
+      }
       setFormData((prev) => ({
         ...prev,
-        [target.name]: files[0],
+        [target.name]: file,
       }));
     }
   } else {
@@ -73,6 +82,7 @@ const handleChange = (
     }));
   }
 };
+
 
 
 

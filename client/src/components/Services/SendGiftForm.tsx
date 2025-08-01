@@ -162,20 +162,29 @@ const SendGiftForm = () => {
     }
 
     // Validate hotel-specific dates if service is hotel
-    if (service.category === "Hotel Rooms") {
-      if (!checkInDate || !checkOutDate) {
-        alert("Please select both check-in and check-out dates.");
-        return;
-      }
-      if (new Date(checkOutDate) <= new Date(checkInDate)) {
-        alert("Check-out date must be after check-in date.");
-        return;
-      }
-      const nightsDiff =
-        (new Date(checkOutDate).getTime() - new Date(checkInDate).getTime()) /
-        (1000 * 3600 * 24);
-      setNights(nightsDiff);
-    }
+   if (service.category === "Hotel Rooms") {
+  if (!checkInDate || !checkOutDate) {
+    alert("Please select both check-in and check-out dates.");
+    return;
+  }
+
+  function parseDateAsLocal(dateString: string): Date {
+    const [year, month, day] = dateString.split("-").map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  const checkIn = parseDateAsLocal(checkInDate);
+  const checkOut = parseDateAsLocal(checkOutDate);
+
+  if (checkOut <= checkIn) {
+    alert("Check-out date must be after check-in date.");
+    return;
+  }
+
+  const nightsDiff = (checkOut.getTime() - checkIn.getTime()) / (1000 * 3600 * 24);
+  setNights(nightsDiff);
+}
+
 
     try {
       const purchasePayload = {
