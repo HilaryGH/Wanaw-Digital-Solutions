@@ -96,7 +96,11 @@ app.use('/api/applications', applicationRoutes);
 const kidneyPatientRoutes = require("./routes/kidneyPatientRoutes");
 app.use("/api/kidney-patients", kidneyPatientRoutes);
 
+const supportCommunityRoutes = require("./routes/supportCommunityRoutes");
+app.use("/api/support-community", supportCommunityRoutes);
 
+const diasporaRoutes = require("./routes/diasporaRoutes");
+app.use("/api/diaspora-members", diasporaRoutes)
 
 // Adjust path as needed
 

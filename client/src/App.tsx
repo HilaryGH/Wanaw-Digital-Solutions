@@ -51,6 +51,8 @@ import SuperAdminDashboard from "./components/Dashbords/Admin/SuperAdminDashboar
 import GiftListAndConfirm from "./components/GiftListAndConfirm";
 import KidneyPatientForm from "./components/KidneyPatientForm";
 import CommunitySelection from "./components/CommunitySelection";
+import SupportCommunityForm from "./components/SupportCommunityForm";
+import DiasporaJoinForm from "./components/DiasporaJoinForm";
 
 
 
@@ -93,6 +95,9 @@ const AppWrapper = () => {
         <Route path="/community" element={<CommunitySelection />} />
   <Route path="/community/kidney" element={<KidneyPatientForm />} />
   <Route path="/community/membership" element={<WanawCommunityMembership />} />
+  <Route path="/community/diaspora" element={<DiasporaJoinForm />} />
+<Route path="/community/support" element={<SupportCommunityForm />} />
+
 
 
         <Route path="/careers" element={<JobsList/>} />
