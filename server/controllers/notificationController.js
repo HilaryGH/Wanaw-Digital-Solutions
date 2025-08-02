@@ -35,8 +35,11 @@ exports.sendGiftNotifications = async (req, res) => {
       providerName,
       serviceLocation,
       giftSender,
+      recipientName,
+      giftOccasion,
+      deliveryDate,
+      serviceId,
 
-      // 👇 Add these for Hotel-specific data
       checkInDate,
       checkOutDate,
       nights,
@@ -44,8 +47,22 @@ exports.sendGiftNotifications = async (req, res) => {
 
 
     const senderDisplayName = giftSender || senderName || "Anonymous";
-    const providerDisplayName = providerName || "—";
-    const locationDisplay = serviceLocation || "—";
+
+    const service = await Service.findById(req.body.serviceId).populate("providerId", "fullName location");
+
+
+    if (!service) {
+      console.error("Service not found with ID:", req.body.serviceId);
+      throw new Error("Service not found");
+    }
+
+    console.log("Populated provider:", service.providerId);
+
+    const providerDisplayName = service.providerId?.fullName || "—";
+    const locationDisplay = service.location || "—";
+
+
+
 
     /* ---------- Main message to recipient ---------- */
     const hotelDetails = checkInDate && checkOutDate
@@ -57,16 +74,25 @@ exports.sendGiftNotifications = async (req, res) => {
       : "";
 
     const finalMessage = `
-🎁 You've received a gift!
+🎁 You are receiving a gift from: ${senderDisplayName}
 
-🎉 Occasion: ${occasionTitle || "—"}
-🛍️ Service: ${serviceTitle || "—"}
-🏢 Provider: ${providerDisplayName}
+🎉 Occasion: ${occasionTitle || ""}
+🛍️ Service: ${serviceTitle || ""}
+🏢 Service Provider: ${providerDisplayName}
 📍 Location: ${locationDisplay}
-💬 Message: ${message?.trim() || "—"}
-👤 From: ${senderDisplayName}
+💬 Message: ${message?.trim() || ""}
 ${hotelDetails ? "\n" + hotelDetails : ""}
 `.trim();
+    console.log({
+      senderDisplayName,
+      occasionTitle,
+      serviceTitle,
+      providerDisplayName,
+      locationDisplay,
+      message,
+      hotelDetails,
+    });
+
 
 
     /* --- Send to recipient --- */
@@ -106,14 +132,18 @@ ${hotelDetails ? "\n" + hotelDetails : ""}
         : "";
 
       const providerNote = `
-🔔 A customer sent a gift related to your service.
+🔔 A customer just sent a gift using your service.
 
-🛍️ Service: ${serviceTitle || "—"}
-📍 Location: ${locationDisplay}
-💬 Customer note: ${providerMessage?.trim() || "—"}
-👤 Sender: ${senderDisplayName}
+👤 Recipient: ${recipientName}
+🎁 Gift Giver: ${senderDisplayName}
+📝 Occasion: ${giftOccasion || "N/A"}
+📅 Delivery Date: ${deliveryDate || "N/A"}
+🛍️ Service: ${serviceTitle || "N/A"}
+💬 Customer note: ${providerMessage?.trim() || ""}
 ${providerHotelDetails ? "\n" + providerHotelDetails : ""}
 `.trim();
+
+
 
       if (providerContact.email)
         await sendEmail({

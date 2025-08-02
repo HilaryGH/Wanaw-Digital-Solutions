@@ -38,7 +38,7 @@ export default function Cards() {
             Are you a healthcare professional? Join the Wanaw Community for various strategic opportunities, partnerships, and internship programs for fresh graduates.
           </p>
           <Link
-            to="/community-membership"
+            to="/community"
             className="mt-5 inline-block text-yellow-500 font-semibold hover:underline"
           >
             Become a Member →

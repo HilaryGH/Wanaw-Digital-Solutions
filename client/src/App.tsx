@@ -49,7 +49,8 @@ import MarketingDashboard from "./components/Dashbords/Admin/MarketingDashboard"
 import CustomerSupportDashboard from "./components/Dashbords/Admin/CustomerSupportDashboard";
 import SuperAdminDashboard from "./components/Dashbords/Admin/SuperAdminDashboard";
 import GiftListAndConfirm from "./components/GiftListAndConfirm";
-
+import KidneyPatientForm from "./components/KidneyPatientForm";
+import CommunitySelection from "./components/CommunitySelection";
 
 
 
@@ -87,9 +88,11 @@ const AppWrapper = () => {
         <Route path="/payment-options" element={<PaymentOptions />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/community-membership" element={<WanawCommunityMembership />} />
         <Route path="/partner-with-us" element={<PartnerWithUs />} />
        <Route path="/career/:jobId" element={<ApplyForm />} />
+        <Route path="/community" element={<CommunitySelection />} />
+  <Route path="/community/kidney" element={<KidneyPatientForm />} />
+  <Route path="/community/membership" element={<WanawCommunityMembership />} />
 
 
         <Route path="/careers" element={<JobsList/>} />

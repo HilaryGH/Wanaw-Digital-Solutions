@@ -93,6 +93,11 @@ const applicationRoutes = require('./routes/applicationRoutes');
 
 app.use('/api/applications', applicationRoutes);
 
+const kidneyPatientRoutes = require("./routes/kidneyPatientRoutes");
+app.use("/api/kidney-patients", kidneyPatientRoutes);
+
+
+
 // Adjust path as needed
 
 

@@ -112,33 +112,35 @@ const SendGiftForm = () => {
   };
 
   const notifyAllChannels = async (deliveryCode: string, recipient: Recipient) => {
-    const payload = {
-      buyerName: senderName,
-      buyerEmail: senderEmail,
-      recipientEmail: recipient.email || "",
-      recipientPhone: recipient.phone || "",
-      recipientWhatsApp: recipient.whatsapp || "",
-      recipientTelegram: recipient.telegram || "",
-      message,
-      senderName,
-      serviceTitle: service.title,
-      occasionTitle: occasion?.title || "",
-      serviceImageUrl: service.imageUrl,
+  const payload = {
+  buyerName: senderName,
+  buyerEmail: senderEmail,
+  recipientEmail: recipient.email || "",
+  recipientPhone: recipient.phone || "",
+  recipientWhatsApp: recipient.whatsapp || "",
+  recipientTelegram: recipient.telegram || "",
+  message,
+  senderName,
+  serviceTitle: service.title,
+  occasionTitle: occasion?.title || "",
+  serviceImageUrl: service.imageUrl,
 
-      notifyProvider,
-      providerMessage,
-      providerContact: service.provider,
+  notifyProvider,
+  providerMessage,
+  providerContact: service.provider,
 
-      provider: service.provider?.name || "",
-      location: service?.location || "",
-      giftCode: deliveryCode,
-      deliveryDate,
+  provider: service.provider?.name || "",
+  location: service?.location || "",
+  giftCode: deliveryCode,
+  deliveryDate,
 
-      // Include hotel-specific dates if relevant
-      checkInDate: service.category === "Hotel Rooms" ? checkInDate : undefined,
-      checkOutDate: service.category === "Hotel Rooms" ? checkOutDate : undefined,
-      nights: service.category === "Hotel Rooms" ? nights : undefined,
-    };
+  serviceId: service._id, // ✅ ADD THIS LINE
+
+  checkInDate: service.category === "Hotel Rooms" ? checkInDate : undefined,
+  checkOutDate: service.category === "Hotel Rooms" ? checkOutDate : undefined,
+  nights: service.category === "Hotel Rooms" ? nights : undefined,
+};
+
 
     await fetch(`${BASE_URL}/notifications/send`, {
       method: "POST",
