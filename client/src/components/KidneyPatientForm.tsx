@@ -83,7 +83,7 @@ const KidneyPatientForm: React.FC = () => {
 </div>
 
     <form onSubmit={handleSubmit} className="grid gap-4 p-6 bg-white rounded shadow max-w-xl mx-auto">
-      <h2 className="text-xl font-semibold text-center">Kidney Patient Submission</h2>
+      <h2 className="text-xl font-semibold text-center">Hemodialysis Patient Submission</h2>
 
       <input name="name" placeholder="Kidney Patient Name" onChange={handleChange} required className="p-2 border rounded border-gray-500" />
       <input name="phone" placeholder="Phone" onChange={handleChange} required className="p-2 border rounded border-gray-500" />

@@ -12,7 +12,7 @@ export default function CommunitySelection() {
           onClick={() => navigate("/community/kidney")}
           className="w-full px-6 py-4 bg-[#D4AF37] text-[#1c2b21] rounded-xl hover:rounded-full transition"
         >
-          Kidney Patient Community
+          Hemodialysis Patient Community
         </button>
 
         <button
