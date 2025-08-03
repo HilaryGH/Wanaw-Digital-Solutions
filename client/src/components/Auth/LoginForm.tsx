@@ -27,8 +27,11 @@ const handleLogin = async (e: React.FormEvent) => {
     }
 
     // Save to localStorage
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
+  // Save to localStorage
+localStorage.setItem("token", data.token);
+localStorage.setItem("user", JSON.stringify(data.user));
+localStorage.setItem("userRole", data.user.role); // ✅ Add this line
+
 
     // ✅ Redirect based on role
     const role = data.user.role;
