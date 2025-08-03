@@ -52,10 +52,10 @@ const HomeHighlights = () => {
 
       <div className="relative z-10 flex flex-col gap-10">
         {/* Top: Image + Two Highlights */}
-    <div className="text-center mb-10">
+    <div className="text-center ">
   <h2 className="relative inline-block text-3xl md:text-4xl font-extrabold text-white leading-tight tracking-tight">
     <span className="relative z-10">
-      Your Seamless Gifting Journey with <span className="text-yellow-300">Wanaw</span>
+      Your Seamless Gifting Journey with <span className="text-gold">Wanaw</span>
     </span>
     <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3/4 h-2 bg-yellow-400 rounded-full opacity-60 blur-sm"></span>
   </h2>
@@ -64,14 +64,13 @@ const HomeHighlights = () => {
   </p>
 </div>
 
-
         <div className="flex flex-col md:flex-row items-center gap-10">
           {/* Image */}
           <div className="w-full md:w-1/2 flex justify-center">
             <img
               src="/Mindfulness.svg"
               alt="Wellness Illustration"
-              className="w-full max-w-[400px] md:max-w-[500px] rounded-full shadow-lg"
+              className="w-full max-w-[400px] md:max-w-[500px] rounded-full "
             />
           </div>
 
