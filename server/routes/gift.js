@@ -19,7 +19,8 @@ router.post("/:giftId/assign-delivery-code", assignDeliveryCode);
 router.post("/:giftId/confirm-gift", confirmGiftCode);
 
 // ✅ Protected route for admins with file upload
-router.post("/", verifyToken, upload.single("image"), createGift);
+router.post("/", verifyToken, createGift);
+
 
 // ✅ Other routes
 router.get("/", getGifts);

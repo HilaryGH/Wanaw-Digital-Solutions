@@ -159,7 +159,7 @@ const handleSubmit = async (e: FormEvent) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Name */}
         <div>
-          <label htmlFor="name" className="block font-semibold mb-1">
+          <label htmlFor="name" className="block  mb-1">
             Name <span className="text-red-600">*</span>
           </label>
           <input
@@ -175,7 +175,7 @@ const handleSubmit = async (e: FormEvent) => {
 
         {/* Email */}
         <div>
-          <label htmlFor="email" className="block font-semibold mb-1">
+          <label htmlFor="email" className="block  mb-1">
             Email <span className="text-red-600">*</span>
           </label>
           <input
@@ -191,7 +191,7 @@ const handleSubmit = async (e: FormEvent) => {
 
         {/* Phone */}
         <div>
-          <label htmlFor="phone" className="block font-semibold mb-1">
+          <label htmlFor="phone" className="block  mb-1">
             Phone <span className="text-red-600">*</span>
           </label>
           <input
@@ -208,7 +208,7 @@ const handleSubmit = async (e: FormEvent) => {
 
         {/* WhatsApp */}
         <div>
-          <label htmlFor="whatsapp" className="block font-semibold mb-1">
+          <label htmlFor="whatsapp" className="block  mb-1">
             WhatsApp
           </label>
           <input
@@ -222,7 +222,7 @@ const handleSubmit = async (e: FormEvent) => {
         </div>
         {/* LinkedIn Profile */}
 <div>
-  <label htmlFor="linkedin" className="block font-semibold mb-1">
+  <label htmlFor="linkedin" className="block  mb-1">
     LinkedIn Profile
   </label>
   <input
@@ -239,7 +239,7 @@ const handleSubmit = async (e: FormEvent) => {
 
         {/* Current Location */}
         <div>
-          <label htmlFor="location" className="block font-semibold mb-1">
+          <label htmlFor="location" className="block  mb-1">
             Current Location
           </label>
           <input
@@ -256,7 +256,7 @@ const handleSubmit = async (e: FormEvent) => {
         <div>
           <label
             htmlFor="specialization"
-            className="block font-semibold mb-1"
+            className="block  mb-1"
           >
             Areas of Specializations <span className="text-red-600">*</span>
           </label>
@@ -281,7 +281,7 @@ const handleSubmit = async (e: FormEvent) => {
        {/* Internship Period - only for fresh graduates */}
 {memberType === "freshGraduate" && (
   <div>
-    <label htmlFor="internshipPeriod" className="block font-semibold mb-1">
+    <label htmlFor="internshipPeriod" className="block  mb-1">
       Internship Period <span className="text-red-600">*</span>
     </label>
     <input
@@ -302,7 +302,7 @@ const handleSubmit = async (e: FormEvent) => {
         <div>
           <label
             htmlFor="cv"
-            className="block font-semibold mb-1"
+            className="block  mb-1"
           >
             Upload CV <span className="text-red-600">*</span>
           </label>
@@ -321,7 +321,7 @@ const handleSubmit = async (e: FormEvent) => {
         <div>
           <label
             htmlFor="credentials"
-            className="block font-semibold mb-1"
+            className="block  mb-1"
           >
             Upload Credentials <span className="text-red-600">*</span>
           </label>

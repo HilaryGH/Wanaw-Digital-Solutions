@@ -71,7 +71,7 @@ exports.createService = async (req, res) => {
   const user = req.user;
 
   // ✅ Allow only provider or admin
-  if (!["provider", "admin"].includes(user.role)) {
+  if (!["provider", "super_admin", "admin"].includes(user.role)) {
     return res
       .status(403)
       .json({ msg: "Only providers or admins can add services" });

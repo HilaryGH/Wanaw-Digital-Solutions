@@ -86,7 +86,7 @@ const medicalSubcategories = [
     options: ["CT Scan", "MRI"],
   },
   {
-    label: "Kidney Dialysis Services",
+    label: "Hemodialysis Services",
     options: [
       "Consultation",
       "Single Dialysis Session",
@@ -349,7 +349,7 @@ const res = await fetch(`${BASE_URL}/services?${query.toString()}`);
             key={option}
             value={option}
             style={
-              group.label === "Kidney Dialysis Services"
+              group.label === "Hemodialysis services"
                 ? { color: "red"}
                 : {}
             }

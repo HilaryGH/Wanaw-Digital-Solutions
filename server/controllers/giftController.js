@@ -19,9 +19,12 @@ exports.createGift = async (req, res) => {
   } = req.body;
 
   const user = req.user;
-  if (!user || user.role !== "admin") {
-    return res.status(403).json({ msg: "Unauthorized: Only admins can add gifts" });
+  const allowedRoles = ["admin", "super_admin", "marketing_admin"];
+  if (!user || !allowedRoles.includes(user.role)) {
+    return res.status(403).json({ msg: "Unauthorized" });
   }
+
+
 
   if (!title || !category) {
     return res.status(400).json({ msg: "Title and category are required" });
