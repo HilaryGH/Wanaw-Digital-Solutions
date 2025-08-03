@@ -53,6 +53,7 @@ import KidneyPatientForm from "./components/KidneyPatientForm";
 import CommunitySelection from "./components/CommunitySelection";
 import SupportCommunityForm from "./components/SupportCommunityForm";
 import DiasporaJoinForm from "./components/DiasporaJoinForm";
+import Settings from "./components/Dashbords/individual/Settings";
 
 
 
@@ -97,6 +98,9 @@ const AppWrapper = () => {
   <Route path="/community/membership" element={<WanawCommunityMembership />} />
   <Route path="/community/diaspora" element={<DiasporaJoinForm />} />
 <Route path="/community/support" element={<SupportCommunityForm />} />
+<Route path="/settings" element={<Settings userId={""}/>} />
+
+
 
 
 

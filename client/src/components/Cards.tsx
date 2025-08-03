@@ -30,28 +30,30 @@ export default function Cards() {
         </div>
 
         {/* Membership */}
-        <div className="bg-white border-l-4 border-yellow-500 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-transform transform hover:-translate-y-1">
-          <h3 className="text-2xl font-semibold text-[#1c2b21] mb-3 hover:text-yellow-500 transition-colors">
-            Join the Community
-          </h3>
-          <p className="text-gray-600 leading-relaxed">
-            Are you a healthcare professional? Join the Wanaw Community for various strategic opportunities, partnerships, and internship programs for fresh graduates.
-          </p>
-          <Link
-            to="/community"
-            className="mt-5 inline-block text-yellow-500 font-semibold hover:underline"
-          >
-            Become a Member →
-          </Link>
-          <a
-            href="https://www.linkedin.com/company/wanaw-health-and-wellness-digital-solution/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block mt-3 text-sm text-blue-600 hover:underline"
-          >
-            Follow us on LinkedIn
-          </a>
-        </div>
+        {/* Membership */}
+<div className="bg-white border-l-4 border-yellow-500 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-transform transform hover:-translate-y-1">
+  <h3 className="text-2xl font-semibold text-[#1c2b21] mb-3 hover:text-yellow-500 transition-colors">
+    Join the Community
+  </h3>
+  <p className="text-gray-600 leading-relaxed">
+    Are you Diaspora, Individual seeking to provide support & volunteer, Healthcare Professional, or a Fresh Graduate? Join Wanaw Community to connect, collaborate, and contribute.
+  </p>
+  <Link
+    to="/community"
+    className="mt-5 inline-block text-yellow-500 font-semibold hover:underline"
+  >
+    Become a Member →
+  </Link>
+  <a
+    href="https://www.linkedin.com/company/wanaw-health-and-wellness-digital-solution/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="block mt-3 text-sm text-blue-600 hover:underline"
+  >
+    Follow us on LinkedIn
+  </a>
+</div>
+
 
         {/* Career Openings */}
         <div

@@ -10,7 +10,7 @@ import FestivitiesT from "./FestivitiesT";
 
 
 import Cards from "./Cards";
-import KidneyPatientForm from "./KidneyPatientForm";
+
 
 
 
@@ -111,7 +111,7 @@ const Home = () => {
       <GiftShowcase />
       <FestivitiesT />
      <MembershipPreview />
-     <KidneyPatientForm/>
+   
       <Footer />
     </>
   );
