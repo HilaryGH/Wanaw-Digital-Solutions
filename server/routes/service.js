@@ -9,6 +9,7 @@ const {
   getServiceById,
   deleteService,
   updateServiceStatus,
+  purchaseService,
 } = require("../controllers/serviceController");
 
 const verifyToken = require("../middleware/verifyToken");
@@ -35,12 +36,12 @@ router.get("/:id", getServiceById);
 // POST create service (with image upload and token verification)
 router.post("/", verifyToken, upload.single("image"), createService);
 
+router.post("/:id/purchase", purchaseService);
+
 // DELETE service by id
 router.delete("/:id", verifyToken, deleteService); // Add verifyToken here for safety
 
 // PUT update service status
-router.put("/:id/status", verifyToken, updateServiceStatus); // Add verifyToken here as well
+router.put("/:id/status", verifyToken, updateServiceStatus);
 
 module.exports = router;
-
-

@@ -5,7 +5,7 @@ const connectDB = require("./config/db");
 const passport = require("passport");
 const session = require("express-session");
 const path = require("path");
-const serviceRoutes = require("./routes/service");
+
 const notificationRoutes = require('./routes/notificationRoutes');
 
 
@@ -64,7 +64,7 @@ app.use(passport.session());
 
 // ✅ Route mounting
 app.use("/api/auth", require("./routes/auth"));
-app.use("/api/services", serviceRoutes);
+
 const partnerRoutes = require("./routes/partnerRoutes");
 app.use("/api", partnerRoutes);
 
@@ -76,13 +76,14 @@ app.use("/api/support", require("./routes/support"));
 app.use("/api/programs", require("./routes/programs"));
 app.use("/api/membership", require("./routes/membership"));
 
-app.use("/api/services", require("./routes/service"));
+
 app.use("/api/payment", require("./routes/payment"));
 app.use('/api/notifications', notificationRoutes);
 app.use("/api/upload", require("./routes/upload"));
 app.use("/api/users", require("./routes/userRoute"));
-const serviceRouter = require("./routes/serviceRoute");
-app.use("/api/services", serviceRouter);
+const serviceRoutes = require("./routes/service");     // ✅ This is correct
+app.use("/api/services", serviceRoutes);
+
 const communityRoutes = require("./routes/communityRoutes");
 app.use("/api/community", communityRoutes);
 
@@ -101,6 +102,9 @@ app.use("/api/support-community", supportCommunityRoutes);
 
 const diasporaRoutes = require("./routes/diasporaRoutes");
 app.use("/api/diaspora-members", diasporaRoutes)
+
+const subscribeRoute = require("./routes/subscribe");
+app.use("/api/subscribe", subscribeRoute);
 
 // Adjust path as needed
 

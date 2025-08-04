@@ -10,7 +10,6 @@ exports.createMember = async (req, res) => {
       whatsapp,
       location,
       specialization,
-      internshipPeriod,
       memberType,
     } = req.body;
 
@@ -44,7 +43,6 @@ exports.createMember = async (req, res) => {
       whatsapp,
       location,
       specialization,
-      internshipPeriod,
       memberType,
       cvUrl,
       credentialsUrl,

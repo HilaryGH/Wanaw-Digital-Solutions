@@ -123,7 +123,7 @@ exports.assignDeliveryCode = async (req, res) => {
     const notification = new GiftNotification({
       service,
       giftId,
-      giftCode: code,   // <-- updated here to match schema
+      giftCode: code,
       recipient,
       status: "pending",
       providerId: service.provider?._id,
@@ -131,61 +131,133 @@ exports.assignDeliveryCode = async (req, res) => {
       serviceLocation: service.location || "",
     });
 
-
     await notification.save();
     console.log("✅ Gift notification saved to database.");
 
-    // 🔔 Send Email
-    if (recipient.email) {
-      const subject = `🎁 A special gift just for you from ${senderName}`;
-      const html = `
-        <div style="font-family: Arial, sans-serif; color: #333;">
-          <h2>🎉 You've received a gift!</h2>
-          <p><strong>From:</strong> ${senderName}</p>
-          <p><strong>Service:</strong> ${service?.title || "Not specified"}</p>
-          <p><strong>Category:</strong> ${service?.category || "Not specified"}</p>
-          <p><strong>Message:</strong> ${message?.trim() ? message : "No personal message was included."}</p>
-          <p><strong>Your Gift Code:</strong> <span style="font-size: 20px; font-weight: bold; color: #007BFF;">${code}</span></p>
-          <p style="margin-top: 20px;">
-            🎁 Redeem your gift now at 
-            <a href="https://wanawhealthandwellness.netlify.app" target="_blank">
-              Wanaw Health & Wellness
-            </a>
-          </p>
-        </div>
-      `;
+    // Prepare recipient email content
+    const subject = `🎁 A special gift just for you from ${senderName}`;
 
-      const text = `
-🎉 You've received a gift!
+    const html = `
+  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+    <div style="background-color:#1c2b21; padding: 20px; text-align: center;">
+      <h1 style="margin: 0; color: #D4AF37;">Wanaw Health and Wellness Digital Solution</h1>
+    </div>
+    <div style="padding: 30px; background-color: #fff;">
+      <h2 style="color: #1c2b21;">🎁 You've received a gift!</h2>
 
-From: ${senderName}
+      <p style="font-size: 16px; color: #333;">
+        <strong>From:</strong> ${senderName}
+      </p>
+
+      <p style="font-size: 16px; color: #333;">
+        <strong>Service:</strong> ${service?.title || "Not specified"}<br/>
+        <strong>Category:</strong> ${service?.category || "Not specified"}
+      </p>
+
+      <p style="font-size: 16px; color: #333;">
+        <strong>Message:</strong> ${message?.trim() ? message : "No personal message was included."}
+      </p>
+
+      <div style="margin: 30px 0; padding: 15px; background-color: #f7f7f7; border-left: 4px solid #D4AF37;">
+        <p style="font-size: 18px; color: #1c2b21; margin: 0;">
+          🎉 Your Gift Code:
+        </p>
+        <p style="font-size: 28px; font-weight: bold; color: #D4AF37; margin: 5px 0 0;">${code}</p>
+      </div>
+
+      <p style="font-size: 16px; color: #333;">
+        Redeem your gift by visiting our platform below:
+      </p>
+
+      <a href="https://wanawhealthandwellness.netlify.app/" style="display: inline-block; margin-top: 15px; padding: 12px 24px; background-color: #D4AF37; color: #1c2b21; text-decoration: none; border-radius: 4px; font-weight: bold;">
+        Redeem at Wanaw
+      </a>
+
+      <p style="font-size: 16px; color: #333; margin-top: 30px;">
+        If you have any questions or need support, just reply to this email.
+      </p>
+
+      <p style="font-size: 16px; color: #333;">
+        With care,<br/>
+        <strong>The Wanaw Team</strong>
+      </p>
+    </div>
+    <div style="background-color: #1c2b21; padding: 15px; text-align: center; font-size: 13px; color:#D4AF37;">
+      &copy; ${new Date().getFullYear()} Wanaw Health and Wellness Digital Solution. All rights reserved.
+    </div>
+  </div>
+`;
+
+    const text = `
+You've received a gift from ${senderName}!
+
 Service: ${service?.title || "Not specified"}
 Category: ${service?.category || "Not specified"}
+
 Message: ${message?.trim() ? message : "No personal message was included."}
+
 Your Gift Code: ${code}
 
-🎁 Redeem your gift now:
-https://wanawhealthandwellness.netlify.app
-      `;
+Redeem your gift by visiting: https://wanawhealthandwellness.netlify.app/
+`;
 
+    // Send email to recipient
+    let recipientEmailSent = false;
+    if (recipient.email) {
       try {
         await sendGiftEmail({ to: recipient.email, subject, html, text });
-        console.log("📧 Gift email sent successfully.");
-        res.status(200).json({ msg: "Gift code assigned and email sent", code });
+        console.log("📧 Gift email sent successfully to recipient.");
+        recipientEmailSent = true;
       } catch (emailErr) {
-        console.error("❌ Failed to send gift email:", emailErr);
-        res.status(500).json({ msg: "Gift code assigned, but failed to send email" });
+        console.error("❌ Failed to send gift email to recipient:", emailErr);
       }
+    }
+
+    // Send notification email to service provider
+    const provider = service.provider;
+    if (provider && provider.email) {
+      const providerSubject = `🎁 A gift was assigned for your service: ${service.title}`;
+      const providerHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; padding: 20px;">
+        <h2>New Gift Assigned</h2>
+        <p><strong>Service:</strong> ${service.title}</p>
+        <p><strong>Recipient Name:</strong> ${recipient.name || "N/A"}</p>
+        <p><strong>Gift Code:</strong> <span style="font-weight:bold; color:#D4AF37;">${code}</span></p>
+        <p><strong>Sender:</strong> ${senderName}</p>
+        <p><strong>Message:</strong> ${message || "No message provided"}</p>
+        <p>Please check your dashboard for details and contact the recipient if needed.</p>
+        <p>Thank you,<br/>Wanaw Team</p>
+      </div>
+      `;
+      const providerText = `
+New gift assigned for your service: ${service.title}
+Recipient: ${recipient.name || "N/A"}
+Gift Code: ${code}
+Sender: ${senderName}
+Message: ${message || "No message provided"}
+
+Please check your dashboard for details.
+`;
+
+      try {
+        await sendGiftEmail({ to: provider.email, subject: providerSubject, html: providerHtml, text: providerText });
+        console.log("📧 Notification email sent successfully to provider.");
+      } catch (providerEmailErr) {
+        console.error("❌ Failed to send notification email to provider:", providerEmailErr);
+      }
+    }
+
+    // Respond to client
+    if (recipientEmailSent) {
+      return res.status(200).json({ msg: "Gift code assigned and email sent", code });
     } else {
-      res.status(200).json({ msg: "Gift code assigned (no email provided)", code });
+      return res.status(200).json({ msg: "Gift code assigned (email not sent to recipient)", code });
     }
   } catch (err) {
     console.error("❌ Error assigning gift code:", err);
-    res.status(500).json({ msg: "Server error while assigning gift code" });
+    return res.status(500).json({ msg: "Server error while assigning gift code" });
   }
 };
-// Confirm gift code and update notification status
-
 
 exports.confirmGiftCode = async (req, res) => {
   try {

@@ -1,47 +1,20 @@
 const Service = require("../models/Service");
 const User = require("../models/User");
 
-// controller/serviceController.js
-const { sendEmail, sendSMS, sendTelegram } = require("../utils/notification");
+const { notifyProviderOfPurchase } = require("../controllers/notificationController");
 
 exports.purchaseService = async (req, res) => {
   try {
-    // Get buyer info and deliveryDate from request body
     const { buyerName, buyerEmail, deliveryDate } = req.body;
-
     if (!buyerName || !buyerEmail) {
       return res.status(400).json({ msg: "Buyer name and email are required" });
     }
 
-    const service = await Service.findById(req.params.id).populate("providerId");
+    const service = await Service.findById(req.params.id).populate("providerId", "fullName location email phone whatsapp telegram");
     if (!service) return res.status(404).json({ msg: "Service not found" });
 
-    const provider = service.providerId;
-
-    // Prepare a formatted date string if deliveryDate is provided
-    let deliveryDateString = "";
-    if (deliveryDate) {
-      const d = new Date(deliveryDate);
-      if (!isNaN(d)) {
-        deliveryDateString = d.toLocaleString();  // readable format
-      }
-    }
-
-    // Send notifications to provider with buyer info and delivery date
-    await sendEmail({
-      to: provider.email || process.env.NOTIFY_EMAIL,
-      subject: `🎉 New Service Purchased: ${service.title}`,
-      html: `
-        <p><strong>Service:</strong> ${service.title}</p>
-        <p><strong>Price:</strong> $${service.price}</p>
-        <p><strong>Buyer:</strong> ${buyerName} (${buyerEmail})</p>
-        ${deliveryDateString ? `<p><strong>Delivery Date:</strong> ${deliveryDateString}</p>` : ""}
-        <p>Login to view the request and follow up.</p>
-        <p>— Wanaw</p>
-      `,
-    });
-
-    // You can also save deliveryDate to DB here if you have a purchase/order model
+    // Call notification function here instead of sending email directly
+    await notifyProviderOfPurchase(service, { buyerName, buyerEmail }, deliveryDate);
 
     res.json({ msg: "Service purchased. Notifications sent." });
   } catch (err) {
@@ -49,6 +22,7 @@ exports.purchaseService = async (req, res) => {
     res.status(500).json({ msg: "Purchase failed." });
   }
 };
+
 
 
 
