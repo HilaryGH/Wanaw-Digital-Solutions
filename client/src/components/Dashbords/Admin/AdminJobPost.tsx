@@ -62,7 +62,7 @@ const AdminJobPost: React.FC = () => {
           <label className="block mb-1 font-semibold">Job Title *</label>
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full  border border-gray-300 rounded px-3 py-2"
             value={title}
             onChange={e => setTitle(e.target.value)}
             required
@@ -72,7 +72,7 @@ const AdminJobPost: React.FC = () => {
         <div>
           <label className="block mb-1 font-semibold">Description</label>
           <textarea
-            className="w-full border rounded px-3 py-2"
+            className="w-full  border border-gray-300 rounded px-3 py-2"
             value={description}
             onChange={e => setDescription(e.target.value)}
             rows={4}
@@ -83,7 +83,7 @@ const AdminJobPost: React.FC = () => {
           <label className="block mb-1 font-semibold">Location</label>
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full  border border-gray-300 rounded px-3 py-2"
             value={location}
             onChange={e => setLocation(e.target.value)}
           />
@@ -92,7 +92,7 @@ const AdminJobPost: React.FC = () => {
         <div>
           <label className="block mb-1 font-semibold">Employment Model *</label>
           <select
-            className="w-full border rounded px-3 py-2"
+            className="w-full  border border-gray-300 rounded px-3 py-2"
             value={employmentModel}
             onChange={e => setEmploymentModel(e.target.value as EmploymentModel)}
             required
@@ -107,7 +107,7 @@ const AdminJobPost: React.FC = () => {
         <div>
           <label className="block mb-1 font-semibold">Specialization *</label>
           <select
-            className="w-full border rounded px-3 py-2"
+            className="w-full  border border-gray-300 rounded px-3 py-2"
             value={specialization}
             onChange={e => setSpecialization(e.target.value)}
             required
@@ -121,7 +121,7 @@ const AdminJobPost: React.FC = () => {
 
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-green text-gold px-4 py-2 rounded hover:rounded-full"
         >
           Post Job
         </button>

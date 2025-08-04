@@ -2,14 +2,46 @@ import { useState } from "react";
 import { FaFacebook, FaInstagram, FaLinkedin, FaTiktok } from "react-icons/fa";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { Link } from "react-router-dom";
+import BASE_URL from "../api/api"; // Adjust path if needed
+import axios from "axios";
 
 const Footer = () => {
   const [showMore, setShowMore] = useState(false);
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+
+ const handleSubscribe = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  try {
+    const res = await axios.post(`${BASE_URL}/subscribe`, { email });
+
+    if (res.status === 200 || res.status === 201) {
+      setMessage("✅ Thank you for subscribing!");
+      setEmail("");
+    } else {
+      setMessage("⚠️ Something went wrong. Please try again.");
+    }
+  } catch (err: any) {
+    if (
+      err.response?.status === 400 &&
+      err.response?.data?.error === "Email already subscribed"
+    ) {
+      setMessage("⚠️ You're already subscribed to our updates.");
+    } else {
+      setMessage("❌ Subscription failed. Please try again.");
+    }
+    console.error("Subscription error:", err);
+  }
+
+  // Hide message after 3 seconds
+  setTimeout(() => setMessage(""), 3000);
+};
+
 
   return (
     <footer className="bg-[#1c2b21] text-white text-sm pt-10 pb-6 px-6 sm:px-10 md:px-20">
       <div className="max-w-7xl mx-auto">
-        {/* Grid Sections */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
@@ -18,7 +50,8 @@ const Footer = () => {
               Wanaw Health & Wellness
             </h4>
             <p className="text-gray-300">
-            Your digital gateway to health and wellness services and gifting programs across Ethiopia.
+              Your digital gateway to health and wellness services and gifting
+              programs across Ethiopia.
             </p>
           </div>
 
@@ -57,22 +90,34 @@ const Footer = () => {
               Connect With Us
             </h4>
             <div className="flex space-x-4">
-              <a href="https://www.facebook.com/share/14JxGfvVv4C/" className="hover:text-[#D4AF37]">
+              <a
+                href="https://www.facebook.com/share/14JxGfvVv4C/"
+                className="hover:text-[#D4AF37]"
+              >
                 <FaFacebook />
               </a>
-              <a href="https://www.instagram.com/wanaw_health_and_wellness_?igsh=bmJxdTVkMGY3NDVn" className="hover:text-[#D4AF37]">
+              <a
+                href="https://www.instagram.com/wanaw_health_and_wellness_?igsh=bmJxdTVkMGY3NDVn"
+                className="hover:text-[#D4AF37]"
+              >
                 <FaInstagram />
               </a>
-              <a href="https://www.linkedin.com/company/wanaw-health-and-wellness-digital-solution/" className="hover:text-[#D4AF37]">
+              <a
+                href="https://www.linkedin.com/company/wanaw-health-and-wellness-digital-solution/"
+                className="hover:text-[#D4AF37]"
+              >
                 <FaLinkedin />
               </a>
-              <a href="https://www.tiktok.com/@wanawhealthandwellness?_t=ZM-8yBOhm4EAIa&_r=1" className="hover:text-[#D4AF37]">
+              <a
+                href="https://www.tiktok.com/@wanawhealthandwellness?_t=ZM-8yBOhm4EAIa&_r=1"
+                className="hover:text-[#D4AF37]"
+              >
                 <FaTiktok />
               </a>
             </div>
           </div>
 
-          {/* Newsletter */}
+          {/* Newsletter Subscription */}
           <div>
             <h4 className="text-lg font-semibold text-[#D4AF37] mb-4">
               Subscribe
@@ -80,20 +125,32 @@ const Footer = () => {
             <p className="text-gray-300 mb-3">
               Join our mailing list for updates and offers.
             </p>
-            <form className="flex flex-col sm:flex-row gap-2">
+            <form
+              onSubmit={handleSubscribe}
+              className="flex flex-col sm:flex-row gap-2"
+            >
               <input
                 type="email"
                 placeholder="Your Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
                 className="px-3 py-2 rounded bg-[#D4AF37] text-black text-sm w-full sm:flex-1"
               />
-              <button className="bg-[#D4AF37] text-black px-4 py-2 rounded-full font-semibold text-sm hover:rounded-md">
+              <button
+                type="submit"
+                className="bg-[#D4AF37] text-black px-4 py-2 rounded-full font-semibold text-sm hover:rounded-md"
+              >
                 Subscribe
               </button>
             </form>
+            {message && (
+              <p className="text-green-400 mt-2 text-xs font-medium">{message}</p>
+            )}
           </div>
         </div>
 
-        {/* Show More Button for Mobile */}
+        {/* Show More Mobile */}
         <div className="mt-6 md:hidden">
           <button
             onClick={() => setShowMore(!showMore)}
@@ -131,8 +188,20 @@ const Footer = () => {
           reserved.
         </div>
       </div>
+        {message && (
+  <p
+    className={`mt-2 text-sm font-medium ${
+      message.includes("Thank you")
+        ? "text-gold"
+        : "text-white"
+    }`}
+  >
+    {message}
+  </p>
+)}
     </footer>
   );
 };
 
 export default Footer;
+

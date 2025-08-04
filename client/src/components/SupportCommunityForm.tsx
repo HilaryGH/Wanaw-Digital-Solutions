@@ -34,33 +34,34 @@ const SupportCommunityForm = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${BASE_URL}/support-community`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify(formData),
-      });
+  try {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${BASE_URL}/support-community`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify(formData),
+    });
 
-      if (!res.ok) {
-        throw new Error("Submission failed");
-      }
-
-      alert("Thank you for joining the Support Community!");
-
-      if (formData.supportTypes.includes("Gift")) {
-        navigate("/services?category=medical");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Something went wrong. Please try again.");
+    if (!res.ok) {
+      throw new Error("Submission failed");
     }
-  };
+
+    alert("Thank you for joining the Support Community!");
+
+    // Navigate to /services page after successful submission
+    navigate("/services");
+
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong. Please try again.");
+  }
+};
+
 
   return (
     <>
@@ -112,32 +113,51 @@ const SupportCommunityForm = () => {
         <div className="space-y-2">
           <label className="block font-medium">How do you want to support?</label>
           <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="supportTypes"
-              value="Volunteer"
-              onChange={handleChange}
-            />
-            Volunteer
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="supportTypes"
-              value="Gift"
-              onChange={handleChange}
-            />
-            Gift
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="supportTypes"
-              value="Service Provider"
-              onChange={handleChange}
-            />
-            Service Provider
-          </label>
+  <input
+    type="checkbox"
+    name="supportTypes"
+    value="Gifter"
+    onChange={handleChange}
+  />
+  Gifter
+</label>
+<label className="flex items-center gap-2">
+  <input
+    type="checkbox"
+    name="supportTypes"
+    value="Influencer"
+    onChange={handleChange}
+  />
+  Influencer
+</label>
+<label className="flex items-center gap-2">
+  <input
+    type="checkbox"
+    name="supportTypes"
+    value="Brand Ambassador"
+    onChange={handleChange}
+  />
+  Brand Ambassador
+</label>
+<label className="flex items-center gap-2">
+  <input
+    type="checkbox"
+    name="supportTypes"
+    value="Service Provider"
+    onChange={handleChange}
+  />
+  Service Provider
+</label>
+<label className="flex items-center gap-2">
+  <input
+    type="checkbox"
+    name="supportTypes"
+    value="Volunteer"
+    onChange={handleChange}
+  />
+  Volunteer
+</label>
+
         </div>
 
         <textarea

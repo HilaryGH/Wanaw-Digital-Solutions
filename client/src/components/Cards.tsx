@@ -28,8 +28,6 @@ export default function Cards() {
             Become a Partner →
           </button>
         </div>
-
-        {/* Membership */}
         {/* Membership */}
 <div className="bg-white border-l-4 border-yellow-500 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-transform transform hover:-translate-y-1">
   <h3 className="text-2xl font-semibold text-[#1c2b21] mb-3 hover:text-yellow-500 transition-colors">

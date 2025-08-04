@@ -54,6 +54,9 @@ import CommunitySelection from "./components/CommunitySelection";
 import SupportCommunityForm from "./components/SupportCommunityForm";
 import DiasporaJoinForm from "./components/DiasporaJoinForm";
 import Settings from "./components/Dashbords/individual/Settings";
+import DiasporaList from "./components/Dashbords/Admin/DiasporaList";
+import KidneyPatientList from "./components/Dashbords/Admin/KidneyPatientList";
+import SubscribersList from "./components/Dashbords/Admin/SubscribersList";
 
 
 
@@ -171,6 +174,33 @@ const AppWrapper = () => {
     </PrivateRoute>
   }
 />
+
+<Route
+  path="/admin/diaspora-list"
+  element={
+    <PrivateRoute requiredRole="super_admin">
+      <DiasporaList/>
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="/admin/patient-list"
+  element={
+    <PrivateRoute requiredRole="super_admin">
+      <KidneyPatientList/>
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="/admin/subscrpition-list"
+  element={
+    <PrivateRoute requiredRole="super_admin">
+      <SubscribersList/>
+    </PrivateRoute>
+  }
+/>
+
+
 
 <Route
   path="/admin/manage-services"

@@ -45,19 +45,16 @@ const CompanyInfo = () => {
     <div className="md:w-1/2 text-[#1c2b21]">
       <h2 className="text-3xl font-bold mb-4 relative inline-block after:block after:h-1 after:bg-green after:w-full after:mt-1 ">About 
 </h2>
-      <p className="leading-relaxed text-sm md:text-lg ">
-        Wanaw Health and Wellness (WHW) provides a seamless, efficient, and user-friendly
-         platform for discovering, booking, and managing a wide range of health and wellness 
-         services, including gifting options and gift card generation.
-      </p>
-      <p className="mt-4 text-sm md:text-lg">
-        Our platform connects service seekers with certified and verified providers in categories like wellness, medical, aesthetic care, personal/self-care, hotel rooms, and more — all with real-time booking and secure payment.
-      </p>
-      <p className="mt-4 text-sm md:text-lg">
-        With just one click, users can access tailored services in their area. Explore the simplicity of managing your health and well-being through our user-friendly platform.
-      </p>
-    </div>
-
+    <p className="leading-relaxed text-sm md:text-lg">
+  Wanaw Health and Wellness (WHW) provides a seamless, efficient, and user-friendly platform for discovering, booking, and managing a wide range of health and wellness services — including gifting options and gift card generation.
+</p>
+<p className="mt-4 text-sm md:text-lg">
+  Our platform connects service seekers with certified and verified providers in categories like wellness, medical care, aesthetic treatments, personal/self-care, hotel rooms, and more — all with real-time booking and secure payments.
+</p>
+<p className="mt-4 text-sm md:text-lg">
+  With just one click, users can access tailored services in their area. Experience the simplicity of managing your health and well-being through our all-in-one platform.
+</p>
+</div>
     {/* GIF Image */}
     <div className="md:w-1/2">
       <img

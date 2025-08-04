@@ -1,4 +1,4 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import BASE_URL from "../../../api/api";
 
 type User = {
@@ -8,12 +8,11 @@ type User = {
   role: string;
   companyName?: string;
 };
-const AdminUserList = () => {
- const [users, setUsers] = useState<User[]>([]);
 
+const AdminUserList = () => {
+  const [users, setUsers] = useState<User[]>([]);
   const [role, setRole] = useState(""); // Selected role filter
   const [loading, setLoading] = useState(false);
-
 
   // Fetch users when role changes
   useEffect(() => {
@@ -44,7 +43,7 @@ const AdminUserList = () => {
   }, [role]);
 
   return (
-    <div className="p-4">
+    <div className="p-4 max-w-full">
       <h2 className="text-xl font-bold mb-4">User Management</h2>
 
       {/* Role filter dropdown */}
@@ -70,31 +69,35 @@ const AdminUserList = () => {
       {/* User list */}
       {!loading && users.length === 0 && <p>No users found.</p>}
       {!loading && users.length > 0 && (
-        <table className="w-full border-collapse border">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border p-2">#</th>
-              <th className="border p-2">Full Name</th>
-              <th className="border p-2">Email</th>
-              <th className="border p-2">Role</th>
-              <th className="border p-2">Company (if provider)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user, idx) => (
-              <tr key={user._id}>
-                <td className="border p-2">{idx + 1}</td>
-                <td className="border p-2">{user.fullName}</td>
-                <td className="border p-2">{user.email}</td>
-                <td className="border p-2 capitalize">{user.role}</td>
-                <td className="border p-2">{user.companyName || "-"}</td>
+        // Wrap table in a container with horizontal scroll for small screens
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse border min-w-[600px]">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border p-2 text-left">#</th>
+                <th className="border p-2 text-left">Full Name</th>
+                <th className="border p-2 text-left">Email</th>
+                <th className="border p-2 text-left">Role</th>
+                <th className="border p-2 text-left">Company (if provider)</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {users.map((user, idx) => (
+                <tr key={user._id} className="hover:bg-gray-50">
+                  <td className="border p-2">{idx + 1}</td>
+                  <td className="border p-2">{user.fullName}</td>
+                  <td className="border p-2">{user.email}</td>
+                  <td className="border p-2 capitalize">{user.role}</td>
+                  <td className="border p-2">{user.companyName || "-"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
 };
 
 export default AdminUserList;
+

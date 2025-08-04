@@ -74,6 +74,24 @@ export default function SuperAdminDashboard() {
       route: "/admin/applicant-list",
       color: "bg-lime-100",
     },
+     {
+      title: "Diaspora List",
+      description: "Review diaspora lists.",
+      route: "/admin/diaspora-list",
+      color: "bg-pink-100",
+    },
+      {
+      title: "Kidney Pateint List",
+      description: "Review kidney pateints list.",
+      route: "/admin/patient-list",
+      color: "bg-black-100",
+    },
+      {
+      title: "Subscrpition List",
+      description: "Review kidney pateints list.",
+      route: "/admin/subscrpition-list",
+      color: "bg-pink-100",
+    },
   ];
 
   return (
