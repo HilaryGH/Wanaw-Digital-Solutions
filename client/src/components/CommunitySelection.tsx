@@ -62,11 +62,11 @@ export default function CommunitySelection() {
 
       {/* Patient Registration Section - At the Bottom */}
       <div
-        onClick={() => navigate("/community/support")}
+        onClick={() => navigate("/community/kidney")}
         className={`${cardBaseClasses} max-w-3xl mx-auto border-[#1c2b21]`}
         role="button"
         tabIndex={0}
-        onKeyDown={() => navigate("/community/support")}
+        onKeyDown={() => navigate("/community/kidney")}
       >
         <h3 className="text-2xl sm:text-3xl font-semibold text-[#1c2b21] mb-4">
           Hemodialysis Patient Form
