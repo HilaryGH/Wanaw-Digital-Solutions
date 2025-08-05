@@ -10,6 +10,8 @@ const KidneyPatientSchema = new mongoose.Schema({
   location: { type: String, required: true },
   idDocument: { type: String, required: true },
   medicalCertificate: { type: String, required: true },
+  message: { type: String }, // Add this to your KidneyPatientSchema
+
   videos: [String],
 }, { timestamps: true });
 

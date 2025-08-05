@@ -85,11 +85,7 @@ const KidneyPatientForm: React.FC = () => {
 
   return (
     <>
-      <div className="text-center mb-4 p-4 bg-green rounded">
-        <h1 className="text-xl font-bold text-gold">Wanaw Lewegenachen Hiwot</h1>
-        <p className="text-gold text-lg">"ዋናው ለወገናችን ሂወት"</p>
-      </div>
-
+      
       <form onSubmit={handleSubmit} className="grid gap-4 p-6 bg-white rounded shadow max-w-xl mx-auto">
         <h2 className="text-xl font-semibold text-center">Hemodialysis Patient Submission Form</h2>
 
