@@ -75,7 +75,7 @@ const CompanyInfo = () => {
       viewBox="0 0 500 80"
       preserveAspectRatio="none"
     >
-      <path d="M500,0 C400,80 100,0 0,80 L0,0 L500,0 Z" fill="#D4AF37" />
+      <path d="M500,0 C400,80 100,0 0,80 L0,0 L500,0 Z" fill="#ffffff" />
     </svg>
   </div>
 
