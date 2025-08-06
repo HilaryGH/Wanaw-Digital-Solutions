@@ -4,6 +4,7 @@ import BASE_URL from "../api/api";
 
 interface KidneyPatientFormData {
   name: string;
+  age: string;
   phone: string;
   whatsapp: string;
   telegram: string;
@@ -19,6 +20,7 @@ interface KidneyPatientFormData {
 const KidneyPatientForm: React.FC = () => {
   const [formData, setFormData] = useState<KidneyPatientFormData>({
     name: "",
+    age: "",
     phone: "",
     whatsapp: "",
     telegram: "",
@@ -30,6 +32,9 @@ const KidneyPatientForm: React.FC = () => {
     medicalCertificate: null,
     videos: null,
   });
+
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -48,9 +53,12 @@ const KidneyPatientForm: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
 
     const form = new FormData();
     form.append("name", formData.name);
+    form.append("age", formData.age);
     form.append("phone", formData.phone);
     form.append("whatsapp", formData.whatsapp);
     form.append("telegram", formData.telegram);
@@ -75,43 +83,158 @@ const KidneyPatientForm: React.FC = () => {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Submission failed");
-      alert("Submission successful");
-      console.log(data);
+      setSuccess("Submission successful");
     } catch (err: any) {
       console.error(err);
-      alert(`Submission failed: ${err.message}`);
+      setError(`Submission failed: ${err.message}`);
     }
   };
 
   return (
-    <>
-      
-      <form onSubmit={handleSubmit} className="grid gap-4 p-6 bg-white rounded shadow max-w-xl mx-auto">
-        <h2 className="text-xl font-semibold text-center">Hemodialysis Patient Submission Form</h2>
+    <div className="min-h-screen flex items-center justify-center bg-white px-4 py-10">
+      <div className="bg-white shadow-2xl rounded-xl p-8 w-full max-w-xl relative z-10">
+        <div className="absolute -top-5 left-5 bg-[#D4AF37] text-white text-xs px-3 py-1 rounded-full shadow-md">
+          Patient Assistance
+        </div>
 
-        <input name="name" placeholder="Kidney Patient Name" onChange={handleChange} required className="p-2 border rounded border-gray-500" />
-        <input name="phone" placeholder="Phone" onChange={handleChange} required className="p-2 border rounded border-gray-500" />
-        <input name="whatsapp" placeholder="WhatsApp" onChange={handleChange} required className="p-2 border rounded border-gray-500" />
-        <input name="telegram" placeholder="Telegram" onChange={handleChange} required className="p-2 border rounded border-gray-500" />
-        <input name="email" type="email" placeholder="Email" onChange={handleChange} required className="p-2 border rounded border-gray-500" />
-        <input name="facility" placeholder="Health Facility Center Name" onChange={handleChange} required className="p-2 border rounded border-gray-500" />
-        <input name="location" placeholder="Location" onChange={handleChange} required className="p-2 border rounded border-gray-500" />
-        <textarea name="message" placeholder="Message or Additional Info" onChange={handleChange} className="p-2 rounded border border-gray-500" />
+        <div className="flex justify-center mb-6">
+          <img
+            src="/WHW.jpg"
+            alt="Wanaw Logo"
+            className="h-16 w-16 rounded-full object-cover"
+          />
+        </div>
 
-        <label>ID / Driving Licence / Passport:</label>
-        <input type="file" name="idDocument" accept=".jpg,.jpeg,.png,.pdf" onChange={handleFileChange} className="p-2 border border-gray-300" required />
+        <h2 className="text-2xl font-bold mb-2 text-center text-[#1c2b21]">
+          Hemodialysis Patient Submission
+        </h2>
 
-        <label>Medical Certificate:</label>
-        <input type="file" name="medicalCertificate" accept=".jpg,.jpeg,.png,.pdf" onChange={handleFileChange} className="p-2 border border-gray-300" required />
+        <p className="text-center text-gray-600 text-sm mb-6">
+          Please fill out this form accurately for support
+        </p>
 
-        <label>Video (30s to 1min):</label>
-        <input type="file" name="videos" accept="video/*" multiple onChange={handleFileChange} className="p-2 border border-gray-300" />
+        {error && <p className="text-red-600 mb-4 text-sm text-center">{error}</p>}
+        {success && <p className="text-green-600 mb-4 text-sm text-center">{success}</p>}
 
-        <button type="submit" className="bg-green text-gold py-2 rounded hover:bg-blue-700">Submit</button>
-      </form>
-    </>
+        <form onSubmit={handleSubmit} className="grid gap-4">
+          <input
+            name="name"
+            placeholder="Full Name"
+            onChange={handleChange}
+            required
+            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"
+          />
+          <input
+            name="age"
+            type="number"
+            placeholder="Age"
+            onChange={handleChange}
+            required
+            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"
+          />
+          <input
+            name="phone"
+            placeholder="Phone"
+            onChange={handleChange}
+            required
+            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"
+          />
+          <input
+            name="whatsapp"
+            placeholder="WhatsApp"
+            onChange={handleChange}
+            required
+            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"
+          />
+          <input
+            name="telegram"
+            placeholder="Telegram"
+            onChange={handleChange}
+            required
+            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"
+          />
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            onChange={handleChange}
+            required
+            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"
+          />
+          <input
+            name="facility"
+            placeholder="Health Facility Name"
+            onChange={handleChange}
+            required
+            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"
+          />
+          <input
+            name="location"
+            placeholder="Location"
+            onChange={handleChange}
+            required
+            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"
+          />
+          <textarea
+            name="message"
+            placeholder="Additional Information"
+            onChange={handleChange}
+            className="p-2 border border-gray-300 rounded-md text-sm resize-none h-24 focus:ring-2 focus:ring-yellow-400"
+          />
+
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">ID / Passport / License</label>
+            <input
+              type="file"
+              name="idDocument"
+              accept=".jpg,.jpeg,.png,.pdf"
+              onChange={handleFileChange}
+              className="w-full text-sm"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">Medical Certificate</label>
+            <input
+              type="file"
+              name="medicalCertificate"
+              accept=".jpg,.jpeg,.png,.pdf"
+              onChange={handleFileChange}
+              className="w-full text-sm"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">Short Video (30s–1min)</label>
+            <input
+              type="file"
+              name="videos"
+              accept="video/*"
+              multiple
+              onChange={handleFileChange}
+              className="w-full text-sm"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="bg-[#D4AF37] text-[#1c2b21] font-semibold py-2 rounded-full hover:rounded-md transition"
+          >
+            Submit Form
+          </button>
+        </form>
+
+        <p className="text-center text-xs text-gray-400 mt-6">
+          Ⓒ All rights reserved by Wanaw
+        </p>
+      </div>
+    </div>
   );
 };
 
 export default KidneyPatientForm;
+
+
 

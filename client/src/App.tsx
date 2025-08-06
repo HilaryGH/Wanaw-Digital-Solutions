@@ -57,6 +57,7 @@ import Settings from "./components/Dashbords/individual/Settings";
 import DiasporaList from "./components/Dashbords/Admin/DiasporaList";
 import KidneyPatientList from "./components/Dashbords/Admin/KidneyPatientList";
 import SubscribersList from "./components/Dashbords/Admin/SubscribersList";
+import HemodialysisPatientsList from "./components/HemodialysisPatientsList";
 
 
 
@@ -102,6 +103,10 @@ const AppWrapper = () => {
   <Route path="/community/diaspora" element={<DiasporaJoinForm />} />
 <Route path="/community/support" element={<SupportCommunityForm />} />
 <Route path="/settings" element={<Settings userId={""}/>} />
+
+  <Route path="/community/hemodialysis" element={<HemodialysisPatientsList />} />
+
+
 
 
 

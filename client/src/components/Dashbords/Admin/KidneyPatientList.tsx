@@ -12,9 +12,9 @@ type KidneyPatient = {
   facility?: string;
   location?: string;
   message?: string;
-  idDocument?: string;
-  medicalCertificate?: string;
-  videos?: string[]; // assuming stored as array of URLs or filenames
+  idDocument?: string;           // Cloudinary URL
+  medicalCertificate?: string;   // Cloudinary URL
+  videos?: string[];             // Array of Cloudinary URLs
 };
 
 const KidneyPatientList = () => {
@@ -46,7 +46,7 @@ const KidneyPatientList = () => {
               <th className="border px-3 py-2">Facility</th>
               <th className="border px-3 py-2">Location</th>
               <th className="border px-3 py-2">Message</th>
-              <th className="border px-3 py-2">Docs</th>
+              <th className="border px-3 py-2">Documents</th>
               <th className="border px-3 py-2">Videos</th>
             </tr>
           </thead>
@@ -59,27 +59,31 @@ const KidneyPatientList = () => {
                 <td className="border px-3 py-2">{patient.whatsapp ?? "-"}</td>
                 <td className="border px-3 py-2">{patient.telegram ?? "-"}</td>
                 <td className="border px-3 py-2">
-                  <a href={`mailto:${patient.email}`} className="text-blue-600 underline">
-                    {patient.email}
-                  </a>
+                  {patient.email ? (
+                    <a href={`mailto:${patient.email}`} className="text-blue-600 underline">
+                      {patient.email}
+                    </a>
+                  ) : (
+                    "-"
+                  )}
                 </td>
                 <td className="border px-3 py-2">{patient.facility ?? "-"}</td>
                 <td className="border px-3 py-2">{patient.location ?? "-"}</td>
                 <td className="border px-3 py-2 whitespace-pre-wrap">{patient.message ?? "-"}</td>
-                <td className="border px-3 py-2">
+                <td className="border px-3 py-2 space-y-1">
                   {patient.idDocument && (
                     <a
-                      href={`${BASE_URL}/uploads/${patient.idDocument}`}
+                      href={patient.idDocument}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 underline block"
                     >
-                      ID
+                      ID Document
                     </a>
                   )}
                   {patient.medicalCertificate && (
                     <a
-                      href={`${BASE_URL}/uploads/${patient.medicalCertificate}`}
+                      href={patient.medicalCertificate}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 underline block"
@@ -88,18 +92,18 @@ const KidneyPatientList = () => {
                     </a>
                   )}
                 </td>
-                <td className="border px-3 py-2">
+                <td className="border px-3 py-2 space-y-2">
                   {patient.videos && patient.videos.length > 0 ? (
                     patient.videos.map((video, i) => (
-                      <a
+                      <video
                         key={i}
-                        href={`${BASE_URL}/uploads/${video}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 underline block"
+                        src={video}
+                        controls
+                        className="w-48 h-auto mx-auto border rounded"
+                        aria-label={`Video ${i + 1} for ${patient.name}`}
                       >
-                        Video {i + 1}
-                      </a>
+                        Your browser does not support the video tag.
+                      </video>
                     ))
                   ) : (
                     "-"
@@ -115,4 +119,3 @@ const KidneyPatientList = () => {
 };
 
 export default KidneyPatientList;
-

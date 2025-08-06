@@ -1,52 +1,80 @@
+const cloudinary = require("../config/cloudinary");
+const fs = require("fs");
 const KidneyPatient = require("../models/KidneyPatient");
 
+// Helper function
+const uploadToCloudinary = async (filePath, folder) => {
+  try {
+    const result = await cloudinary.uploader.upload(filePath, {
+      folder,
+      resource_type: "auto",
+    });
+    fs.unlinkSync(filePath); // Remove file after upload
+    return result.secure_url;
+  } catch (error) {
+    fs.unlinkSync(filePath); // Clean up even on error
+    throw error;
+  }
+};
+
+// Controller
 const createKidneyPatient = async (req, res) => {
   try {
-    // Build file paths from req.files
-    const idDocument = req.files["idDocument"] ? req.files["idDocument"][0].filename : null;
-    const medicalCertificate = req.files["medicalCertificate"] ? req.files["medicalCertificate"][0].filename : null;
-    const videos = req.files["videos"] ? req.files["videos"].map(file => file.filename) : [];
-
-    // Extract other form fields from req.body
     const {
       name,
       phone,
       whatsapp,
       telegram,
       email,
-      facility,
+      facilityName,
       location,
       message,
+      age,
     } = req.body;
 
-    // Validate required fields manually (optional)
-    if (!name || !phone || !whatsapp || !telegram || !email || !facility || !location) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-    if (!idDocument || !medicalCertificate) {
-      return res.status(400).json({ error: "Required documents are missing" });
+    // Upload files
+    let idDocumentUrl = null;
+    let medicalCertificateUrl = null;
+    let videoUrls = [];
+
+    if (req.files?.idDocument?.[0]) {
+      idDocumentUrl = await uploadToCloudinary(req.files.idDocument[0].path, "id_documents");
     }
 
-    // Create new document
+    if (req.files?.medicalCertificate?.[0]) {
+      medicalCertificateUrl = await uploadToCloudinary(
+        req.files.medicalCertificate[0].path,
+        "medical_certificates"
+      );
+    }
+
+    if (req.files?.videos) {
+      for (const file of req.files.videos) {
+        const videoUrl = await uploadToCloudinary(file.path, "kidney_videos");
+        videoUrls.push(videoUrl);
+      }
+    }
+
     const newPatient = new KidneyPatient({
       name,
       phone,
       whatsapp,
       telegram,
       email,
-      facilityName: facility,
+      facilityName,
       location,
       message,
-      idDocument,
-      medicalCertificate,
-      videos,
+      age,
+      idDocument: idDocumentUrl,
+      medicalCertificate: medicalCertificateUrl,
+      videos: videoUrls,
     });
 
-    const savedPatient = await newPatient.save();
-    res.status(201).json(savedPatient);
+    await newPatient.save();
+    res.status(201).json(newPatient);
   } catch (err) {
-    console.error("Error saving KidneyPatient:", err);
-    res.status(500).json({ error: "Something went wrong", detail: err.message });
+    console.error("❌ KidneyPatient creation error:", err);
+    res.status(500).json({ msg: "Server error", error: err.message });
   }
 };
 
@@ -64,4 +92,3 @@ module.exports = {
   createKidneyPatient,
   getAllKidneyPatients,
 };
-

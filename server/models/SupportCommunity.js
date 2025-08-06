@@ -6,9 +6,16 @@ const SupportCommunitySchema = new mongoose.Schema({
   email: { type: String, required: true },
   phone: String,
   region: String,
+  whatsapp: String,    // ✅ Add this
+  telegram: String,
   supportTypes: [String],
   message: String,
   createdAt: { type: Date, default: Date.now },
+  userType: {
+    type: String,
+    enum: ["individual", "corporate"],
+    default: "individual",
+  },
 });
 
 module.exports = mongoose.model("SupportCommunity", SupportCommunitySchema);

@@ -9,12 +9,15 @@ const SupportCommunityForm = () => {
     name: "",
     email: "",
     phone: "",
+    whatsapp: "",
+    telegram: "",
     region: "",
+    userType: "individual",
     message: "",
     supportTypes: [] as string[],
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
 
     if (type === "checkbox" && name === "supportTypes" && e.target instanceof HTMLInputElement) {
@@ -34,149 +37,147 @@ const SupportCommunityForm = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${BASE_URL}/support-community`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
-      },
-      body: JSON.stringify(formData),
-    });
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${BASE_URL}/support-community`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(formData),
+      });
 
-    if (!res.ok) {
-      throw new Error("Submission failed");
+      if (!res.ok) throw new Error("Submission failed");
+
+      alert("Thank you for joining the Support Community!");
+      navigate("/community/hemodialysis");
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong. Please try again.");
     }
-
-    alert("Thank you for joining the Support Community!");
-
-    // Navigate to /services page after successful submission
-    navigate("/services");
-
-  } catch (err) {
-    console.error(err);
-    alert("Something went wrong. Please try again.");
-  }
-};
-
+  };
 
   return (
-    <>
-      <div className="text-center mb-4 p-4 bg-green rounded">
-        <h1 className="text-xl font-bold text-gold">Wanaw Lewegenachen Hiwot</h1>
-        <p className="text-gold text-lg">"ዋናው ለወገናችን ሂወት"</p>
-      </div>
-      <form onSubmit={handleSubmit} className="max-w-lg mx-auto p-6 bg-white shadow rounded-lg space-y-4">
-        <h2 className="text-2xl font-semibold text-center">Join Our Support Community</h2>
+    <div className="min-h-screen flex items-center justify-center bg-white px-4 relative overflow-hidden">
+      {/* Brand Decorations */}
+      <div className="absolute top-0 left-0 w-40 h-40 bg-[#1c2b21] rounded-full opacity-40 animate-pulse z-0"></div>
+      <div className="absolute bottom-0 right-0 w-60 h-60 bg-[#1c2b21] rounded-full opacity-30 animate-spin-slow z-0"></div>
+      <div className="absolute top-10 left-10 w-40 h-40 bg-[#1c2b21] rounded-full opacity-40 animate-pulse z-0"></div>
+      <div className="absolute -top-10 right-10 w-32 h-32 bg-[#D4AF37] rotate-45 rounded-lg opacity-50 z-0"></div>
 
-        <input
-          type="text"
-          name="name"
-          placeholder="Your Name"
-          value={formData.name}
-          onChange={handleChange}
-          className="w-full border border-gray-300 rounded px-4 py-2"
-          required
-        />
+      <form
+        onSubmit={handleSubmit}
+        className="z-10 w-full max-w-2xl bg-white shadow-2xl rounded-xl p-8 space-y-4 relative"
+      >
+        <div className="absolute -top-5 left-5 bg-[#D4AF37] text-white text-xs px-3 py-1 rounded-full shadow-md">
+          Join Support Community
+        </div>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Your Email"
-          value={formData.email}
-          onChange={handleChange}
-          className="w-full border border-gray-300 rounded px-4 py-2"
-          required
-        />
+        <h2 className="text-3xl font-bold text-center text-[#1c2b21]">
+          Wanaw Lewegenachen Hiwot
+        </h2>
+        <p className="text-center font-bold text-gold mb-4 text-lg">“ዋናው ለወገናችን ሂወት”</p>
 
-        <input
-          type="tel"
-          name="phone"
-          placeholder="Phone Number"
-          value={formData.phone}
-          onChange={handleChange}
-          className="w-full border border-gray-300 rounded px-4 py-2"
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input
+            name="name"
+            placeholder="Full Name"
+            value={formData.name}
+            onChange={handleChange}
+            className="p-2 border rounded border-gray-300"
+            required
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email Address"
+            value={formData.email}
+            onChange={handleChange}
+            className="p-2 border rounded border-gray-300"
+            required
+          />
+          <input
+            type="tel"
+            name="phone"
+            placeholder="Phone Number"
+            value={formData.phone}
+            onChange={handleChange}
+            className="p-2 border rounded border-gray-300"
+          />
+          <input
+            name="whatsapp"
+            placeholder="WhatsApp"
+            value={formData.whatsapp}
+            onChange={handleChange}
+            className="p-2 border rounded border-gray-300"
+          />
+          <input
+            name="telegram"
+            placeholder="Telegram"
+            value={formData.telegram}
+            onChange={handleChange}
+            className="p-2 border rounded border-gray-300"
+          />
+          <input
+            name="region"
+            placeholder="City / Region"
+            value={formData.region}
+            onChange={handleChange}
+            className="p-2 border rounded border-gray-300"
+          />
+          <select
+            name="userType"
+            value={formData.userType}
+            onChange={handleChange}
+            className="p-2 border rounded border-gray-300"
+          >
+            <option value="individual">Individual</option>
+            <option value="corporate">Corporate</option>
+          </select>
+        </div>
 
-        <input
-          type="text"
-          name="region"
-          placeholder="City / Region"
-          value={formData.region}
-          onChange={handleChange}
-          className="w-full border border-gray-300 rounded px-4 py-2"
-        />
-
-        <div className="space-y-2">
-          <label className="block font-medium">How do you want to support?</label>
-          <label className="flex items-center gap-2">
-  <input
-    type="checkbox"
-    name="supportTypes"
-    value="Gifter"
-    onChange={handleChange}
-  />
-  Gifter
-</label>
-<label className="flex items-center gap-2">
-  <input
-    type="checkbox"
-    name="supportTypes"
-    value="Influencer"
-    onChange={handleChange}
-  />
-  Influencer
-</label>
-<label className="flex items-center gap-2">
-  <input
-    type="checkbox"
-    name="supportTypes"
-    value="Brand Ambassador"
-    onChange={handleChange}
-  />
-  Brand Ambassador
-</label>
-<label className="flex items-center gap-2">
-  <input
-    type="checkbox"
-    name="supportTypes"
-    value="Service Provider"
-    onChange={handleChange}
-  />
-  Service Provider
-</label>
-<label className="flex items-center gap-2">
-  <input
-    type="checkbox"
-    name="supportTypes"
-    value="Volunteer"
-    onChange={handleChange}
-  />
-  Volunteer
-</label>
-
+        <div>
+          <label className="block font-medium mb-2">How would you like to support?</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            {["Gifter", "Influencer", "Brand Ambassador", "Service Provider", "Volunteer"].map((type) => (
+              <label key={type} className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="supportTypes"
+                  value={type}
+                  onChange={handleChange}
+                  checked={formData.supportTypes.includes(type)}
+                />
+                {type}
+              </label>
+            ))}
+          </div>
         </div>
 
         <textarea
           name="message"
-          placeholder="Any message or additional info?"
+          placeholder="Message or additional info..."
           value={formData.message}
           onChange={handleChange}
-          className="w-full border border-gray-300 rounded px-4 py-2"
           rows={4}
+          className="w-full border border-gray-300 rounded px-4 py-2"
         />
 
         <button
           type="submit"
-          className="w-full bg-[#1c2b21] text-white py-2 rounded hover:bg-[#2a3d30] transition duration-300"
+          className="w-full bg-[#D4AF37] text-[#1c2b21] font-semibold py-2 rounded-full hover:rounded-md transition"
         >
           Join Community
         </button>
+
+        <p className="text-center text-xs text-gray-400 mt-4">
+          Ⓒ All rights reserved by Wanaw
+        </p>
       </form>
-    </>
+    </div>
   );
 };
 
