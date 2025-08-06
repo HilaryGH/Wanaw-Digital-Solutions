@@ -67,54 +67,48 @@ const CompanyInfo = () => {
 </section>
 
 {/* Mission & Vision */}
-<section className="relative text-gold px-6 py-16 overflow-hidden">
-  {/* Decorative SVG top wave */}
-  <div className="absolute top-0 right-0 w-full h-32 overflow-hidden leading-[0] z-10">
+<section className="relative px-6 sm:px-10 md:px-20 py-20 bg-[#1c2b21] text-white overflow-hidden">
+  {/* Decorative Top Wave */}
+  <div className="absolute top-0 right-0 w-full h-32 overflow-hidden leading-[0] z-0">
     <svg
       className="relative block w-full h-full"
       viewBox="0 0 500 80"
       preserveAspectRatio="none"
     >
-      <path d="M500,0 C400,80 100,0 0,80 L0,0 L500,0 Z" fill="#1c2b21" />
+      <path d="M500,0 C400,80 100,0 0,80 L0,0 L500,0 Z" fill="#D4AF37" />
     </svg>
   </div>
 
-  {/* Mission & Vision content */}
+  <div className="relative z-10 max-w-7xl mx-auto text-center">
+    <h2 className="text-3xl md:text-4xl font-bold mb-14 text-gold">
+      Our Mission & Vision
+    </h2>
 
-    {/* Mission */}
- <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
-  {/* Mission */}
-  <div
-    className="bg-[#D4AF37] text-black p-6 rounded-xl shadow-md"
-    data-aos="slid-doen"
-    data-aos-delay="100"
-  >
-    <h3 className="text-xl font-bold mb-2 relative inline-block after:block after:h-1 after:bg-[#D4AF37] after:w-full after:mt-1">
-      Mission
-    </h3>
-    <p className="text-sm md:text-base">
-      To empower users to easily purchase, gift, and manage a wide range of health and wellness services.
-      We strive to improve overall well-being through innovation, partnerships, and community support.
-    </p>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+      {/* Mission Card */}
+      <div className="bg-white text-[#1c2b21] p-8 rounded-2xl shadow-lg border-l-8 border-[#D4AF37] hover:shadow-2xl transition">
+        <h3 className="text-xl md:text-2xl font-bold mb-4 relative">
+          <span className="inline-block pb-1 border-b-4 border-[#D4AF37]">Mission</span>
+        </h3>
+        <p className="text-sm md:text-base leading-relaxed">
+          To empower users to easily purchase, gift, and manage a wide range of health and wellness services. We strive to improve overall well-being through innovation, partnerships, and community support.
+        </p>
+      </div>
+
+      {/* Vision Card */}
+      <div className="bg-white text-[#1c2b21] p-8 rounded-2xl shadow-lg border-l-8 border-[#D4AF37] hover:shadow-2xl transition">
+        <h3 className="text-xl md:text-2xl font-bold mb-4 relative">
+          <span className="inline-block pb-1 border-b-4 border-[#D4AF37]">Vision</span>
+        </h3>
+        <p className="text-sm md:text-base leading-relaxed">
+          To become the leading digital platform for health and wellness services, recognized for quality, accessibility, and user satisfaction by 2030.
+        </p>
+      </div>
+    </div>
   </div>
-
-  {/* Vision */}
-  <div
-    className="bg-[#D4AF37] text-black p-6 rounded-xl shadow-md"
-    data-aos="slid-down"
-    data-aos-delay="300"
-  >
-    <h3 className="text-xl font-bold mb-2 relative inline-block after:block after:h-1 after:bg-[#D4AF37] after:w-full after:mt-1">
-      Vision
-    </h3>
-    <p className="text-sm md:text-base">
-      To become the leading digital platform for health and wellness services, recognized for quality,
-      accessibility, and user satisfaction by 2030.
-    </p>
-  </div>
-</div>
-
 </section>
+
+
 
   <ServiceCatalog/>
 

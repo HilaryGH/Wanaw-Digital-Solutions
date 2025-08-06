@@ -1,7 +1,5 @@
-import  { useState,  } from "react";
-import type { FormEvent} from "react";
+import { useState, type FormEvent } from "react";
 import BASE_URL from "../api/api";
-
 
 const healthcareSpecializations = [
   "Medical Doctor",
@@ -21,7 +19,6 @@ const freshGraduateSpecializations = [
   "Sales",
 ];
 
-
 type MemberType = "healthcare" | "freshGraduate";
 
 interface FormData {
@@ -39,7 +36,6 @@ interface FormData {
 
 export default function WanawCommunityMembership() {
   const [memberType, setMemberType] = useState<MemberType>("healthcare");
-
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
@@ -53,75 +49,61 @@ export default function WanawCommunityMembership() {
     credentials: null,
   });
 
-const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB in bytes
+  const MAX_FILE_SIZE = 100 * 1024 * 1024;
 
-const handleChange = (
-  e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-) => {
-  const target = e.target as HTMLInputElement | HTMLSelectElement;
-
-  if (target instanceof HTMLInputElement && target.type === "file") {
-    const files = target.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-      if (file.size > MAX_FILE_SIZE) {
-        alert("File size must not exceed 100MB.");
-        // Optionally clear the input:
-        target.value = ""; // reset input file selection
-        return;
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const target = e.target;
+    if (target instanceof HTMLInputElement && target.type === "file") {
+      const file = target.files?.[0];
+      if (file) {
+        if (file.size > MAX_FILE_SIZE) {
+          alert("File size must not exceed 100MB.");
+          target.value = "";
+          return;
+        }
+        setFormData((prev) => ({
+          ...prev,
+          [target.name]: file,
+        }));
       }
+    } else {
       setFormData((prev) => ({
         ...prev,
-        [target.name]: file,
+        [target.name]: target.value,
       }));
     }
-  } else {
-    setFormData((prev) => ({
-      ...prev,
-      [target.name]: target.value,
-    }));
-  }
-};
+  };
 
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    try {
+      const form = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value) form.append(key, value);
+      });
+      form.append("memberType", memberType);
 
+      const res = await fetch(`${BASE_URL}/community`, {
+        method: "POST",
+        body: form,
+      });
 
+      const result = await res.json();
 
-const handleSubmit = async (e: FormEvent) => {
-  e.preventDefault();
-
-  try {
-    const form = new FormData();
-    form.append("name", formData.name);
-    form.append("email", formData.email);
-    form.append("phone", formData.phone);
-    form.append("whatsapp", formData.whatsapp);
-    form.append("location", formData.location);
-    form.append("specialization", formData.specialization);
-    form.append("internshipPeriod", formData.internshipPeriod);
-    form.append("memberType", memberType);
-    if (formData.cv) form.append("cv", formData.cv);
-    if (formData.credentials) form.append("credentials", formData.credentials);
-
-    const res = await fetch(`${BASE_URL}/community`, {
-      method: "POST",
-      body: form,
-    });
-
-    const result = await res.json();
-
-    if (res.ok) {
-      alert("🎉 Membership submitted successfully!");
-      console.log("✅ Response:", result);
-    } else {
-      alert(`❌ Submission failed: ${result.message}`);
-      console.error("❌ Server error:", result);
+      if (res.ok) {
+        alert("🎉 Membership submitted successfully!");
+        console.log("✅ Response:", result);
+      } else {
+        alert(`❌ Submission failed: ${result.message}`);
+        console.error("❌ Server error:", result);
+      }
+    } catch (err) {
+      console.error("❌ Submission error:", err);
+      alert("❌ Something went wrong while submitting.");
     }
-  } catch (err) {
-    console.error("❌ Submission error:", err);
-    alert("❌ Something went wrong while submitting.");
-  }
-};
-
+  };
 
   const specializations =
     memberType === "healthcare"
@@ -129,144 +111,104 @@ const handleSubmit = async (e: FormEvent) => {
       : freshGraduateSpecializations;
 
   return (
-    <div className="max-w-xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6">Wanaw Community Membership</h2>
-
-      <div className="flex gap-6 mb-6">
-        <label className="inline-flex items-center space-x-2">
-          <input
-            type="radio"
-            value="healthcare"
-            checked={memberType === "healthcare"}
-            onChange={() => setMemberType("healthcare")}
-            className="form-radio"
+    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-10">
+      <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-xl">
+        <div className="flex justify-center mb-6">
+          <img
+            src="/WHW.jpg"
+            alt="Wanaw Logo"
+            className="h-16 w-16 rounded-full object-cover"
           />
-          <span>Healthcare Professionals</span>
-        </label>
+        </div>
 
-        <label className="inline-flex items-center space-x-2">
-          <input
-            type="radio"
-            value="freshGraduate"
-            checked={memberType === "freshGraduate"}
-            onChange={() => setMemberType("freshGraduate")}
-            className="form-radio"
-          />
-          <span>Fresh Graduates ~ Internship Program</span>
-        </label>
-      </div>
+        <h2 className="text-2xl font-bold text-center text-[#1c2b21] mb-1">
+          Wanaw Community Membership
+        </h2>
+        <p className="text-center text-gray-600 text-sm mb-6">
+          Join us by filling the form below
+        </p>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Name */}
-        <div>
-          <label htmlFor="name" className="block  mb-1">
-            Name <span className="text-red-600">*</span>
+        {/* Member Type Selector */}
+        <div className="flex justify-center gap-6 mb-6">
+          <label className="inline-flex items-center space-x-2">
+            <input
+              type="radio"
+              value="healthcare"
+              checked={memberType === "healthcare"}
+              onChange={() => setMemberType("healthcare")}
+              className="form-radio text-[#D4AF37]"
+            />
+            <span>Healthcare</span>
           </label>
+          <label className="inline-flex items-center space-x-2">
+            <input
+              type="radio"
+              value="freshGraduate"
+              checked={memberType === "freshGraduate"}
+              onChange={() => setMemberType("freshGraduate")}
+              className="form-radio text-[#D4AF37]"
+            />
+            <span>Fresh Graduate</span>
+          </label>
+        </div>
+
+        {/* FORM */}
+        <form onSubmit={handleSubmit} className="grid gap-4">
           <input
-            id="name"
             name="name"
-            type="text"
-            required
+            placeholder="Full Name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-green-400"
           />
-        </div>
-
-        {/* Email */}
-        <div>
-          <label htmlFor="email" className="block  mb-1">
-            Email <span className="text-red-600">*</span>
-          </label>
           <input
-            id="email"
             name="email"
             type="email"
-            required
+            placeholder="Email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Phone */}
-        <div>
-          <label htmlFor="phone" className="block  mb-1">
-            Phone <span className="text-red-600">*</span>
-          </label>
-          <input
-            id="phone"
-            name="phone"
-            type="tel"
             required
+            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-green-400"
+          />
+          <input
+            name="phone"
+            placeholder="Phone"
             value={formData.phone}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-green-400"
           />
-        </div>
-
-
-        {/* WhatsApp */}
-        <div>
-          <label htmlFor="whatsapp" className="block  mb-1">
-            WhatsApp
-          </label>
           <input
-            id="whatsapp"
             name="whatsapp"
-            type="tel"
+            placeholder="WhatsApp (Optional)"
             value={formData.whatsapp}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-green-400"
           />
-        </div>
-        {/* LinkedIn Profile */}
-<div>
-  <label htmlFor="linkedin" className="block  mb-1">
-    LinkedIn Profile
-  </label>
-  <input
-    id="linkedin"
-    name="linkedin"
-    type="url"
-    placeholder="https://linkedin.com/in/yourname"
-    value={formData.linkedin}
-    onChange={handleChange}
-    className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-  />
-</div>
-
-
-        {/* Current Location */}
-        <div>
-          <label htmlFor="location" className="block  mb-1">
-            Current Location
-          </label>
           <input
-            id="location"
+            name="linkedin"
+            type="url"
+            placeholder="LinkedIn Profile (Optional)"
+            value={formData.linkedin}
+            onChange={handleChange}
+            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-green-400"
+          />
+          <input
             name="location"
-            type="text"
+            placeholder="Current Location"
             value={formData.location}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-green-400"
           />
-        </div>
 
-        {/* Areas of Specializations */}
-        <div>
-          <label
-            htmlFor="specialization"
-            className="block  mb-1"
-          >
-            Areas of Specializations <span className="text-red-600">*</span>
-          </label>
+          {/* Specialization Dropdown */}
           <select
-            id="specialization"
             name="specialization"
-            required
             value={formData.specialization}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-green-400"
           >
             <option value="">-- Select Specialization --</option>
             {specializations.map((spec) => (
@@ -275,74 +217,55 @@ const handleSubmit = async (e: FormEvent) => {
               </option>
             ))}
           </select>
-        </div>
 
-        {/* Internship Period */}
-       {/* Internship Period - only for fresh graduates */}
-{memberType === "freshGraduate" && (
-  <div>
-    <label htmlFor="internshipPeriod" className="block  mb-1">
-      Internship Period <span className="text-red-600">*</span>
-    </label>
-    <input
-      id="internshipPeriod"
-      name="internshipPeriod"
-      type="text"
-      required={memberType === "freshGraduate"}
-      value={formData.internshipPeriod}
-      onChange={handleChange}
-      placeholder="e.g. June 2025 - August 2025"
-      className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-    />
-  </div>
-)}
+          {/* Internship period — shown only for fresh graduates */}
+          {memberType === "freshGraduate" && (
+            <input
+              name="internshipPeriod"
+              placeholder="Internship Period (e.g. June–August 2025)"
+              value={formData.internshipPeriod}
+              onChange={handleChange}
+              required
+              className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-green-400"
+            />
+          )}
 
+          {/* File uploads */}
+          <div>
+            <label className="block text-sm mb-1">Upload CV *</label>
+            <input
+              name="cv"
+              type="file"
+              required
+              accept=".pdf,.doc,.docx"
+              onChange={handleChange}
+              className="w-full text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm mb-1">Upload Credentials *</label>
+            <input
+              name="credentials"
+              type="file"
+              required
+              accept=".pdf,.doc,.docx"
+              onChange={handleChange}
+              className="w-full text-sm"
+            />
+          </div>
 
-        {/* Upload CV */}
-        <div>
-          <label
-            htmlFor="cv"
-            className="block  mb-1"
+          <button
+            type="submit"
+            className="mt-2 bg-[#D4AF37] text-[#1c2b21] font-semibold py-2 rounded-full hover:rounded-xl transition"
           >
-            Upload CV <span className="text-red-600">*</span>
-          </label>
-          <input
-            id="cv"
-            name="cv"
-            type="file"
-            accept=".pdf,.doc,.docx"
-            required
-            onChange={handleChange}
-            className="w-full"
-          />
-        </div>
+            Submit
+          </button>
+        </form>
 
-        {/* Upload Credentials */}
-        <div>
-          <label
-            htmlFor="credentials"
-            className="block  mb-1"
-          >
-            Upload Credentials <span className="text-red-600">*</span>
-          </label>
-          <input
-            id="credentials"
-            name="credentials"
-            type="file"
-            accept=".pdf,.doc,.docx"
-            required
-            onChange={handleChange}
-            className="w-full"
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="mt-4 px-6 py-2 bg-green text-gold rounded hover:bg-blue-700 transition"
-        >
-          Submit
-        </button>
-      </form>
+        <p className="text-center text-xs text-gray-400 mt-6">
+          Ⓒ All rights reserved by Wanaw
+        </p>
+      </div>
     </div>
   );
 }
