@@ -27,8 +27,8 @@ const categoryHeadings: Record<string, { letter: string; label: string }> = {
 const categoryImages: Record<string, string> = {
   Wellness: "/wellness.svg",
   Medical: "/medical.svg",
-  "Home Based/Mobile Services": "/home-services.svg",
-  "Hotel Rooms": "/home-health.svg",
+  "Home Based/Mobile Services": "/home-health.svg",
+  "Hotel Rooms": "/hotel-room.svg",
 };
 
 const ServiceCatalog = () => {
