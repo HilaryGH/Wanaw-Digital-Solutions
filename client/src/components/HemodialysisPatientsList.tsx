@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Mail, Phone, MessageCircle, Send, FileText } from "lucide-react";
+import BASE_URL from "../api/api";
 
 interface Patient {
   _id: string;
@@ -23,7 +24,7 @@ const HemodialysisPatientsList: React.FC = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/kidney-patients")
+    fetch(`${BASE_URL}/kidney-patients`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch patients");
         return res.json();
@@ -37,6 +38,8 @@ const HemodialysisPatientsList: React.FC = () => {
         setLoading(false);
       });
   }, []);
+
+  const fileBase = BASE_URL.replace("/api", "");
 
   if (loading) return <div className="text-center mt-10 text-lg text-gray-600">Loading patients...</div>;
   if (error) return <div className="text-center mt-10 text-red-600">{error}</div>;
@@ -58,7 +61,7 @@ const HemodialysisPatientsList: React.FC = () => {
                 <video
                   controls
                   className="w-full h-full object-cover"
-                  src={`http://localhost:5000/uploads/${patient.videos[0]}`}
+                  src={`${fileBase}/uploads/${patient.videos[0]}`}
                 />
               </div>
             )}
@@ -100,7 +103,7 @@ const HemodialysisPatientsList: React.FC = () => {
                   <li className="flex items-center gap-2">
                     <FileText size={16}/>
                     <a
-                      href={`http://localhost:5000/uploads/${patient.idDocument}`}
+                      href={`${fileBase}/uploads/${patient.idDocument}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:underline"
@@ -111,7 +114,7 @@ const HemodialysisPatientsList: React.FC = () => {
                   <li className="flex items-center gap-2">
                     <FileText size={16}/>
                     <a
-                      href={`http://localhost:5000/uploads/${patient.medicalCertificate}`}
+                      href={`${fileBase}/uploads/${patient.medicalCertificate}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:underline"
@@ -137,5 +140,6 @@ const HemodialysisPatientsList: React.FC = () => {
 };
 
 export default HemodialysisPatientsList;
+
 
 
