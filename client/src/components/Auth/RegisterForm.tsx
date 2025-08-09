@@ -34,6 +34,7 @@ const RegisterForm = () => {
     tradeRegistration: null as File | null,
     servicePhotos: [] as File[],
     video: null as File | null,
+    priceList: null as File | null,
   });
 
   const [consent, setConsent] = useState(false);
@@ -85,6 +86,15 @@ const handleProviderChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElemen
     setProviderForm({ ...providerForm, [name]: value });
   }
 };
+
+//membership
+const [membership, setMembership] = useState<string>(
+  role === "provider" ? "Basic Provider" : "Standard Member"
+);
+const handleMembershipChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  setMembership(e.target.value);
+};
+
 
 
   // (3) SUBMIT
@@ -178,6 +188,10 @@ const handleProviderChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElemen
     if (providerForm.tradeRegistration) fd.append("tradeRegistration", providerForm.tradeRegistration);
     providerForm.servicePhotos.forEach(file => fd.append("servicePhotos", file));
     if (providerForm.video) fd.append("video", providerForm.video);
+    if (providerForm.priceList) {
+  fd.append("priceList", providerForm.priceList);
+}
+
 
     const resProv = await fetch(`${BASE_URL}/auth/register`, {
       method: "POST",
@@ -229,6 +243,39 @@ const handleProviderChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElemen
               <option value="diaspora">Ethiopian Diaspora</option>
             </select>
           </div>
+{/* Membership Options */}
+<div className="mb-4">
+  <label htmlFor="membership" className="block text-sm font-medium text-gray-700 mb-1">
+    Membership Level
+  </label>
+
+  { (role === "individual" || role === "diaspora" || role === "corporate") && (
+    <select
+      id="membership"
+      name="membership"
+      value={membership}
+      onChange={handleMembershipChange}
+      className="w-full p-2 border border-gray-300 rounded text-sm"
+    >
+      <option value="Standard Member">Standard Member</option>
+      <option value="Gold Member" disabled>Gold Member (Coming Soon)</option>
+      <option value="Platinum Member" disabled>Platinum Member (Coming Soon)</option>
+    </select>
+  )}
+
+  {role === "provider" && (
+    <select
+      id="membership"
+      name="membership"
+      value={membership}
+      onChange={handleMembershipChange}
+      className="w-full p-2 border border-gray-300 rounded text-sm"
+    >
+      <option value="Basic Provider">Basic Provider</option>
+      <option value="Premium Provider" disabled>Premium Provider (Coming Soon)</option>
+    </select>
+  )}
+</div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -490,6 +537,20 @@ const handleProviderChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElemen
                   onChange={handleProviderChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
+                
+  <label htmlFor="priceList" className="block text-sm font-medium text-gray-700 mb-1">
+    Price List / Quotation Document (PDF)
+  </label>
+  <input
+    type="file"
+    id="priceList"
+    name="priceList"
+    accept=".pdf"
+    onChange={handleProviderChange}
+    className="w-full p-2 border border-gray-300 rounded text-sm"
+  />
+
+
               </>
             )}
 

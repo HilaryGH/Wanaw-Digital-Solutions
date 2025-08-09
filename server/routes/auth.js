@@ -37,7 +37,9 @@ router.post(
     { name: "tradeRegistration", maxCount: 1 },
     { name: "servicePhotos", maxCount: 5 },
     { name: "video", maxCount: 1 },
+    { name: "priceList", maxCount: 1 },  // Add this line for price list upload
   ]),
+
   register
 );
 

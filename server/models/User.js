@@ -13,13 +13,23 @@ const userSchema = new mongoose.Schema(
 
       default: "individual",
     },
-
-    googleId: { type: String }, // For Google login
     membership: {
       type: String,
-      enum: ["none", "basic", "premium", "enterprise"],
-      default: "none",
+      enum: [
+        "Standard Member",
+        "Gold Member",
+        "Platinum Member",
+        "Basic Provider",
+        "Premium Provider",
+      ],
+      default: "Standard Member",
     },
+    membershipId: { type: String, unique: true, required: true },
+
+
+
+    googleId: { type: String }, // For Google login
+
 
     // 🔸 Provider-only fields (optional)
     companyName: { type: String },
@@ -34,6 +44,7 @@ const userSchema = new mongoose.Schema(
     tradeRegUrl: { type: String },
     photoUrls: [String],
     videoUrl: { type: String },
+    priceListUrl: { type: String },
     resetToken: { type: String },
     tokenExpire: { type: Date },
   },
