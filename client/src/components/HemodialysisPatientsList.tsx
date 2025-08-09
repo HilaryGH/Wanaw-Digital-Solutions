@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Mail, Phone, MessageCircle, Send, FileText } from "lucide-react";
 
 interface Patient {
   _id: string;
@@ -37,38 +38,67 @@ const HemodialysisPatientsList: React.FC = () => {
       });
   }, []);
 
-  if (loading) return <div className="text-center mt-10">Loading patients...</div>;
+  if (loading) return <div className="text-center mt-10 text-lg text-gray-600">Loading patients...</div>;
   if (error) return <div className="text-center mt-10 text-red-600">{error}</div>;
 
   return (
     <div className="max-w-7xl mx-auto p-6">
-      <h2 className="text-3xl font-bold text-center mb-8 text-[#1c2b21]">Hemodialysis Patients Needing Support</h2>
+      <h2 className="text-3xl font-bold text-center mb-8 text-[#1c2b21]">
+        Hemodialysis Patients Needing Support
+      </h2>
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {patients.map((patient) => (
           <div
             key={patient._id}
-            className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300"
+            className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-transform duration-300"
           >
-            <div className="p-6">
-              <h3 className="text-xl font-semibold text-[#1c2b21]">{patient.name}, {patient.age ?? "N/A"}</h3>
-              <p className="text-gray-700 mb-1"><strong>Facility:</strong> {patient.facilityName}</p>
-              <p className="text-gray-700 mb-1"><strong>Location:</strong> {patient.location}</p>
-              <p className="text-gray-700 mb-3">{patient.message || "No additional info provided."}</p>
+            {/* Top Profile Video */}
+            {patient.videos.length > 0 && (
+              <div className="relative w-full aspect-video bg-gray-100">
+                <video
+                  controls
+                  className="w-full h-full object-cover"
+                  src={`http://localhost:5000/uploads/${patient.videos[0]}`}
+                />
+              </div>
+            )}
 
-              <div className="mb-4">
-                <strong>Contact Info:</strong>
-                <ul className="text-gray-600 mt-1 space-y-1">
-                  <li>Phone: {patient.phone}</li>
-                  <li>WhatsApp: {patient.whatsapp}</li>
-                  <li>Telegram: {patient.telegram}</li>
-                  <li>Email: <a href={`mailto:${patient.email}`} className="text-blue-600 underline">{patient.email}</a></li>
+            <div className="p-6 space-y-4">
+              {/* Patient Info */}
+              <h3 className="text-2xl font-semibold text-[#1c2b21]">
+                {patient.name}{" "}
+                <span className="text-gray-500 text-lg">
+                  ({patient.age ?? "N/A"} yrs)
+                </span>
+              </h3>
+              <p className="text-gray-700"><strong>Facility:</strong> {patient.facilityName}</p>
+              <p className="text-gray-700"><strong>Location:</strong> {patient.location}</p>
+              <p className="text-gray-600 italic">
+                {patient.message || "No additional info provided."}
+              </p>
+
+              {/* Contact Info */}
+              <div className="space-y-1">
+                <strong className="block text-gray-800 mb-1">Contact Info:</strong>
+                <ul className="text-gray-600 space-y-1">
+                  <li className="flex items-center gap-2"><Phone size={16}/> {patient.phone}</li>
+                  <li className="flex items-center gap-2"><MessageCircle size={16}/> {patient.whatsapp}</li>
+                  <li className="flex items-center gap-2"><Send size={16}/> {patient.telegram}</li>
+                  <li className="flex items-center gap-2">
+                    <Mail size={16}/> 
+                    <a href={`mailto:${patient.email}`} className="text-blue-600 underline">
+                      {patient.email}
+                    </a>
+                  </li>
                 </ul>
               </div>
 
-              <div>
-                <strong>Documents:</strong>
-                <ul className="mt-1 space-y-1">
-                  <li>
+              {/* Documents */}
+              <div className="space-y-1">
+                <strong className="block text-gray-800 mb-1">Documents:</strong>
+                <ul className="space-y-1">
+                  <li className="flex items-center gap-2">
+                    <FileText size={16}/>
                     <a
                       href={`http://localhost:5000/uploads/${patient.idDocument}`}
                       target="_blank"
@@ -78,7 +108,8 @@ const HemodialysisPatientsList: React.FC = () => {
                       ID Document
                     </a>
                   </li>
-                  <li>
+                  <li className="flex items-center gap-2">
+                    <FileText size={16}/>
                     <a
                       href={`http://localhost:5000/uploads/${patient.medicalCertificate}`}
                       target="_blank"
@@ -90,27 +121,12 @@ const HemodialysisPatientsList: React.FC = () => {
                   </li>
                 </ul>
               </div>
-
-              {patient.videos.length > 0 && (
-                <div className="mt-4">
-                  <strong>Videos:</strong>
-                  <div className="flex flex-col gap-2 mt-1">
-                    {patient.videos.map((video, idx) => (
-                      <video
-                        key={idx}
-                        controls
-                        className="w-full rounded border border-gray-300"
-                        src={`http://localhost:5000/uploads/${video}`}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
+
+            {/* Send Gift Button */}
             <div className="bg-[#D4AF37] text-[#1c2b21] text-center py-3 font-semibold cursor-pointer hover:bg-yellow-400 transition">
-              {/* Replace this with your donation action/link */}
-              <button onClick={() => alert("Donation feature coming soon!")}>
-                Donate to {patient.name}
+              <button onClick={() => alert(`Send gift feature coming soon for ${patient.name}!`)}>
+                🎁 Send Gift to {patient.name}
               </button>
             </div>
           </div>
@@ -121,3 +137,5 @@ const HemodialysisPatientsList: React.FC = () => {
 };
 
 export default HemodialysisPatientsList;
+
+
