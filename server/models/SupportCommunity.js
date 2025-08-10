@@ -1,4 +1,3 @@
-// models/SupportCommunity.js
 const mongoose = require("mongoose");
 
 const SupportCommunitySchema = new mongoose.Schema({
@@ -6,17 +5,77 @@ const SupportCommunitySchema = new mongoose.Schema({
   email: { type: String, required: true },
   phone: String,
   region: String,
-  whatsapp: String,    // ✅ Add this
+  whatsapp: String,
   telegram: String,
-  supportTypes: [String],
-  message: String,
-  createdAt: { type: Date, default: Date.now },
+
   userType: {
     type: String,
     enum: ["individual", "corporate"],
     default: "individual",
   },
+
+  roles: {
+    type: [String],
+    enum: ["Gifter", "Influencer", "Brand Ambassador", "Service Provider", "Volunteer"],
+    required: true,
+    validate: {
+      validator: (arr) => arr.length > 0,
+      message: "At least one role must be selected",
+    },
+  },
+
+  influencerTier: {
+    type: String,
+    enum: [
+      "Mega Influencer",
+      "Macro Influencer",
+      "Micro Influencer",
+      "Nano Influencer",
+    ],
+    default: null,
+  },
+
+  influencerRoles: [String],
+
+  brandAmbassadorTier: {
+    type: String,
+    enum: [
+      "Celebrity Ambassador",
+      "Community Advocate",
+      "Industry Expert",
+      "Customer Ambassador",
+    ],
+    default: null,
+  },
+
+  brandAmbassadorRoles: [String],
+
+  serviceProviderTier: {
+    type: String,
+    enum: ["Primary Healthcare Provider", "Specialized Service Provider"],
+    default: null,
+  },
+
+  volunteerTier: {
+    type: String,
+    enum: [
+      "Core Volunteer",
+      "Project Based Volunteer",
+      "Occasional Volunteer",
+      "Virtual Volunteer",
+      "Student Volunteer",
+    ],
+    default: null,
+  },
+
+  supportTypes: [String],
+
+  message: String,
+
+  createdAt: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model("SupportCommunity", SupportCommunitySchema);
+
+
 
