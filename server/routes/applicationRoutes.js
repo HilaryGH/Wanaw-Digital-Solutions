@@ -1,6 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const { createApplication, getApplicationsByJob } = require('../controllers/applicationController');
+const { createApplication, getAllApplications } = require('../controllers/applicationController');
 
 const router = express.Router();
 
@@ -26,7 +26,8 @@ router.post(
 );
 
 // 3. Regular GET route
-router.get('/:jobId', getApplicationsByJob);
+// routes/applicationRoutes.js
+router.get('/', getAllApplications); // new controller function
 
 module.exports = router;
 

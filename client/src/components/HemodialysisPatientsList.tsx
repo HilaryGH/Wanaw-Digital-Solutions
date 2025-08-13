@@ -18,10 +18,33 @@ interface Patient {
   videos: string[];
 }
 
+interface UserRoles {
+  gifter: boolean;
+  influencer: boolean;
+  brandAmbassador: boolean;
+  serviceProvider: boolean;
+  volunteer: boolean;
+}
+
+// Load user roles from localStorage or default to false
+const getUserRoles = (): UserRoles => {
+  const stored = localStorage.getItem("userRoles");
+  return stored
+    ? JSON.parse(stored)
+    : {
+        gifter: false,
+        influencer: false,
+        brandAmbassador: false,
+        serviceProvider: false,
+        volunteer: false,
+      };
+};
+
 const HemodialysisPatientsList: React.FC = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [userRoles] = useState<UserRoles>(getUserRoles());
 
   useEffect(() => {
     fetch(`${BASE_URL}/kidney-patients`)
@@ -41,14 +64,45 @@ const HemodialysisPatientsList: React.FC = () => {
 
   const fileBase = BASE_URL.replace("/api", "");
 
-  if (loading) return <div className="text-center mt-10 text-lg text-gray-600">Loading patients...</div>;
-  if (error) return <div className="text-center mt-10 text-red-600">{error}</div>;
+  const handleAction = (patient: Patient, action: keyof UserRoles) => {
+    switch (action) {
+      case "gifter":
+        alert(`🎁 Send gift feature coming soon for ${patient.name}!`);
+        break;
+      case "influencer":
+        alert(`📢 Promote ${patient.name} on your platform!`);
+        break;
+      case "brandAmbassador":
+        alert(`🌟 Promote Wanaw Support Community Program for ${patient.name}!`);
+        break;
+      case "serviceProvider":
+        alert(`🏥 Provide treatment or services for ${patient.name}!`);
+        break;
+      case "volunteer":
+        alert(`🤝 Volunteer for ${patient.name}'s care!`);
+        break;
+      default:
+        break;
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="text-center mt-10 text-lg text-gray-600">
+        Loading patients...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="text-center mt-10 text-red-600">{error}</div>
+    );
 
   return (
     <div className="max-w-7xl mx-auto p-6">
       <h2 className="text-3xl font-bold text-center mb-8 text-[#1c2b21]">
         Hemodialysis Patients Needing Support
       </h2>
+
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {patients.map((patient) => (
           <div
@@ -67,29 +121,43 @@ const HemodialysisPatientsList: React.FC = () => {
             )}
 
             <div className="p-6 space-y-4">
-              {/* Patient Info */}
               <h3 className="text-2xl font-semibold text-[#1c2b21]">
                 {patient.name}{" "}
                 <span className="text-gray-500 text-lg">
                   ({patient.age ?? "N/A"} yrs)
                 </span>
               </h3>
-              <p className="text-gray-700"><strong>Facility:</strong> {patient.facilityName}</p>
-              <p className="text-gray-700"><strong>Location:</strong> {patient.location}</p>
+              <p className="text-gray-700">
+                <strong>Facility:</strong> {patient.facilityName}
+              </p>
+              <p className="text-gray-700">
+                <strong>Location:</strong> {patient.location}
+              </p>
               <p className="text-gray-600 italic">
                 {patient.message || "No additional info provided."}
               </p>
 
               {/* Contact Info */}
               <div className="space-y-1">
-                <strong className="block text-gray-800 mb-1">Contact Info:</strong>
+                <strong className="block text-gray-800 mb-1">
+                  Contact Info:
+                </strong>
                 <ul className="text-gray-600 space-y-1">
-                  <li className="flex items-center gap-2"><Phone size={16}/> {patient.phone}</li>
-                  <li className="flex items-center gap-2"><MessageCircle size={16}/> {patient.whatsapp}</li>
-                  <li className="flex items-center gap-2"><Send size={16}/> {patient.telegram}</li>
                   <li className="flex items-center gap-2">
-                    <Mail size={16}/> 
-                    <a href={`mailto:${patient.email}`} className="text-blue-600 underline">
+                    <Phone size={16} /> {patient.phone}
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <MessageCircle size={16} /> {patient.whatsapp}
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Send size={16} /> {patient.telegram}
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Mail size={16} />
+                    <a
+                      href={`mailto:${patient.email}`}
+                      className="text-blue-600 underline"
+                    >
                       {patient.email}
                     </a>
                   </li>
@@ -101,7 +169,7 @@ const HemodialysisPatientsList: React.FC = () => {
                 <strong className="block text-gray-800 mb-1">Documents:</strong>
                 <ul className="space-y-1">
                   <li className="flex items-center gap-2">
-                    <FileText size={16}/>
+                    <FileText size={16} />
                     <a
                       href={`${fileBase}/uploads/${patient.idDocument}`}
                       target="_blank"
@@ -112,7 +180,7 @@ const HemodialysisPatientsList: React.FC = () => {
                     </a>
                   </li>
                   <li className="flex items-center gap-2">
-                    <FileText size={16}/>
+                    <FileText size={16} />
                     <a
                       href={`${fileBase}/uploads/${patient.medicalCertificate}`}
                       target="_blank"
@@ -126,11 +194,24 @@ const HemodialysisPatientsList: React.FC = () => {
               </div>
             </div>
 
-            {/* Send Gift Button */}
-            <div className="bg-[#D4AF37] text-[#1c2b21] text-center py-3 font-semibold cursor-pointer hover:bg-yellow-400 transition">
-              <button onClick={() => alert(`Send gift feature coming soon for ${patient.name}!`)}>
-                🎁 Send Gift to {patient.name}
-              </button>
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-2 p-4 bg-[#F5F5F5] border-t">
+              {Object.entries(userRoles).map(([role, isActive]) =>
+                isActive ? (
+                  <button
+                    key={role}
+                    type="button" // Prevents page refresh
+                    onClick={() => handleAction(patient, role as keyof UserRoles)}
+                    className="flex-1 py-2 px-3 rounded-lg bg-[#D4AF37] text-[#1c2b21] font-semibold hover:bg-yellow-400 transition text-sm"
+                  >
+                    {role === "gifter" && "🎁 Send Gift"}
+                    {role === "influencer" && "📢 Promote"}
+                    {role === "brandAmbassador" && "🌟 Promote Program"}
+                    {role === "serviceProvider" && "🏥 Provide Service"}
+                    {role === "volunteer" && "🤝 Volunteer"}
+                  </button>
+                ) : null
+              )}
             </div>
           </div>
         ))}
@@ -140,6 +221,8 @@ const HemodialysisPatientsList: React.FC = () => {
 };
 
 export default HemodialysisPatientsList;
+
+
 
 
 

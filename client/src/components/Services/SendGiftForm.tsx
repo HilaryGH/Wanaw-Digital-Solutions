@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Gift as GiftIcon, ChevronDown, ChevronUp } from "lucide-react";
 
-
-
 import BASE_URL from "../../api/api";
 
 /* ----------------------------- Types ----------------------------- */

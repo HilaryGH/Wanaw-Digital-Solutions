@@ -4,6 +4,7 @@ import BASE_URL from '../api/api';
 
 interface Application {
   _id: string;
+  jobId: string; // make sure this exists in your backend model
   fullName: string;
   email: string;
   phone: string;
@@ -15,21 +16,14 @@ interface Application {
 }
 
 const ApplicationsList = () => {
-    const { jobId } = useParams<{ jobId: string }>();
+  const { jobId } = useParams<{ jobId: string }>();
   const [applications, setApplications] = useState<Application[]>([]);
 
   useEffect(() => {
-    if (!jobId) {
-      console.error("jobId is undefined!");
-      return;
-    }
-
     const fetchApplications = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/applications/${jobId}`);
+        const res = await fetch(`${BASE_URL}/applications`); // fetch all applications
         const data = await res.json();
-
-        // Assuming `data` is an array of applications
         setApplications(data);
       } catch (error) {
         console.error('Failed to fetch applications', error);
@@ -37,15 +31,21 @@ const ApplicationsList = () => {
     };
 
     fetchApplications();
-  }, [jobId]);
+  }, []);
+
+  // Filter by jobId if it exists
+  const filteredApplications = jobId
+    ? applications.filter(app => app.jobId === jobId)
+    : applications;
+
   return (
     <div className="max-w-4xl mx-auto my-10">
       <h2 className="text-2xl font-bold mb-6 text-blue-800">Applications</h2>
-      {applications.length === 0 ? (
+      {filteredApplications.length === 0 ? (
         <p>No applications found.</p>
       ) : (
         <div className="space-y-6">
-          {applications.map(app => (
+          {filteredApplications.map(app => (
             <div
               key={app._id}
               className="p-6 bg-white border border-gray-200 rounded-xl shadow-md"
@@ -88,3 +88,4 @@ const ApplicationsList = () => {
 };
 
 export default ApplicationsList;
+

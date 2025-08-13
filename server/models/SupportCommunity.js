@@ -12,7 +12,13 @@ const SupportCommunitySchema = new mongoose.Schema({
     type: String,
     enum: ["individual", "corporate"],
     default: "individual",
-  },
+  }
+  ,
+  // models/SupportCommunity.js (update)
+  membershipId: { type: String, unique: true, index: true, sparse: true },
+  emailSent: { type: Boolean, default: false },
+  emailSentAt: { type: Date, default: null },
+
 
   roles: {
     type: [String],
@@ -59,14 +65,15 @@ const SupportCommunitySchema = new mongoose.Schema({
   volunteerTier: {
     type: String,
     enum: [
-      "Core Volunteer",
-      "Project Based Volunteer",
-      "Occasional Volunteer",
-      "Virtual Volunteer",
-      "Student Volunteer",
+      "coreVolunteer",
+      "projectBasedVolunteer",
+      "occasionalVolunteer",
+      "virtualVolunteer",
+      "studentVolunteer",
     ],
     default: null,
-  },
+  }
+  ,
 
   supportTypes: [String],
 

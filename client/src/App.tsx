@@ -58,6 +58,7 @@ import DiasporaList from "./components/Dashbords/Admin/DiasporaList";
 import KidneyPatientList from "./components/Dashbords/Admin/KidneyPatientList";
 import SubscribersList from "./components/Dashbords/Admin/SubscribersList";
 import HemodialysisPatientsList from "./components/HemodialysisPatientsList";
+import MembershipLookup from "./components/MembershipLookup";
 
 
 
@@ -158,6 +159,7 @@ const AppWrapper = () => {
 />
 
 
+
         {/* 🔐 Admin-only routes */}
     {/* 🔐 Super Admin Only */}
 <Route
@@ -168,7 +170,14 @@ const AppWrapper = () => {
     </PrivateRoute>
   }
 />
-
+<Route
+  path="/admin/Support-community"
+  element={
+    <PrivateRoute requiredRole="super_admin">
+      <MembershipLookup/>
+    </PrivateRoute>
+  }
+/>
 
 
 <Route
@@ -298,6 +307,7 @@ const AppWrapper = () => {
     </PrivateRoute>
   }
 />
+
 <Route
   path="/admin/gift-list & confirm"
   element={

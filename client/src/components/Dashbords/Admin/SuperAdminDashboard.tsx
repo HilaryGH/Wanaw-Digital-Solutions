@@ -92,6 +92,12 @@ export default function SuperAdminDashboard() {
       route: "/admin/subscrpition-list",
       color: "bg-pink-100",
     },
+      {
+      title: "Support community",
+      description: "Review kidney pateints list.",
+      route: "/admin/Support-community",
+      color: "bg-pink-100",
+    },
   ];
 
   return (
