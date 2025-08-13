@@ -16,11 +16,13 @@ const SelectMembership = () => {
     }
   }, [token, navigate]);
 
-  const membershipPrices: Record<string, number> = {
-  basic: 200,
-  premium: 500,
-  enterprise: 1000,
+ const membershipPrices: Record<string, number> = {
+  standard: 200,
+  gold: 500,
+  premium: 1000,
+  platinum: 2000,
 };
+
 
 const handleSubmit = async () => {
   if (!selected) {
@@ -69,16 +71,18 @@ const handleSubmit = async () => {
   return (
     <div className="p-6 bg-white rounded shadow w-full max-w-md mx-auto mt-10">
       <h2 className="text-xl font-bold mb-4">Select Membership Plan</h2>
-      <select
-        value={selected}
-        onChange={(e) => setSelected(e.target.value)}
-        className="w-full p-2 border mb-4"
-      >
-        <option value="">-- Choose Plan --</option>
-        <option value="basic">Basic</option>
-        <option value="premium">Premium</option>
-        <option value="enterprise">Enterprise</option>
-      </select>
+     <select
+  value={selected}
+  onChange={(e) => setSelected(e.target.value)}
+  className="w-full p-2 border mb-4"
+>
+  <option value="">-- Choose Plan --</option>
+  <option value="standard">Standard</option>
+  <option value="gold">Gold</option>
+  <option value="premium">Premium</option>
+  <option value="platinum">Platinum</option>
+</select>
+
       <button
         onClick={handleSubmit}
         className="w-full bg-[#D4AF37] text-[#1c2b21] font-semibold py-2 rounded"
