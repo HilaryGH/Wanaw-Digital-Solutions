@@ -11,12 +11,16 @@ const {
   assignDeliveryCode,
   confirmGiftCode,
   getGiftsByProvider,
+  getAllGiftCodes,
 } = require("../controllers/giftController");
 
 
 
 router.post("/:giftId/assign-delivery-code", assignDeliveryCode);
 router.post("/:giftId/confirm-gift", confirmGiftCode);
+
+router.get("/codes", verifyToken, getAllGiftCodes);
+
 
 // ✅ Protected route for admins with file upload
 router.post("/", verifyToken, createGift);

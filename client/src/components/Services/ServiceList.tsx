@@ -2,20 +2,38 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import BASE_URL from "../../api/api";
 
+
 const wellnessSubcategories = [
+  {
+    label: "Salon & Hairstyling",
+    options: ["Hair Styling", "Haircut", "Hair Coloring", "Blow Dry"],
+  },
+  {
+    label: "Gym & Fitness",
+    options: ["Gym", "Personal Trainer", "Yoga Instructor", "Health Coach"],
+  },
+  {
+    label: "Outdoor Wellness Activities",
+    options: [
+      "Hiking",
+      "Wellness Camping",
+    ],
+  },
   {
     label: "Spa and Wellness Treatments",
     options: ["Massages", "Facials", "Other Spa Services"],
   },
   {
     label: "Cosmetic Services",
-    options: ["Skin Treatments", "Hair Styling", "Makeup Services"],
+    options: ["Skin Treatments", "Makeup Services"],
   },
   {
     label: "Holistic Therapies",
     options: ["Aromatherapy", "Acupuncture", "Reiki"],
   },
 ];
+
+
 
 const homeBasedSubcategories = [
   {

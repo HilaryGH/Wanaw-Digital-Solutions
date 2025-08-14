@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import BASE_URL from "../api/api";
-
+import axios from "axios";
 
 import { FaPhoneAlt, FaEnvelope, FaWhatsapp } from "react-icons/fa";
 import { SiTelegram } from "react-icons/si";
@@ -104,43 +104,48 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
-  console.log("All items:", allItems);
-  if (Array.isArray(allItems)) {
-    console.log("First item:", allItems[0]);
-  } else {
-    console.error("allItems is not an array");
-  }
-}, [allItems]);
+    const fetchItems = async () => {
+      try {
+        const services = await axios.get(`${BASE_URL}/services`);
+        const programs = await axios.get(`${BASE_URL}/programs`);
+        const gifts = await axios.get(`${BASE_URL}/gift`);
 
+        // Combine all items into a single array
+        const combinedItems = [
+          ...services.data,
+          ...programs.data,
+          ...gifts.data,
+        ];
+        setAllItems(combinedItems);
+        console.log("allItems:", combinedItems);
+      } catch (error) {
+        console.error("Search fetch error:", error);
+      }
+    };
 
-  /* fetch searchable data when user opens search */
- useEffect(() => {
-  if (!searchOpen || allItems.length > 0) return; // Don't fetch again if already fetched
+    fetchItems();
+  }, []);
 
-  const fetchAll = async () => {
-    try {
-      const [services, programs, gifts] = await Promise.all([
-        fetch(`${BASE_URL}/services`).then(r => r.json()),
-        fetch(`${BASE_URL}/programs`).then(r => r.json()),
-        fetch(`${BASE_URL}/gifts`).then(r => r.json()),
-      ]);
-
-      setAllItems([
-        ...(Array.isArray(services) ? services.map((s: any) => ({ ...s, type: "Service" })) : []),
-        ...(Array.isArray(programs) ? programs.map((p: any) => ({ ...p, type: "Program" })) : []),
-        ...(Array.isArray(gifts) ? gifts.map((g: any) => ({ ...g, type: "Gift" })) : []),
-      ]);
-
-      console.log("Services:", services);
-      console.log("Programs:", programs);
-      console.log("Gifts:", gifts);
-    } catch (e) {
-      console.error("Search fetch error:", e);
+  // Filter results whenever searchQuery changes
+  useEffect(() => {
+    if (!searchQuery) {
+      setFilteredResults([]);
+      return;
     }
-  };
 
-  fetchAll();
-}, [searchOpen, allItems]);
+    const q = searchQuery.toLowerCase();
+    const results = allItems.filter((item) => {
+      const titleMatch = String(item.title || "").toLowerCase().includes(q);
+      const categoryMatch = String(item.category || "").toLowerCase().includes(q);
+      const locationMatch = String(item.location || "").toLowerCase().includes(q);
+      const priceMatch = String(item.price || "").toLowerCase().includes(q);
+      const ratingMatch = String(item.rating || "").toLowerCase().includes(q);
+
+      return titleMatch || categoryMatch || locationMatch || priceMatch || ratingMatch;
+    });
+
+    setFilteredResults(results);
+  }, [searchQuery, allItems]);
 
 
 
@@ -412,14 +417,14 @@ const menuSections: MenuSection[] = [
         </div>
 
         {/* SEARCH OVERLAY */}
-  {searchOpen && (
+{searchOpen && (
   <div className="absolute top-full left-0 w-full bg-white shadow-md z-40 p-4 border-t md:flex md:justify-center">
     <div className="w-full md:max-w-xl">
       {/* input */}
       <div className="flex items-center gap-2">
         <input
           type="text"
-          placeholder="Search by title, category, location..."
+          placeholder="Search services, programs, or gifts by title, category, or location..."
           className="flex-grow px-4 py-2 rounded-full border text-sm"
           autoFocus
           value={searchQuery}
@@ -427,28 +432,22 @@ const menuSections: MenuSection[] = [
             const q = e.target.value.toLowerCase();
             setSearchQuery(q);
 
-         
+            setFilteredResults(
+              allItems
+                .filter((item) => {
+                  const titleMatch = String(item.title || item.name || "")
+                    .toLowerCase()
+                    .includes(q);
+                  const categoryMatch = String(item.category || item.serviceType || "")
+                    .toLowerCase()
+                    .includes(q);
+                  const locationMatch = String(item.location || item.city || "")
+                    .toLowerCase()
+                    .includes(q);
 
-setFilteredResults(
-  allItems.filter((item) => {
-    const titleMatch = String(item.title || "").toLowerCase().includes(q);
-    const categoryMatch = String(item.category || "").toLowerCase().includes(q);
-    const locationMatch = String(item.location || "").toLowerCase().includes(q);
-    const priceMatch = String(item.price || "").toLowerCase().includes(q);
-    const ratingMatch = String(item.rating || "").toLowerCase().includes(q);
-
-    return (
-      titleMatch ||
-      categoryMatch ||
-      locationMatch ||
-      priceMatch ||
-      ratingMatch
-    );
-  })
-);
-
-               
-        
+                  return titleMatch || categoryMatch || locationMatch;
+                })
+            );
           }}
         />
         <button
@@ -464,39 +463,33 @@ setFilteredResults(
 
       {/* results */}
       {searchQuery && (
-  <div className="mt-4 bg-white border rounded shadow max-h-64 overflow-y-auto">
-    {filteredResults.length ? (
-      filteredResults.map((item, idx) => {
-        let path = "/";
-        if (item.type === "Program") {
-          path = "/programs";
-        } else if (item.type === "Service") {
-          path = `/services?category=${encodeURIComponent(
-            item.category
-          )}&location=${encodeURIComponent(item.location)}`;
-        } else if (item.type === "Gift") {
-          path = "/gifting-options";
-        }
+        <div className="mt-4 bg-white border rounded shadow max-h-64 overflow-y-auto">
+          {filteredResults.length ? (
+            filteredResults.map((item, idx) => {
+              const path = `/services?category=${encodeURIComponent(
+                item.category || item.serviceType || ""
+              )}&location=${encodeURIComponent(item.location || item.city || "")}`;
 
-        return (
-          <a
-            key={idx}
-            href={path}
-            className="block px-4 py-2 hover:bg-gray-100 text-sm"
-          >
-            <strong>{item.title}</strong> <br />
-            <span className="text-xs text-gray-500">
-              {item.category} | {item.location} | ${item.price} | ⭐ {item.rating}
-            </span>
-          </a>
-        );
-      })
-    ) : (
-      <p className="text-center text-gray-500 p-2 text-sm">No results found.</p>
-    )}
-  </div>
-)}
-
+              return (
+                <a
+                  key={idx}
+                  href={path}
+                  className="block px-4 py-2 hover:bg-gray-100 text-sm"
+                >
+                  <strong>{item.title || item.name}</strong> <br />
+                  <span className="text-xs text-gray-500">
+                    {item.category || item.serviceType} | {item.location || item.city}
+                  </span>
+                </a>
+              );
+            })
+          ) : (
+            <p className="text-center text-gray-500 p-2 text-sm">
+              No results found.
+            </p>
+          )}
+        </div>
+      )}
     </div>
   </div>
 )}

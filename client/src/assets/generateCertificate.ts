@@ -4,13 +4,13 @@ import QRCode from "qrcode";
 export async function generateCertificate({
   name,
   role,
-  tier,
+  level, // renamed from tier
   qrData, // any string or URL to encode
   logoUrl = "/WHW.jpg", // default logo path
 }: {
   name: string;
   role: string;
-  tier?: string;
+  level?: string;
   qrData?: string;
   logoUrl?: string;
 }) {
@@ -19,7 +19,6 @@ export async function generateCertificate({
   // 🎨 Brand Colors
   const brandDark: [number, number, number] = [28, 43, 33]; // #1c2b21
   const brandGold: [number, number, number] = [212, 175, 55]; // #D4AF37
-
 
   // 📄 Border
   doc.setDrawColor(...brandDark);
@@ -52,12 +51,12 @@ export async function generateCertificate({
   doc.setTextColor(...brandGold);
   doc.text(name, 148.5, 120, { align: "center" });
 
-  // 📌 Role & Tier
+  // 📌 Role & Level
   doc.setFontSize(16);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(...brandDark);
-  const tierText = tier ? ` (${tier})` : "";
-  doc.text(`as ${role}${tierText}`, 148.5, 135, { align: "center" });
+  const levelText = level ? ` (${level})` : "";
+  doc.text(`as ${role}${levelText}`, 148.5, 135, { align: "center" });
 
   // 📝 Tagline based on role
   const roleTaglines: Record<string, string> = {
@@ -82,7 +81,7 @@ export async function generateCertificate({
   doc.setFillColor(...brandGold);
   doc.circle(240, 165, 15, "FD");
   doc.setFontSize(10);
-  doc.setTextColor(255, 255, 255);
+  doc.setTextColor(...brandDark); // ✅ brand green instead of white
   doc.text("Wanaw", 240, 165, { align: "center", baseline: "middle" });
 
   // 🔳 Add QR Code if provided
@@ -98,4 +97,5 @@ export async function generateCertificate({
   // 💾 Download
   doc.save(`${name}-certificate.pdf`);
 }
+
 

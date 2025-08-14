@@ -20,22 +20,25 @@ const RegisterForm = () => {
   });
 
   const [providerForm, setProviderForm] = useState({
-    companyName: "",
-    serviceType: "",
-    email: "",
-    phone: "",
-    whatsapp: "",
-    telegram: "",
-    city: "",
-    location: "",
-    password: "",
-    confirmPassword: "",
-    license: null as File | null,
-    tradeRegistration: null as File | null,
-    servicePhotos: [] as File[],
-    video: null as File | null,
-    priceList: null as File | null,
-  });
+  companyName: "",
+  serviceType: "",
+  email: "",
+  phone: "",
+  whatsapp: "",
+  telegram: "",
+  city: "",
+  location: "",
+  tin: "",
+  branches: [{ city: "", location: "" }],
+  banks: [{ bankName: "", accountNumber: "" }],
+  password: "",
+  confirmPassword: "",
+  license: null as File | null,
+  tradeRegistration: null as File | null,
+  servicePhotos: [] as File[],
+  video: null as File | null,
+  priceList: null as File | null,
+});
 
   const [consent, setConsent] = useState(false);
   const navigate = useNavigate();
@@ -61,30 +64,61 @@ const handleUserChange = (e: ChangeEvent<HTMLInputElement>) => {
 };
 
 
+// Update single-value fields
 const handleProviderChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
   const { name, value, files } = e.target as HTMLInputElement;
+  // ... existing file logic ...
 
-  if (files) {
-    if (name === "servicePhotos") {
-      const validFiles = Array.from(files).filter(file => {
-        if (file.size > 200 * 1024 * 1024) {
-          alert(`${file.name} exceeds the 200MB limit and was not added.`);
-          return false;
-        }
-        return true;
-      });
-      setProviderForm({ ...providerForm, servicePhotos: validFiles });
-    } else {
-      const file = files[0];
-      if (file && file.size > 200 * 1024 * 1024) {
-        alert("File size exceeds the 200MB limit.");
-        return;
-      }
-      setProviderForm({ ...providerForm, [name]: file });
-    }
-  } else {
+  if (!files) {
     setProviderForm({ ...providerForm, [name]: value });
   }
+};
+
+// Handle branches change
+const handleBranchChange = (
+  index: number,
+  field: "city" | "location",
+  value: string
+) => {
+  const newBranches = [...providerForm.branches];
+  newBranches[index][field] = value;
+  setProviderForm({ ...providerForm, branches: newBranches });
+};
+
+const addBranch = () => {
+  setProviderForm({
+    ...providerForm,
+    branches: [...providerForm.branches, { city: "", location: "" }],
+  });
+};
+
+const removeBranch = (index: number) => {
+  const newBranches = providerForm.branches.filter((_, i) => i !== index);
+  setProviderForm({ ...providerForm, branches: newBranches });
+};
+
+// Handle banks change
+const handleBankChange = (
+  index: number,
+  field: "bankName" | "accountNumber",
+  value: string
+) => {
+  const newBanks = [...providerForm.banks];
+  newBanks[index][field] = value;
+  setProviderForm({ ...providerForm, banks: newBanks });
+};
+
+
+const addBank = () => {
+  setProviderForm({
+    ...providerForm,
+    banks: [...providerForm.banks, { bankName: "", accountNumber: "" }],
+  });
+};
+
+const removeBank = (index: number) => {
+  const newBanks = providerForm.banks.filter((_, i) => i !== index);
+  setProviderForm({ ...providerForm, banks: newBanks });
 };
 
 //membership
@@ -190,6 +224,10 @@ const handleMembershipChange = (e: ChangeEvent<HTMLSelectElement>) => {
     if (providerForm.video) fd.append("video", providerForm.video);
     if (providerForm.priceList) {
   fd.append("priceList", providerForm.priceList);
+  fd.append("tin", providerForm.tin);
+fd.append("branches", JSON.stringify(providerForm.branches));
+fd.append("banks", JSON.stringify(providerForm.banks));
+
 }
 
 
@@ -537,6 +575,76 @@ const handleMembershipChange = (e: ChangeEvent<HTMLSelectElement>) => {
                   onChange={handleProviderChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
+                {/* TIN */}
+<input
+  type="text"
+  name="tin"
+  placeholder="Tax Identification Number (TIN)"
+  required
+  value={providerForm.tin}
+  onChange={handleProviderChange}
+  className="w-full p-2 border border-gray-300 rounded text-sm"
+/>
+
+{/* Branches */}
+<div className="mt-4">
+  <label className="block font-medium">Branches</label>
+  {providerForm.branches.map((branch, idx) => (
+    <div key={idx} className="flex flex-col sm:flex-row gap-2 mb-2">
+      <input
+        type="text"
+        placeholder="Branch City"
+        value={branch.city}
+        onChange={(e) => handleBranchChange(idx, "city", e.target.value)}
+        className="w-full sm:w-1/2 p-2 border border-gray-300 rounded text-sm"
+      />
+      <input
+        type="text"
+        placeholder="Branch Address / Location"
+        value={branch.location}
+        onChange={(e) => handleBranchChange(idx, "location", e.target.value)}
+        className="w-full sm:w-1/2 p-2 border border-gray-300 rounded text-sm"
+      />
+      {providerForm.branches.length > 1 && (
+        <button type="button" onClick={() => removeBranch(idx)} className="text-red-500">Remove</button>
+      )}
+    </div>
+  ))}
+  <button type="button" onClick={addBranch} className="text-blue-500 mt-1">+ Add Branch</button>
+</div>
+
+{/* Banks */}
+<div className="mt-4">
+  <label className="block font-medium">Bank Accounts</label>
+  {providerForm.banks.map((bank, idx) => (
+    <div key={idx} className="flex flex-col sm:flex-row gap-2 mb-2">
+      <select
+        value={bank.bankName}
+        onChange={(e) => handleBankChange(idx, "bankName", e.target.value)}
+        className="w-full sm:w-1/2 p-2 border border-gray-300 rounded text-sm"
+      >
+        <option value="">Select Bank</option>
+        <option value="Commercial Bank of Ethiopia">Commercial Bank of Ethiopia</option>
+        <option value="Awash Bank">Awash Bank</option>
+        <option value="Dashen Bank">Dashen Bank</option>
+        <option value="Nib Bank">Nib Bank</option>
+        {/* Add more */}
+      </select>
+      <input
+        type="text"
+        placeholder="Account Number"
+        value={bank.accountNumber}
+        onChange={(e) => handleBankChange(idx, "accountNumber", e.target.value)}
+        className="w-full sm:w-1/2 p-2 border border-gray-300 rounded text-sm"
+      />
+      {providerForm.banks.length > 1 && (
+        <button type="button" onClick={() => removeBank(idx)} className="text-red-500">Remove</button>
+      )}
+    </div>
+  ))}
+  <button type="button" onClick={addBank} className="text-blue-500 mt-1">+ Add Bank Account</button>
+</div>
+
                 
   <label htmlFor="priceList" className="block text-sm font-medium text-gray-700 mb-1">
     Price List / Quotation Document (PDF)

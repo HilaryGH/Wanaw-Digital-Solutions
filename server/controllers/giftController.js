@@ -303,3 +303,30 @@ exports.confirmGiftCode = async (req, res) => {
   }
 };
 
+// Get all gift codes with filters and populated service/provider
+
+
+exports.getAllGiftCodes = async (req, res) => {
+  try {
+    const { status, providerName, dateFrom, dateTo } = req.query;
+    let filter = {};
+
+    if (status) filter.deliveryStatus = status;
+    if (providerName) filter.providerName = { $regex: providerName, $options: "i" };
+    if (dateFrom || dateTo) {
+      filter.createdAt = {};
+      if (dateFrom) filter.createdAt.$gte = new Date(dateFrom);
+      if (dateTo) filter.createdAt.$lte = new Date(dateTo);
+    }
+
+    const codes = await GiftNotification.find(filter)
+      .sort({ createdAt: -1 })
+      .populate({ path: "service", strictPopulate: false }) // <- strictPopulate false
+      .populate({ path: "providerId", select: "name" });
+
+    res.status(200).json(codes);
+  } catch (err) {
+    console.error("❌ Error fetching gift codes:", err);
+    res.status(500).json({ msg: "Server error fetching gift codes" });
+  }
+};

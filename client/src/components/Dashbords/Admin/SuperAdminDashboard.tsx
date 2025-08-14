@@ -88,14 +88,20 @@ export default function SuperAdminDashboard() {
     },
       {
       title: "Subscrpition List",
-      description: "Review kidney pateints list.",
+      description: "Review subscribers list.",
       route: "/admin/subscrpition-list",
       color: "bg-pink-100",
     },
       {
       title: "Support community",
-      description: "Review kidney pateints list.",
+      description: "Review suport comunity list.",
       route: "/admin/Support-community",
+      color: "bg-pink-100",
+    },
+       {
+      title: "Gift code",
+      description: "Review Gift code.",
+      route: "/admin/gift-codes",
       color: "bg-pink-100",
     },
   ];

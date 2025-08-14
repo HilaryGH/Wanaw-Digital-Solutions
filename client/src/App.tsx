@@ -59,6 +59,7 @@ import KidneyPatientList from "./components/Dashbords/Admin/KidneyPatientList";
 import SubscribersList from "./components/Dashbords/Admin/SubscribersList";
 import HemodialysisPatientsList from "./components/HemodialysisPatientsList";
 import MembershipLookup from "./components/MembershipLookup";
+import AdminGiftCodes from "./components/Dashbords/Admin/AdminGiftCodes";
 
 
 
@@ -251,6 +252,15 @@ const AppWrapper = () => {
     </PrivateRoute>
   }
 />
+<Route
+  path="/admin/gift-codes"
+  element={
+    <PrivateRoute requiredRole="super_admin">
+      <AdminGiftCodes/>
+    </PrivateRoute>
+  }
+/>
+
 
 {/* 🎯 Marketing Admin + Super Admin */}
 <Route

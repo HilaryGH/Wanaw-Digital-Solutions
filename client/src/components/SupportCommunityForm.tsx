@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import BASE_URL from "../api/api";
 import { generateCertificate } from "../assets/generateCertificate";
 
-
 const SupportCommunityForm = () => {
   const navigate = useNavigate();
 
@@ -24,13 +23,13 @@ const SupportCommunityForm = () => {
       volunteer: false,
     },
 
-    gifterTier: "individual",
-    influencerTier: "",
+    gifterLevel: "individual",
+    influencerLevel: "",
     influencerRoles: [] as string[],
-    brandAmbassadorTier: "",
+    brandAmbassadorLevel: "",
     brandAmbassadorRoles: [] as string[],
-    serviceProviderTier: "",
-    volunteerTier: "",
+    serviceProviderLevel: "",
+    volunteerLevel: "",
 
     message: "",
   });
@@ -41,28 +40,28 @@ const SupportCommunityForm = () => {
       roles: { ...prev.roles, [role]: !prev.roles[role] },
       ...(prev.roles[role]
         ? {
-            ...(role === "gifter" && { gifterTier: "individual" }),
-            ...(role === "influencer" && { influencerTier: "", influencerRoles: [] }),
-            ...(role === "brandAmbassador" && { brandAmbassadorTier: "", brandAmbassadorRoles: [] }),
-            ...(role === "serviceProvider" && { serviceProviderTier: "" }),
-            ...(role === "volunteer" && { volunteerTier: "" }),
+            ...(role === "gifter" && { gifterLevel: "individual" }),
+            ...(role === "influencer" && { influencerLevel: "", influencerRoles: [] }),
+            ...(role === "brandAmbassador" && { brandAmbassadorLevel: "", brandAmbassadorRoles: [] }),
+            ...(role === "serviceProvider" && { serviceProviderLevel: "" }),
+            ...(role === "volunteer" && { volunteerLevel: "" }),
           }
         : {}),
     }));
   };
 
-  const handleTierChange = (
-    roleTierKey:
-      | "gifterTier"
-      | "influencerTier"
-      | "brandAmbassadorTier"
-      | "serviceProviderTier"
-      | "volunteerTier",
+  const handleLevelChange = (
+    roleLevelKey:
+      | "gifterLevel"
+      | "influencerLevel"
+      | "brandAmbassadorLevel"
+      | "serviceProviderLevel"
+      | "volunteerLevel",
     value: string
   ) => {
     setFormData((prev) => ({
       ...prev,
-      [roleTierKey]: value,
+      [roleLevelKey]: value,
     }));
   };
 
@@ -112,13 +111,13 @@ const SupportCommunityForm = () => {
       if (formData.roles.serviceProvider) rolesArray.push("Service Provider");
       if (formData.roles.volunteer) rolesArray.push("Volunteer");
 
-      // Map tier values to backend enum format
-      const serviceProviderTierMap: Record<string, string> = {
+      // Map level values to backend enum format
+      const serviceProviderLevelMap: Record<string, string> = {
         primaryHealthcareProvider: "Primary Healthcare Provider",
         specializedServiceProvider: "Specialized Service Provider",
       };
 
-      const volunteerTierMap: Record<string, string> = {
+      const volunteerLevelMap: Record<string, string> = {
         coreVolunteer: "coreVolunteer",
         projectBasedVolunteer: "projectBasedVolunteer",
         occasionalVolunteer: "occasionalVolunteer",
@@ -129,8 +128,8 @@ const SupportCommunityForm = () => {
       const payload = {
         ...formData,
         roles: rolesArray,
-        serviceProviderTier: serviceProviderTierMap[formData.serviceProviderTier] || "",
-        volunteerTier: volunteerTierMap[formData.volunteerTier] || "",
+        serviceProviderLevel: serviceProviderLevelMap[formData.serviceProviderLevel] || "",
+        volunteerLevel: volunteerLevelMap[formData.volunteerLevel] || "",
       };
 
       const res = await fetch(`${BASE_URL}/support-community`, {
@@ -144,19 +143,18 @@ const SupportCommunityForm = () => {
 
       if (!res.ok) throw new Error("Submission failed");
 
-      // Save userRoles in localStorage
       localStorage.setItem("userRoles", JSON.stringify(formData.roles));
-  generateCertificate({
-  name: formData.name,
-  role: rolesArray[0] || "Member", // pick first or main role
-  tier:
-    formData.gifterTier ||
-    formData.influencerTier ||
-    formData.brandAmbassadorTier ||
-    formData.serviceProviderTier ||
-    formData.volunteerTier,
-});
 
+      generateCertificate({
+        name: formData.name,
+        role: rolesArray[0] || "Member",
+        level:
+          formData.gifterLevel ||
+          formData.influencerLevel ||
+          formData.brandAmbassadorLevel ||
+          formData.serviceProviderLevel ||
+          formData.volunteerLevel,
+      });
 
       alert("Thank you for joining the Support Community!");
       navigate("/community/hemodialysis");
@@ -202,7 +200,7 @@ const SupportCommunityForm = () => {
             A. Gifters — Send Gift for preferable Hemodialysis Patients Treatments
           </label>
           {formData.roles.gifter && (
-            <select value={formData.gifterTier} onChange={(e) => handleTierChange("gifterTier", e.target.value)} className="ml-2 p-2 border rounded border-gray-300">
+            <select value={formData.gifterLevel} onChange={(e) => handleLevelChange("gifterLevel", e.target.value)} className="ml-2 p-2 border rounded border-gray-300">
               <option value="individual">Individual</option>
               <option value="corporate">Corporate</option>
             </select>
@@ -217,8 +215,8 @@ const SupportCommunityForm = () => {
           </label>
           {formData.roles.influencer && (
             <>
-              <select value={formData.influencerTier} onChange={(e) => handleTierChange("influencerTier", e.target.value)} className="ml-2 p-2 border rounded border-gray-300">
-                <option value="">Select</option>
+              <select value={formData.influencerLevel} onChange={(e) => handleLevelChange("influencerLevel", e.target.value)} className="ml-2 p-2 border rounded border-gray-300">
+                <option value="">Select Level</option>
                 <option value="Mega Influencer">Mega Influencers (Over 1 Million Followers)</option>
                 <option value="Macro Influencer">Macro Influencers (100,000 to 1 Million Followers)</option>
                 <option value="Micro Influencer">Micro Influencers (1,000 to 100,000 Followers)</option>
@@ -244,8 +242,8 @@ const SupportCommunityForm = () => {
           </label>
           {formData.roles.brandAmbassador && (
             <>
-              <select value={formData.brandAmbassadorTier} onChange={(e) => handleTierChange("brandAmbassadorTier", e.target.value)} className="ml-2 p-2 border rounded border-gray-300">
-                <option value="">Select</option>
+              <select value={formData.brandAmbassadorLevel} onChange={(e) => handleLevelChange("brandAmbassadorLevel", e.target.value)} className="ml-2 p-2 border rounded border-gray-300">
+                <option value="">Select Level</option>
                 <option value="Celebrity Ambassador">Celebrity Ambassador</option>
                 <option value="Community Advocate">Community Advocate</option>
                 <option value="Industry Expert">Industry Expert</option>
@@ -270,8 +268,8 @@ const SupportCommunityForm = () => {
             D. Service Providers — Provide Health Service
           </label>
           {formData.roles.serviceProvider && (
-            <select value={formData.serviceProviderTier} onChange={(e) => handleTierChange("serviceProviderTier", e.target.value)} className="ml-2 p-2 border rounded border-gray-300">
-              <option value="">Select Tier</option>
+            <select value={formData.serviceProviderLevel} onChange={(e) => handleLevelChange("serviceProviderLevel", e.target.value)} className="ml-2 p-2 border rounded border-gray-300">
+              <option value="">Select Level</option>
               <option value="primaryHealthcareProvider">Primary Healthcare Provider</option>
               <option value="specializedServiceProvider">Specialized Service Provider</option>
             </select>
@@ -285,8 +283,8 @@ const SupportCommunityForm = () => {
             E. Volunteers — Support Community Program
           </label>
           {formData.roles.volunteer && (
-            <select value={formData.volunteerTier} onChange={(e) => handleTierChange("volunteerTier", e.target.value)} className="ml-2 p-2 border rounded border-gray-300">
-              <option value="">Select Tier</option>
+            <select value={formData.volunteerLevel} onChange={(e) => handleLevelChange("volunteerLevel", e.target.value)} className="ml-2 p-2 border rounded border-gray-300">
+              <option value="">Select Level</option>
               <option value="coreVolunteer">Core Volunteer</option>
               <option value="projectBasedVolunteer">Project Based Volunteer</option>
               <option value="occasionalVolunteer">Occasional Volunteer</option>
