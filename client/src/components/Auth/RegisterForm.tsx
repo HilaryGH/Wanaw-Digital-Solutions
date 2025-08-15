@@ -24,6 +24,8 @@ const RegisterForm = () => {
   serviceType: "",
   email: "",
   phone: "",
+   alternativePhone: "",// ✅ new
+  officePhone: "",   
   whatsapp: "",
   telegram: "",
   city: "",
@@ -461,33 +463,55 @@ fd.append("banks", JSON.stringify(providerForm.banks));
                   onChange={handleProviderChange}
                   className="w-full p-2 border border-gray-300 rounded text-sm"
                 />
-                <input
-                  type="tel"
-                  name="phone"
-                  placeholder="Phone"
-                  required
-                  value={providerForm.phone}
-                  onChange={handleProviderChange}
-                  className="w-full p-2 border border-gray-300 rounded text-sm"
-                />
-                <input
-                  type="tel"
-                  name="whatsapp"
-                  placeholder="WhatsApp"
-                  required
-                  value={providerForm.whatsapp}
-                  onChange={handleProviderChange}
-                  className="w-full p-2 border border-gray-300 rounded text-sm"
-                />
-                <input
-                  type="text"
-                  name="telegram"
-                  placeholder="Telegram"
-                  required
-                  value={providerForm.telegram}
-                  onChange={handleProviderChange}
-                  className="w-full p-2 border border-gray-300 rounded text-sm"
-                />
+              <input
+  type="tel"
+  name="phone"
+  placeholder="Phone"
+  required
+  value={providerForm.phone}
+  onChange={handleProviderChange}
+  className="w-full p-2 border border-gray-300 rounded text-sm"
+/>
+
+<input
+  type="tel"
+  name="alternativePhone"
+  placeholder="Alternative Phone"
+  value={providerForm.alternativePhone}
+  onChange={handleProviderChange}
+  className="w-full p-2 border border-gray-300 rounded text-sm"
+/>
+
+<input
+  type="tel"
+  name="officePhone"
+  placeholder="Office Phone"
+  value={providerForm.officePhone}
+  onChange={handleProviderChange}
+  className="w-full p-2 border border-gray-300 rounded text-sm"
+/>
+
+<input
+  type="tel"
+  name="whatsapp"
+  placeholder="WhatsApp"
+  required
+  value={providerForm.whatsapp}
+  onChange={handleProviderChange}
+  className="w-full p-2 border border-gray-300 rounded text-sm"
+/>
+
+<input
+  type="text"
+  name="telegram"
+  placeholder="Telegram"
+  required
+  value={providerForm.telegram}
+  onChange={handleProviderChange}
+  className="w-full p-2 border border-gray-300 rounded text-sm"
+/>
+
+                
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
