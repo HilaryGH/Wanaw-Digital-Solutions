@@ -476,7 +476,7 @@ fd.append("banks", JSON.stringify(providerForm.banks));
 <input
   type="tel"
   name="alternativePhone"
-  placeholder="Alternative Phone"
+  placeholder="Alternative Mobile Phone"
   value={providerForm.alternativePhone}
   onChange={handleProviderChange}
   className="w-full p-2 border border-gray-300 rounded text-sm"
