@@ -75,15 +75,6 @@ const handleProviderChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElemen
 };
 
 // Handle branches change
-const handleBranchChange = (
-  index: number,
-  field: "city" | "location",
-  value: string
-) => {
-  const newBranches = [...providerForm.branches];
-  newBranches[index][field] = value;
-  setProviderForm({ ...providerForm, branches: newBranches });
-};
 
 const addBranch = () => {
   setProviderForm({
@@ -589,22 +580,20 @@ fd.append("banks", JSON.stringify(providerForm.banks));
 {/* Branches */}
 <div className="mt-4">
   <label className="block font-medium">Branches</label>
-  {providerForm.branches.map((branch, idx) => (
+  {providerForm.branches.map((_branch, idx) => (
     <div key={idx} className="flex flex-col sm:flex-row gap-2 mb-2">
-      <input
-        type="text"
-        placeholder="Branch City"
-        value={branch.city}
-        onChange={(e) => handleBranchChange(idx, "city", e.target.value)}
-        className="w-full sm:w-1/2 p-2 border border-gray-300 rounded text-sm"
-      />
-      <input
-        type="text"
-        placeholder="Branch Address / Location"
-        value={branch.location}
-        onChange={(e) => handleBranchChange(idx, "location", e.target.value)}
-        className="w-full sm:w-1/2 p-2 border border-gray-300 rounded text-sm"
-      />
+    <input
+  type="text"
+  name="city"
+  placeholder="Headquarter / Primary Location"
+  required
+  value={providerForm.city}
+  onChange={handleProviderChange}
+  className="w-full p-2 border border-gray-300 rounded text-sm"
+/>
+
+ 
+
       {providerForm.branches.length > 1 && (
         <button type="button" onClick={() => removeBranch(idx)} className="text-red-500">Remove</button>
       )}
@@ -618,18 +607,39 @@ fd.append("banks", JSON.stringify(providerForm.banks));
   <label className="block font-medium">Bank Accounts</label>
   {providerForm.banks.map((bank, idx) => (
     <div key={idx} className="flex flex-col sm:flex-row gap-2 mb-2">
-      <select
-        value={bank.bankName}
-        onChange={(e) => handleBankChange(idx, "bankName", e.target.value)}
-        className="w-full sm:w-1/2 p-2 border border-gray-300 rounded text-sm"
-      >
-        <option value="">Select Bank</option>
-        <option value="Commercial Bank of Ethiopia">Commercial Bank of Ethiopia</option>
-        <option value="Awash Bank">Awash Bank</option>
-        <option value="Dashen Bank">Dashen Bank</option>
-        <option value="Nib Bank">Nib Bank</option>
-        {/* Add more */}
-      </select>
+<select
+  value={bank.bankName}
+  onChange={(e) => handleBankChange(idx, "bankName", e.target.value)}
+  className="w-full sm:w-1/2 p-2 border border-gray-300 rounded text-sm"
+>
+  <option value="">Select Bank</option>
+  <option value="Abay Bank">Abay Bank</option>
+  <option value="Addis International Bank">Addis International Bank</option>
+  <option value="Ahadu Bank">Ahadu Bank</option>
+  <option value="Amhara Bank">Amhara Bank</option>
+  <option value="Anbesa International Bank">Anbesa International Bank</option>
+  <option value="Bank of Abyssinia">Bank of Abyssinia</option>
+  <option value="Berhan Bank">Berhan Bank</option>
+  <option value="Buna Bank">Buna Bank</option>
+  <option value="Buna Cooperative Bank of Oromia">Buna Cooperative Bank of Oromia</option>
+  <option value="Commercial Bank of Ethiopia">Commercial Bank of Ethiopia</option>
+  <option value="Dashen Bank">Dashen Bank</option>
+  <option value="Debub Global Bank">Debub Global Bank</option>
+  <option value="Dire Microfinance Institution">Dire Microfinance Institution</option>
+  <option value="Enat Bank">Enat Bank</option>
+  <option value="Goh Betoch Bank">Goh Betoch Bank</option>
+  <option value="Hibret Bank">Hibret Bank</option>
+  <option value="Nib Bank">Nib International Bank</option>
+  <option value="Shebelle Bank">Shebelle Bank</option>
+  <option value="Siket Bank">Siket Bank</option>
+  <option value="Sidamo Bank">Sidamo Bank</option>
+  <option value="Wegagen Bank">Wegagen Bank</option>
+  <option value="ZamZam Bank">ZamZam Bank</option>
+  <option value="Zemen Bank">Zemen Bank</option>
+</select>
+
+
+
       <input
         type="text"
         placeholder="Account Number"

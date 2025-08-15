@@ -11,12 +11,19 @@ interface GiftRecipient {
   price?: number;
 }
 
+interface ServiceProvider {
+  name: string;
+  tin?: string;
+  address?: string;
+}
+
 interface DownloadableInvoiceProps {
   fullName: string; // Buyer / sender full name
   email: string; // Buyer / sender email
   cart?: { title: string; price: number }[];
   total: number;
   giftRecipient?: GiftRecipient;
+  provider?: ServiceProvider;
 }
 
 const DownloadableInvoice = ({
@@ -25,6 +32,7 @@ const DownloadableInvoice = ({
   cart = [],
   total,
   giftRecipient,
+  provider,
 }: DownloadableInvoiceProps) => {
   const invoiceRef = useRef<HTMLDivElement>(null);
 
@@ -122,7 +130,6 @@ const DownloadableInvoice = ({
           <p>
             <strong>TIN:</strong> 0086928365
           </p>
-
           <p>
             <strong>Address:</strong> Addis Ababa, Ethiopia
           </p>
@@ -130,6 +137,28 @@ const DownloadableInvoice = ({
             <strong>Phone:</strong> +251 989 177 777
           </p>
         </div>
+
+        {/* Service Provider Info */}
+        {provider && (
+          <div
+            style={{
+              marginBottom: "1rem",
+              fontSize: "0.875rem",
+              borderTop: "1px dashed #d1d5db",
+              paddingTop: "0.75rem",
+            }}
+          >
+            <p>
+              <strong>Service Provider Name:</strong> {provider.name}
+            </p>
+            <p>
+              <strong>Provider TIN:</strong> {provider.tin || "N/A"}
+            </p>
+            <p>
+              <strong>Provider Address:</strong> {provider.address || "N/A"}
+            </p>
+          </div>
+        )}
 
         {/* Buyer / Sender Info */}
         <div style={{ marginBottom: "1rem", fontSize: "0.875rem" }}>
@@ -144,7 +173,7 @@ const DownloadableInvoice = ({
           </p>
         </div>
 
-        {/* Render Cart Table if cart has items */}
+        {/* Render Cart Table or Gift Recipient */}
         {cart.length > 0 ? (
           <table
             style={{
@@ -156,31 +185,13 @@ const DownloadableInvoice = ({
           >
             <thead style={{ backgroundColor: "#f3f4f6", color: "#1f2937" }}>
               <tr>
-                <th
-                  style={{
-                    padding: "0.5rem",
-                    border: "1px solid #d1d5db",
-                    textAlign: "left",
-                  }}
-                >
+                <th style={{ padding: "0.5rem", border: "1px solid #d1d5db", textAlign: "left" }}>
                   #
                 </th>
-                <th
-                  style={{
-                    padding: "0.5rem",
-                    border: "1px solid #d1d5db",
-                    textAlign: "left",
-                  }}
-                >
+                <th style={{ padding: "0.5rem", border: "1px solid #d1d5db", textAlign: "left" }}>
                   Item
                 </th>
-                <th
-                  style={{
-                    padding: "0.5rem",
-                    border: "1px solid #d1d5db",
-                    textAlign: "left",
-                  }}
-                >
+                <th style={{ padding: "0.5rem", border: "1px solid #d1d5db", textAlign: "left" }}>
                   Price (ETB)
                 </th>
               </tr>
@@ -188,21 +199,14 @@ const DownloadableInvoice = ({
             <tbody>
               {cart.map((item, index) => (
                 <tr key={index}>
-                  <td style={{ padding: "0.5rem", border: "1px solid #d1d5db" }}>
-                    {index + 1}
-                  </td>
-                  <td style={{ padding: "0.5rem", border: "1px solid #d1d5db" }}>
-                    {item.title}
-                  </td>
-                  <td style={{ padding: "0.5rem", border: "1px solid #d1d5db" }}>
-                    {item.price.toFixed(2)}
-                  </td>
+                  <td style={{ padding: "0.5rem", border: "1px solid #d1d5db" }}>{index + 1}</td>
+                  <td style={{ padding: "0.5rem", border: "1px solid #d1d5db" }}>{item.title}</td>
+                  <td style={{ padding: "0.5rem", border: "1px solid #d1d5db" }}>{item.price.toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         ) : giftRecipient ? (
-          // Gift recipient details
           <div style={{ marginBottom: "1rem", fontSize: "0.875rem" }}>
             <p>
               <strong>Gift Recipient:</strong> {giftRecipient.name}
@@ -232,38 +236,21 @@ const DownloadableInvoice = ({
             )}
           </div>
         ) : (
-          <p style={{ marginBottom: "1rem", fontSize: "0.875rem" }}>
-            No purchase or gift details available.
-          </p>
+          <p style={{ marginBottom: "1rem", fontSize: "0.875rem" }}>No purchase or gift details available.</p>
         )}
 
         {/* Total Amount */}
-        <div
-          style={{
-            textAlign: "right",
-            fontWeight: "600",
-            fontSize: "1rem",
-          }}
-        >
+        <div style={{ textAlign: "right", fontWeight: "600", fontSize: "1rem" }}>
           Total Paid Amount: {total.toFixed(2)} ETB
         </div>
 
         {/* QR Code */}
         <div style={{ marginTop: "1.5rem", textAlign: "center" }}>
-          <p
-            style={{
-              fontSize: "0.75rem",
-              color: "#6b7280",
-              marginBottom: "0.5rem",
-            }}
-          >
+          <p style={{ fontSize: "0.75rem", color: "#6b7280", marginBottom: "0.5rem" }}>
             Scan to verify this invoice
           </p>
           <div style={{ display: "flex", justifyContent: "center" }}>
-            <QRCode
-              value={`https://wanaw.com/invoice?code=${invoiceNumber}`}
-              size={80}
-            />
+            <QRCode value={`https://wanaw.com/invoice?code=${invoiceNumber}`} size={80} />
           </div>
         </div>
 
@@ -302,6 +289,7 @@ const DownloadableInvoice = ({
 };
 
 export default DownloadableInvoice;
+
 
 
 
