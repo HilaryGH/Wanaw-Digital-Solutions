@@ -74,15 +74,28 @@ const GiftDetails = () => {
   return (
     <div className="min-h-screen bg-[#f9f9f9] py-10 px-6 md:px-20">
       {/* Occasion Banner */}
-      <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-8 mb-12">
-        {occasion.imageUrl && (
-          <img
-            src={occasion.imageUrl}
-            alt={occasion.title}
-            className="w-full h-64 object-cover rounded-lg mb-6"
-            onError={(e) => ((e.target as HTMLImageElement).style.display = "none")}
-          />
-        )}
+      <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8 mb-12">
+      {occasion.imageUrl ? (
+  <img
+    src={occasion.imageUrl}
+    alt={occasion.title}
+    className="w-full h-64 object-cover rounded-lg mb-6"
+    loading="lazy"
+    onError={(e) => {
+      const target = e.target as HTMLImageElement;
+      target.onerror = null; // prevent infinite loop
+      target.src = "/placeholder.png"; // your local fallback image
+    }}
+  />
+) : (
+  <img
+    src="/placeholder.png"
+    alt="Placeholder"
+    className="w-full h-64 object-cover rounded-lg mb-6"
+    loading="lazy"
+  />
+)}
+
         <h1 className="text-3xl font-bold text-[#1c2b21] mb-2">{occasion.title}</h1>
         <p className="text-sm text-gray-500 mb-1">
           Category:&nbsp;{occasion.category}
@@ -154,7 +167,7 @@ const GiftDetails = () => {
         <button
           onClick={handleSendGift}
           disabled={!selectedServiceId}
-          className={`mt-10 w-full bg-[#D4AF37] text-[#1c2b21] font-medium py-2 rounded-md transition ${
+          className={`mt-10 w-1/2 bg-[#D4AF37] text-[#1c2b21] font-medium py-2 rounded-md transition ${
             !selectedServiceId ? "opacity-50 cursor-not-allowed" : "hover:bg-[#caa82f]"
           }`}
         >
