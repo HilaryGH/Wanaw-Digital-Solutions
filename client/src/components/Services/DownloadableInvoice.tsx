@@ -9,6 +9,7 @@ interface GiftRecipient {
   message?: string;
   itemTitle?: string;
   price?: number;
+  type?: "standard" | "vip"; // Added type for VIP/Standard
 }
 
 interface ServiceProvider {
@@ -54,6 +55,14 @@ const DownloadableInvoice = ({
     const unique = Date.now().toString().slice(-6);
     return `INV-${initials}-${date}-${unique}`;
   }, [fullName]);
+
+  // Adjusted total for VIP gifts
+  const adjustedTotal = useMemo(() => {
+    if (giftRecipient?.type === "vip" && giftRecipient.price) {
+      return total + giftRecipient.price * 0.25; // 25% VIP surcharge
+    }
+    return total;
+  }, [total, giftRecipient]);
 
   const handleDownload = async () => {
     if (!invoiceRef.current) return;
@@ -209,7 +218,8 @@ const DownloadableInvoice = ({
         ) : giftRecipient ? (
           <div style={{ marginBottom: "1rem", fontSize: "0.875rem" }}>
             <p>
-              <strong>Gift Recipient:</strong> {giftRecipient.name}
+              <strong>Gift Recipient:</strong> {giftRecipient.name}{" "}
+              {giftRecipient.type === "vip" && "⭐ VIP"}
             </p>
             <p>
               <strong>Recipient Email:</strong> {giftRecipient.email}
@@ -241,7 +251,12 @@ const DownloadableInvoice = ({
 
         {/* Total Amount */}
         <div style={{ textAlign: "right", fontWeight: "600", fontSize: "1rem" }}>
-          Total Paid Amount: {total.toFixed(2)} ETB
+          Total Paid Amount: {adjustedTotal.toFixed(2)} ETB
+          {giftRecipient?.type === "vip" && giftRecipient.price && (
+            <span style={{ fontSize: "0.75rem", color: "#6b7280", display: "block" }}>
+              (Includes 25% VIP surcharge: {(giftRecipient.price * 0.25).toFixed(2)} ETB)
+            </span>
+          )}
         </div>
 
         {/* QR Code */}
@@ -289,6 +304,7 @@ const DownloadableInvoice = ({
 };
 
 export default DownloadableInvoice;
+
 
 
 

@@ -8,10 +8,14 @@ import BASE_URL from "../../api/api";
 type Recipient = {
   name: string;
   email: string;
-  phone: string;
+   phone?: string;
+  profileImage?: File | string; // ✅ union, not string & File
   whatsapp: string;
   telegram: string;
+   type: "standard" | "vip"; // only these two options
+   photo?: string | File | null; // <-- allow null
 };
+
 
 type LocationState = {
   occasion?: { _id: string; title: string; category: string };
@@ -126,9 +130,10 @@ const SendGiftForm: React.FC = () => {
   const senderEmail = loggedInUser?.email || senderEmailInput || "";
 
   /* ------------------ Recipients + Gift data ------------------ */
-  const [recipients, setRecipients] = useState<Recipient[]>([
-    { name: "", email: "", phone: "", whatsapp: "", telegram: "" },
-  ]);
+const [recipients, setRecipients] = useState<Recipient[]>([
+  { name: "", email: "", phone: "", whatsapp: "", telegram: "", type: "standard", photo: null }
+]);
+
 
   const [message, setMessage] = useState("");
   const [notifyProvider, setNotifyProvider] = useState(false);
@@ -161,15 +166,16 @@ const SendGiftForm: React.FC = () => {
   }, [checkInDate, checkOutDate, service.category]);
 
   /* ------------------ Handlers ------------------ */
-  const handleRecipientChange = (
-    index: number,
-    field: keyof Recipient,
-    value: string
-  ) => {
-    const updated = [...recipients];
-    updated[index][field] = value;
-    setRecipients(updated);
-  };
+ const handleRecipientChange = (
+  index: number,
+  field: keyof Recipient,
+  value: string | File // ✅ allow both
+) => {
+  const updated = [...recipients];
+  updated[index][field] = value as any; // or narrow by field if needed
+  setRecipients(updated);
+};
+
 
   async function handleCheckAvailability() {
     setAvailabilityError(null);
@@ -579,57 +585,98 @@ const SendGiftForm: React.FC = () => {
             )}
 
             {recipients.map((r, index) => (
-              <div key={index} className="mb-6 border p-4 rounded bg-gray-50">
-                <input
-                  type="text"
-                  placeholder="Recipient Name"
-                  value={r.name}
-                  onChange={(e) => handleRecipientChange(index, "name", e.target.value)}
-                  className="w-full p-2 border border-gray-300 mb-2 rounded"
-                />
-                <input
-                  type="email"
-                  placeholder="Recipient Email"
-                  value={r.email}
-                  onChange={(e) => handleRecipientChange(index, "email", e.target.value)}
-                  className="w-full p-2 border border-gray-300 mb-2 rounded"
-                />
-                <input
-                  type="tel"
-                  placeholder="Phone"
-                  value={r.phone}
-                  onChange={(e) => handleRecipientChange(index, "phone", e.target.value)}
-                  className="w-full p-2 border border-gray-300 mb-2 rounded"
-                />
-                <input
-                  type="tel"
-                  placeholder="WhatsApp"
-                  value={r.whatsapp}
-                  onChange={(e) => handleRecipientChange(index, "whatsapp", e.target.value)}
-                  className="w-full p-2 border border-gray-300 mb-2 rounded"
-                />
-                <input
-                  type="text"
-                  placeholder="Telegram"
-                  value={r.telegram}
-                  onChange={(e) => handleRecipientChange(index, "telegram", e.target.value)}
-                  className="w-full p-2 border border-gray-300 mb-2 rounded"
-                />
-              </div>
-            ))}
+  <div key={index} className="mb-6 border p-4 rounded bg-gray-50">
+    {/* Recipient Type (Standard / VIP) */}
+    <select
+      value={r.type || "standard"}
+      onChange={(e) => handleRecipientChange(index, "type", e.target.value)}
+      className="w-full p-2 border border-gray-300 mb-2 rounded"
+    >
+      <option value="standard">Standard Gift </option>
+      <option value="vip">VIP Gift</option>
+    </select>
 
-            <button
-              type="button"
-              className="bg-[#1c2b21] text-white px-4 py-1 mb-4 rounded"
-              onClick={() =>
-                setRecipients([
-                  ...recipients,
-                  { name: "", email: "", phone: "", whatsapp: "", telegram: "" },
-                ])
-              }
-            >
-              ➕ Add Another Recipient
-            </button>
+    <input
+      type="text"
+      placeholder="Recipient Name"
+      value={r.name}
+      onChange={(e) => handleRecipientChange(index, "name", e.target.value)}
+      className="w-full p-2 border border-gray-300 mb-2 rounded"
+    />
+    <input
+      type="email"
+      placeholder="Recipient Email"
+      value={r.email}
+      onChange={(e) => handleRecipientChange(index, "email", e.target.value)}
+      className="w-full p-2 border border-gray-300 mb-2 rounded"
+    />
+    <input
+      type="tel"
+      placeholder="Phone"
+      value={r.phone}
+      onChange={(e) => handleRecipientChange(index, "phone", e.target.value)}
+      className="w-full p-2 border border-gray-300 mb-2 rounded"
+    />
+    <input
+      type="tel"
+      placeholder="WhatsApp"
+      value={r.whatsapp}
+      onChange={(e) => handleRecipientChange(index, "whatsapp", e.target.value)}
+      className="w-full p-2 border border-gray-300 mb-2 rounded"
+    />
+    <input
+      type="text"
+      placeholder="Telegram"
+      value={r.telegram}
+      onChange={(e) => handleRecipientChange(index, "telegram", e.target.value)}
+      className="w-full p-2 border border-gray-300 mb-2 rounded"
+    />
+
+    {/* If VIP, show photo upload */}
+    {r.type === "vip" && (
+      <div className="mt-2">
+        <label className="block mb-2 font-medium text-[#1c2b21]">
+          Upload Photo (VIP only)
+        </label>
+   <input
+  type="file"
+  accept="image/*"
+  onChange={(e) => {
+    const file = e.target.files?.[0];
+    if (file) handleRecipientChange(index, "photo", file);
+  }}
+  className="w-full p-2 border border-gray-300 rounded"
+/>
+
+
+      </div>
+    )}
+  </div>
+))}
+
+<button
+  type="button"
+  className="bg-[#1c2b21] text-white px-4 py-1 mb-4 rounded"
+  onClick={() =>
+    setRecipients([
+      ...recipients,
+      {
+        name: "",
+        email: "",
+        phone: "",
+        whatsapp: "",
+        telegram: "",
+        type: "standard", // default
+        photo: null,
+      },
+    ])
+  }
+>
+  ➕ Add Another Recipient
+</button>
+
+
+
 
             {/* Conditional date inputs */}
             {service.category === "Hotel Rooms" ? (
@@ -671,37 +718,50 @@ const SendGiftForm: React.FC = () => {
               </>
             )}
 
-            <textarea
-              placeholder="Add a message (optional)"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg mb-6 h-32 resize-none"
-            />
+            {/* Main Message Section (recipient message, restricted if VIP) */}
+<textarea
+  placeholder="Add a message (optional)"
+  value={message}
+  onChange={(e) => {
+    const words = e.target.value.trim().split(/\s+/);
+    if (recipients.some((r) => r.type === "vip") && words.length > 20) {
+      return; // prevent typing more than 20 words
+    }
+    setMessage(e.target.value);
+  }}
+  className="w-full p-3 border border-gray-300 rounded-lg mb-6 h-32 resize-none"
+/>
 
-            {service.provider && (
-              <div className="mb-6 border-t pt-4">
-                <button
-                  type="button"
-                  onClick={() => setNotifyProvider((v) => !v)}
-                  className="flex items-center text-sm font-medium text-[#1c2b21] mb-2"
-                >
-                  {notifyProvider ? (
-                    <ChevronUp className="w-4 h-4 mr-1" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4 mr-1" />
-                  )}
-                  Notify {service.provider.name}
-                </button>
+{service.provider && (
+  <div className="mb-6 border-t pt-4">
+    <button
+      type="button"
+      onClick={() => setNotifyProvider((v) => !v)}
+      className="flex items-center text-sm font-medium text-[#1c2b21] mb-2"
+    >
+      {notifyProvider ? (
+        <ChevronUp className="w-4 h-4 mr-1" />
+      ) : (
+        <ChevronDown className="w-4 h-4 mr-1" />
+      )}
+      Notify {service.provider.name}
+    </button>
 
-                {notifyProvider && (
-                  <textarea
-                    placeholder="Message to the service provider (optional)"
-                    value={providerMessage}
-                    onChange={(e) => setProviderMessage(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg resize-none"
-                    rows={4}
-                  />
-                )}
+    {notifyProvider && (
+      <>
+        {/* Separate message for provider */}
+        <textarea
+          placeholder="Message to the service provider (optional)"
+          value={providerMessage}
+          onChange={(e) => setProviderMessage(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg resize-none"
+          rows={4}
+        />
+      </>
+    )}
+  </div>
+)}
+
               </div>
             )}
 
@@ -718,9 +778,8 @@ const SendGiftForm: React.FC = () => {
               Pay&nbsp;&amp;&nbsp;Send Gift
             </button>
           </div>
-        )}
+        )
       </div>
-    </div>
   );
 };
 

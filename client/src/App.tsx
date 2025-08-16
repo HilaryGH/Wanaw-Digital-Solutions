@@ -67,7 +67,7 @@ import RegisteredPartners from "./components/RegisteredPartners";
 // Wrapper to conditionally render Navbar
 const AppWrapper = () => {
   const location = useLocation();
-  const hideNavbarPaths = ["/login", "/register", "/dashboard","/individual-dashboard"];
+  const hideNavbarPaths = ["/login", "/register", "/dashboard",];
   
 
   return (
