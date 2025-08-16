@@ -27,10 +27,16 @@ const handleLogin = async (e: React.FormEvent) => {
     }
 
     // Save to localStorage
-  // Save to localStorage
+// Save to localStorage
 localStorage.setItem("token", data.token);
 localStorage.setItem("user", JSON.stringify(data.user));
-localStorage.setItem("userRole", data.user.role); // ✅ Add this line
+localStorage.setItem("userRole", data.user.role);
+
+// ✅ Save providerId separately for GiftListForProvider
+if (data.user.role === "provider" || data.user.role === "corporate") {
+  localStorage.setItem("providerId", data.user.id); // this is the key your component reads
+}
+
 
 
     // ✅ Redirect based on role

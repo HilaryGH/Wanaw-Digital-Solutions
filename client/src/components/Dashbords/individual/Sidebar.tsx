@@ -8,7 +8,7 @@ export default function Sidebar() {
         <Link to="/my-gifts" className="block text-gold hover:font-semibold">My Gifts</Link>
         <Link to="/notifications" className="block text-gold hover:font-semibold">🔔 Notifications</Link>
         <Link to="/payments" className="block text-gold hover:font-semibold"> Payments</Link>
-        <Link to="/settings" className="block text-gold hover:font-semibold">⚙️ Settings</Link>
+        <Link to="/account" className="block text-gold hover:font-semibold">⚙️Account</Link>
         <Link to="/logout" className="block text-gold hover:font-semibold"> Logout</Link>
       </nav>
     </aside>

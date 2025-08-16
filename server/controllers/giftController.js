@@ -1,6 +1,7 @@
 const sendGiftEmail = require("../services/emailService");
 const GiftNotification = require("../models/GiftNotification");
 const Service = require('../models/Service'); // <-- then use it like below
+const mongoose = require("mongoose");
 
 
 
@@ -60,35 +61,56 @@ exports.createGift = async (req, res) => {
 
 };
 // Get all gifts
+// Get all gifts (optionally filter by serviceId)
 exports.getGifts = async (req, res) => {
-  const { providerId } = req.query;
-
   try {
-    const query = providerId ? { providerId } : {};
+    const { serviceId } = req.query;
+
+    // Build query object
+    const query = {};
+    if (serviceId) {
+      if (!mongoose.Types.ObjectId.isValid(serviceId)) {
+        return res.status(400).json({ msg: "Invalid serviceId" });
+      }
+      query.service = serviceId;
+    }
 
     const gifts = await Gift.find(query)
-      .populate("service", "title category")      // populate service with only title & category fields
-      .populate("recipient", "name email phone")  // populate recipient with needed fields
+      .populate("service", "title category")
+      .populate("recipient", "name email phone")
       .sort({ createdAt: -1 });
 
-    res.status(200).json(gifts);
+    res.status(200).json(gifts); // always return array
   } catch (err) {
     console.error("❌ Error fetching gifts:", err);
     res.status(500).json({ msg: "Server error fetching gifts" });
   }
 };
 
-exports.getGiftsByProvider = async (req, res) => {
+// Get gifts by service (route param)
+exports.getGiftsByService = async (req, res) => {
   try {
-    const { providerId } = req.params;
-    const gifts = await Gift.find({ providerId });
-    res.json(gifts);
+    const { serviceId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(serviceId)) {
+      return res.status(400).json({ msg: "Invalid serviceId" });
+    }
+
+    const gifts = await Gift.find({ service: serviceId })
+      .populate("service", "title category")
+      .populate("recipient", "name email phone")
+      .sort({ createdAt: -1 });
+
+    if (!gifts.length) {
+      return res.status(200).json({ msg: "No gifts found for this service", gifts: [] });
+    }
+
+    res.status(200).json(gifts);
   } catch (err) {
-    console.error("❌ Error fetching provider gifts:", err);
+    console.error("❌ Error fetching service gifts:", err);
     res.status(500).json({ msg: "Server error" });
   }
 };
-
 
 // Delete a gift by ID
 exports.deleteGift = async (req, res) => {

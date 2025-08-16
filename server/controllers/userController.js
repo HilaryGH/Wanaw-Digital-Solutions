@@ -16,6 +16,40 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({ msg: "Failed to fetch users" });
   }
 };
+// Get a single user by ID
+exports.getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ msg: "Server error" });
+  }
+};
+// Update user profile
+exports.updateUser = async (req, res) => {
+  try {
+    const updates = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { $set: updates },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ msg: "Server error" });
+  }
+};
 
 
 exports.updateMembership = async (req, res) => {

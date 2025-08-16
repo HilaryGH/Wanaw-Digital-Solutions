@@ -43,5 +43,22 @@ router.delete("/:id", verifyToken, deleteService); // Add verifyToken here for s
 
 // PUT update service status
 router.put("/:id/status", verifyToken, updateServiceStatus);
+router.get("/provider/:providerId/services", verifyToken, async (req, res) => {
+  try {
+    const { providerId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(providerId)) {
+      return res.status(400).json({ msg: "Invalid provider ID" });
+    }
+
+    const services = await Service.find({ providerId })
+      .select("_id title category"); // only send needed fields
+
+    res.status(200).json(services);
+  } catch (err) {
+    console.error("❌ Error fetching provider services:", err);
+    res.status(500).json({ msg: "Server error fetching services" });
+  }
+});
 
 module.exports = router;

@@ -15,41 +15,92 @@ type Gift = {
   providerId?: string;
 };
 
+type Service = {
+  _id: string;
+  title: string;
+};
+
 const GiftListForProvider = () => {
   const [gifts, setGifts] = useState<Gift[]>([]);
+  const [serviceId, setServiceId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedGiftId, setSelectedGiftId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // 💡 Replace this with actual auth or provider context
-  const providerId = localStorage.getItem("providerId"); // Or context/auth state
+  const providerId = localStorage.getItem("providerId");
+  const token = localStorage.getItem("token");
 
+  // Fetch provider services first
   useEffect(() => {
-  const fetchGifts = async () => {
-    try {
-      const res = await axios.get(`${BASE_URL}/gift?providerId=${providerId}`);
-      setGifts(res.data);
-      setLoading(false);
-    } catch (err) {
-      setError("Failed to load gifts");
-      setLoading(false);
-    }
-  };
-  if (providerId) fetchGifts();
-}, [providerId]);
+    const fetchProviderService = async () => {
+      if (!providerId || !token) {
+        setError("Provider not logged in.");
+        setLoading(false);
+        return;
+      }
 
+      try {
+       const res = await axios.get(`${BASE_URL}/service/provider/${providerId}/services`, {
+  headers: { Authorization: `Bearer ${token}` },
+});
+
+
+        const services: Service[] = res.data;
+        if (services.length === 0) {
+          setError("No services found for this provider.");
+          setLoading(false);
+          return;
+        }
+
+        setServiceId(services[0]._id); // use first service
+      } catch (err: any) {
+        console.error("❌ Failed to fetch services:", err.response?.data || err.message);
+        setError("Failed to fetch services.");
+        setLoading(false);
+      }
+    };
+
+    fetchProviderService();
+  }, [providerId, token]);
+
+  // Fetch gifts for the selected service
+  useEffect(() => {
+    if (!serviceId) return;
+
+    const fetchGifts = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/gift/service/${serviceId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        let giftsData: Gift[] = [];
+        if (Array.isArray(res.data)) {
+          giftsData = res.data;
+        } else if (res.data.gifts && Array.isArray(res.data.gifts)) {
+          giftsData = res.data.gifts;
+        }
+
+        setGifts(giftsData);
+      } catch (err: any) {
+        console.error("❌ Fetch gifts error:", err.response?.data || err.message);
+        setError("Failed to load gifts.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGifts();
+  }, [serviceId, token]);
 
   const filteredGifts = gifts.filter((gift) =>
-  (gift.title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-  gift.recipient?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  gift.senderName?.toLowerCase().includes(searchTerm.toLowerCase())
-);
-
+    (gift.title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+    gift.recipient?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    gift.senderName?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (loading) return <p className="text-center py-6">Loading gifts...</p>;
   if (error) return <p className="text-red-600 text-center">{error}</p>;
-  console.log("🧪 Loaded gifts:", gifts);
 
   return (
     <div className="px-4 max-w-3xl mx-auto">
@@ -65,26 +116,15 @@ const GiftListForProvider = () => {
 
       <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
         {filteredGifts.length === 0 ? (
-          <p>No gifts found for your service.</p>
+          <p className="text-center col-span-full">No gifts found for your service.</p>
         ) : (
           filteredGifts.map((gift) => (
-            <div
-              key={gift._id}
-              className="bg-white shadow-lg rounded-lg p-4 border"
-            >
+            <div key={gift._id} className="bg-white shadow-lg rounded-lg p-4 border">
               <h3 className="text-lg font-semibold text-blue-800">{gift.title}</h3>
-              <p className="text-sm text-gray-600 mt-1">
-                🎁 Sender: {gift.senderName || "Unknown"}
-              </p>
-              <p className="text-sm text-gray-600">
-                👤 Recipient: {gift.recipient?.name || "N/A"}
-              </p>
-              <p className="text-sm text-gray-600">
-                📧 Email: {gift.recipient?.email || "N/A"}
-              </p>
-              <p className="text-sm text-gray-600">
-                📞 Phone: {gift.recipient?.phone || "N/A"}
-              </p>
+              <p className="text-sm text-gray-600 mt-1">🎁 Sender: {gift.senderName || "Unknown"}</p>
+              <p className="text-sm text-gray-600">👤 Recipient: {gift.recipient?.name || "N/A"}</p>
+              <p className="text-sm text-gray-600">📧 Email: {gift.recipient?.email || "N/A"}</p>
+              <p className="text-sm text-gray-600">📞 Phone: {gift.recipient?.phone || "N/A"}</p>
               <button
                 onClick={() => setSelectedGiftId(gift._id)}
                 className="mt-3 bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
@@ -113,3 +153,7 @@ const GiftListForProvider = () => {
 };
 
 export default GiftListForProvider;
+
+
+
+

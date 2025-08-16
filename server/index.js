@@ -61,6 +61,8 @@ app.use(passport.session());
 
 
 
+// Serve uploads folder as static
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ✅ Route mounting
 app.use("/api/auth", require("./routes/auth"));

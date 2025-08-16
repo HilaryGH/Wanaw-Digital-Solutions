@@ -72,7 +72,7 @@ router.post("/send-promo", verifyToken, checkRole(["marketing_admin", "super_adm
 router.post("/resolve-issue", verifyToken, checkRole(["customer_support_admin", "super_admin"]), resolveSupportIssue);
 
 
-
+router.get("/users/:id", verifyToken, authController.getUserProfile);
 module.exports = router;
 
 

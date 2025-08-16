@@ -338,3 +338,35 @@ exports.resolveSupportIssue = async (req, res) => {
   }
 };
 
+// Get a single user profile
+exports.getUserProfile = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById(userId).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    res.status(500).json({ msg: "Server error" });
+  }
+};
+// auth.js or userController.js
+exports.getCurrentUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.id; // verifyToken middleware should set req.user
+    const user = await User.findById(userId).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching current user profile:", error);
+    res.status(500).json({ msg: "Server error" });
+  }
+};

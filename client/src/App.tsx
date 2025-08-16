@@ -53,13 +53,14 @@ import KidneyPatientForm from "./components/KidneyPatientForm";
 import CommunitySelection from "./components/CommunitySelection";
 import SupportCommunityForm from "./components/SupportCommunityForm";
 import DiasporaJoinForm from "./components/DiasporaJoinForm";
-import Settings from "./components/Dashbords/individual/Settings";
 import DiasporaList from "./components/Dashbords/Admin/DiasporaList";
 import KidneyPatientList from "./components/Dashbords/Admin/KidneyPatientList";
 import SubscribersList from "./components/Dashbords/Admin/SubscribersList";
 import HemodialysisPatientsList from "./components/HemodialysisPatientsList";
 import MembershipLookup from "./components/MembershipLookup";
 import AdminGiftCodes from "./components/Dashbords/Admin/AdminGiftCodes";
+import Account from "./components/Dashbords/individual/Account";
+import RegisteredPartners from "./components/RegisteredPartners";
 
 
 
@@ -98,13 +99,16 @@ const AppWrapper = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/partner-with-us" element={<PartnerWithUs />} />
-       <Route path="/career/:jobId" element={<ApplyForm />} />
+       <Route path="/career/:jobId" element={<ApplyForm  />} />
         <Route path="/community" element={<CommunitySelection />} />
   <Route path="/community/kidney" element={<KidneyPatientForm />} />
   <Route path="/community/membership" element={<WanawCommunityMembership />} />
   <Route path="/community/diaspora" element={<DiasporaJoinForm />} />
 <Route path="/community/support" element={<SupportCommunityForm />} />
-<Route path="/settings" element={<Settings userId={""}/>} />
+<Route path="/account" element={<Account/>} />
+<Route path="/admin/partner" element={<RegisteredPartners/>} />
+
+
 
   <Route path="/community/hemodialysis" element={<HemodialysisPatientsList />} />
 

@@ -104,6 +104,12 @@ export default function SuperAdminDashboard() {
       route: "/admin/gift-codes",
       color: "bg-pink-100",
     },
+       {
+      title: "Gift code",
+      description: "Review registerd partners ",
+      route: "/admin/partner",
+      color: "bg-pink-100",
+    },
   ];
 
   return (

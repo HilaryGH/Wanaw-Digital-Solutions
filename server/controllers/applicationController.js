@@ -1,5 +1,7 @@
 const Application = require('../models/Application');
 
+
+// Create a new application
 exports.createApplication = async (req, res) => {
   const { fullName, email, phone, currentLocation, specialization, employmentModel } = req.body;
   const jobId = req.params.jobId;
@@ -29,18 +31,18 @@ exports.createApplication = async (req, res) => {
     });
   } catch (err) {
     console.error('❌ Error submitting application:', err);
-    res.status(500).json({ msg: 'Server error submitting application' });
+    res.status(500).json({ msg: 'Server error submitting application', error: err.message });
   }
 };
 
-// Get all applications 
-
+// Get all applications
 exports.getAllApplications = async (req, res) => {
   try {
-    const applications = await Application.find().populate('job'); // if you have job reference
+    const applications = await Application.find().populate('job'); // populate job details if needed
     res.status(200).json(applications);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server Error' });
+    console.error('❌ Fetch applications error:', error);
+    res.status(500).json({ msg: 'Server error fetching applications', error: error.message });
   }
 };
+

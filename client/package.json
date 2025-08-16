@@ -19,6 +19,8 @@
     "aos": "^2.3.4",
     "axios": "^1.11.0",
     "canvas-confetti": "^1.9.3",
+    "fayda-auth": "^1.0.5",
+    "framer-motion": "^12.23.12",
     "html2pdf.js": "^0.10.3",
     "i18next": "^25.3.2",
     "jspdf": "^3.0.1",
