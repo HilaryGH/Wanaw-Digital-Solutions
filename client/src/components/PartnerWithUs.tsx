@@ -3,7 +3,7 @@ import axios from "axios";
 import BASE_URL from "../api/api";
 
 export default function PartnerWithUs() {
-  const [tab, setTab] = useState<"Investor" | "Strategic Partner" | "Marketing">("Investor");
+  const [tab, setTab] = useState<"Investor" | "Strategic Partner" | "Co Branding">("Investor");
 
   const investmentOptions = ["Equity", "Debt", "Other Alternative Investment"];
   const sectorOptions = ["Bank", "Hotel", "Business Company", "NGOs", "Health Sectors"];
@@ -86,7 +86,7 @@ export default function PartnerWithUs() {
 
         {/* Tabs */}
         <div className="flex flex-wrap justify-center mb-6 gap-3">
-          {["Investor", "Strategic Partner", "Marketing"].map(role => (
+          {["Investor", "Strategic Partner", "Co Branding"].map(role => (
             <button
               key={role}
               onClick={() => setTab(role as any)}
@@ -177,10 +177,10 @@ export default function PartnerWithUs() {
             </>
           )}
 
-          {/* Marketing & Promotion Section */}
-          {tab === "Marketing" && (
+          {/* Co Branding & Promotion Section */}
+          {tab === "Co Branding" && (
             <>
-              {["name", "email", "phone", "officePhone", "whatsapp", "coBrand"].map(field => (
+              {["name", "email", "phone", "officePhone", "whatsapp",].map(field => (
                 <div key={field}>
                   <label className="block mb-1 text-sm font-medium capitalize">{field.replace(/([A-Z])/g, " $1")}</label>
                   <input type="text" name={field} value={(formData as any)[field]} onChange={handleChange} className="w-full border border-gray-300 p-2 rounded" required />

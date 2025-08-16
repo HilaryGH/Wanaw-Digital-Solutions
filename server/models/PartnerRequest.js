@@ -4,7 +4,7 @@ const partnerRequestSchema = new mongoose.Schema(
   {
     tab: {
       type: String,
-      enum: ["Investor", "Strategic Partner", "Marketing"],
+      enum: ["Investor", "Strategic Partner", "Co Branding"],
       required: true,
     },
 
