@@ -1,16 +1,32 @@
-import { Link } from "react-router-dom";
+type SidebarProps = {
+  onSelect: (section: string) => void;
+};
 
-export default function Sidebar() {
+const Sidebar = ({ onSelect }: SidebarProps) => {
+  const items = [
+    { label: "Dashboard", key: "dashboard" },
+    { label: "My Gifts", key: "gifts" },
+    { label: "🔔 Notifications", key: "notifications" },
+    { label: "Payments", key: "payments" },
+    { label: "⚙️ Account", key: "account" },
+  ];
+
   return (
-    <aside className="bg-green w-full md:w-64 shadow-md p-6 mb-6 md:mb-0 md:mr-6">
+    <aside className="bg-green w-64 shadow-md p-6 text-white">
       <nav className="space-y-4">
-        <Link to="/dashboard" className="block text-gold hover:font-semibold"> Dashboard</Link>
-        <Link to="/my-gifts" className="block text-gold hover:font-semibold">My Gifts</Link>
-        <Link to="/notifications" className="block text-gold hover:font-semibold">🔔 Notifications</Link>
-        <Link to="/payments" className="block text-gold hover:font-semibold"> Payments</Link>
-        <Link to="/account" className="block text-gold hover:font-semibold">⚙️Account</Link>
-        <Link to="/logout" className="block text-gold hover:font-semibold"> Logout</Link>
+        {items.map((item) => (
+          <div
+            key={item.key}
+            className="block text-gold font-semibold cursor-pointer hover:underline"
+            onClick={() => onSelect(item.key)}
+          >
+            {item.label}
+          </div>
+        ))}
       </nav>
     </aside>
   );
-}
+};
+
+export default Sidebar;
+

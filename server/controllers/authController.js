@@ -370,3 +370,30 @@ exports.getCurrentUserProfile = async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 };
+// controllers/authController.js
+
+// Update current user profile
+exports.updateCurrentUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.id; // from verifyToken middleware
+    const updateData = { ...req.body };
+
+    // Prevent password update here (separate route)
+    delete updateData.password;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      updateData,
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    res.status(200).json({ msg: "Profile updated successfully", user: updatedUser });
+  } catch (err) {
+    console.error("Error updating profile:", err);
+    res.status(500).json({ msg: "Server error while updating profile" });
+  }
+};

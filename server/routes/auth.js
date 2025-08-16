@@ -3,14 +3,10 @@ const multer = require("multer");
 const fs = require("fs");
 const router = express.Router();
 const passport = require("passport");
-const { register, login, sendPromo, resolveSupportIssue } = require("../controllers/authController");
-const { getAllUsers } = require("../controllers/userController");
 const verifyToken = require("../middleware/verifyToken");
-const isAdmin = require("../middleware/isAdmin");
-const authController = require("../controllers/authController");
 const checkRole = require("../middleware/checkRole");
-
-
+const authController = require("../controllers/authController");
+const { getAllUsers } = require("../controllers/userController");
 
 // Multer setup for file uploads
 const storage = multer.diskStorage({
@@ -29,7 +25,9 @@ const upload = multer({
   limits: { fileSize: 2 * 1024 ** 3 }, // 2GB
 });
 
-// Use multer middleware ONLY on register route (because login doesn't upload files)
+// -------------------- AUTH ROUTES --------------------
+
+// Register user
 router.post(
   "/register",
   upload.fields([
@@ -37,20 +35,16 @@ router.post(
     { name: "tradeRegistration", maxCount: 1 },
     { name: "servicePhotos", maxCount: 5 },
     { name: "video", maxCount: 1 },
-    { name: "priceList", maxCount: 1 },  // Add this line for price list upload
+    { name: "priceList", maxCount: 1 },
   ]),
-
-  register
+  authController.register
 );
 
-router.post("/login", login);
+// Login
+router.post("/login", authController.login);
 
-// Google OAuth2 routes unchanged
-router.get(
-  "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
-
+// Google OAuth2
+router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 router.get(
   "/google/callback",
   passport.authenticate("google", {
@@ -60,20 +54,24 @@ router.get(
   })
 );
 
+// Forgot / Reset password
 router.post("/forgot-password", authController.forgotPassword);
-// ✅ FIXED VERSION
 router.post("/reset-password/:token", authController.resetPassword);
 
+// Current logged-in user
+router.get("/me", verifyToken, authController.getCurrentUserProfile);
+router.put("/me", verifyToken, authController.updateCurrentUserProfile);
 
+// Admin / Super admin routes
 router.get("/all-users", verifyToken, checkRole(["super_admin", "admin"]), getAllUsers);
+router.post("/send-promo", verifyToken, checkRole(["marketing_admin", "super_admin"]), authController.sendPromo);
+router.post("/resolve-issue", verifyToken, checkRole(["customer_support_admin", "super_admin"]), authController.resolveSupportIssue);
 
-router.post("/send-promo", verifyToken, checkRole(["marketing_admin", "super_admin"]), sendPromo);
-
-router.post("/resolve-issue", verifyToken, checkRole(["customer_support_admin", "super_admin"]), resolveSupportIssue);
-
-
+// Get user by ID
 router.get("/users/:id", verifyToken, authController.getUserProfile);
+
 module.exports = router;
+
 
 
 

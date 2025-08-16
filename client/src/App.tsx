@@ -59,7 +59,7 @@ import SubscribersList from "./components/Dashbords/Admin/SubscribersList";
 import HemodialysisPatientsList from "./components/HemodialysisPatientsList";
 import MembershipLookup from "./components/MembershipLookup";
 import AdminGiftCodes from "./components/Dashbords/Admin/AdminGiftCodes";
-import Account from "./components/Dashbords/individual/Account";
+
 import RegisteredPartners from "./components/RegisteredPartners";
 
 
@@ -67,7 +67,7 @@ import RegisteredPartners from "./components/RegisteredPartners";
 // Wrapper to conditionally render Navbar
 const AppWrapper = () => {
   const location = useLocation();
-  const hideNavbarPaths = ["/login", "/register", "/dashboard"];
+  const hideNavbarPaths = ["/login", "/register", "/dashboard","/individual-dashboard"];
   
 
   return (
@@ -105,7 +105,6 @@ const AppWrapper = () => {
   <Route path="/community/membership" element={<WanawCommunityMembership />} />
   <Route path="/community/diaspora" element={<DiasporaJoinForm />} />
 <Route path="/community/support" element={<SupportCommunityForm />} />
-<Route path="/account" element={<Account/>} />
 <Route path="/admin/partner" element={<RegisteredPartners/>} />
 
 
