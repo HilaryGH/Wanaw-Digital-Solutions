@@ -5,7 +5,7 @@ import BASE_URL from "../api/api";
 export default function PartnerWithUs() {
   const [tab, setTab] = useState<"Investor" | "Strategic Partner" | "Co Branding">("Investor");
 
-  const investmentOptions = ["Equity", "Debt", "Other Alternative Investment"];
+  const investmentOptions = ["Equity", "Debt", "Convertible Bonds"];
   const sectorOptions = ["Bank", "Hotel", "Business Company", "NGOs", "Health Sectors"];
 
   const [formData, setFormData] = useState({
