@@ -13,16 +13,32 @@ type Gift = {
   };
   senderName?: string;
   providerId?: string;
+  price?: number;
 };
 
 type Service = {
   _id: string;
   title: string;
+  price?: number;
+};
+
+type Purchase = {
+  _id: string;
+  itemType: "gift" | "service";
+  itemId: Gift | Service;
+  buyerName: string;
+  buyerEmail: string;
+  amount: number;
+  purchaseDate: string;
+  deliveryDate?: string;
+  extraInfo?: any;
 };
 
 const GiftListForProvider = () => {
   const [gifts, setGifts] = useState<Gift[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [serviceId, setServiceId] = useState<string | null>(null);
+  const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedGiftId, setSelectedGiftId] = useState<string | null>(null);
@@ -31,9 +47,9 @@ const GiftListForProvider = () => {
   const providerId = localStorage.getItem("providerId");
   const token = localStorage.getItem("token");
 
-  // Fetch provider services first
+  // 1️⃣ Fetch provider services
   useEffect(() => {
-    const fetchProviderService = async () => {
+    const fetchProviderServices = async () => {
       if (!providerId || !token) {
         setError("Provider not logged in.");
         setLoading(false);
@@ -41,30 +57,25 @@ const GiftListForProvider = () => {
       }
 
       try {
-       const res = await axios.get(`${BASE_URL}/service/provider/${providerId}/services`, {
+        const res = await axios.get(`${BASE_URL}/services/provider/${providerId}/services`, {
   headers: { Authorization: `Bearer ${token}` },
 });
 
 
-        const services: Service[] = res.data;
-        if (services.length === 0) {
-          setError("No services found for this provider.");
-          setLoading(false);
-          return;
-        }
-
-        setServiceId(services[0]._id); // use first service
+        setServices(res.data);
+        if (res.data.length > 0) setServiceId(res.data[0]._id);
       } catch (err: any) {
         console.error("❌ Failed to fetch services:", err.response?.data || err.message);
         setError("Failed to fetch services.");
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchProviderService();
+    fetchProviderServices();
   }, [providerId, token]);
 
-  // Fetch gifts for the selected service
+  // 2️⃣ Fetch gifts for selected service
   useEffect(() => {
     if (!serviceId) return;
 
@@ -74,38 +85,65 @@ const GiftListForProvider = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        let giftsData: Gift[] = [];
-        if (Array.isArray(res.data)) {
-          giftsData = res.data;
-        } else if (res.data.gifts && Array.isArray(res.data.gifts)) {
-          giftsData = res.data.gifts;
-        }
-
+        const giftsData: Gift[] = Array.isArray(res.data) ? res.data : res.data.gifts || [];
         setGifts(giftsData);
       } catch (err: any) {
         console.error("❌ Fetch gifts error:", err.response?.data || err.message);
         setError("Failed to load gifts.");
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchGifts();
   }, [serviceId, token]);
 
-  const filteredGifts = gifts.filter((gift) =>
-    (gift.title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-    gift.recipient?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    gift.senderName?.toLowerCase().includes(searchTerm.toLowerCase())
+  // 3️⃣ Fetch all purchases for provider
+  useEffect(() => {
+    if (!providerId || !token) return;
+
+    const fetchPurchases = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/purchase/provider/${providerId}/purchases`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setPurchases(res.data);
+      } catch (err: any) {
+        console.error("❌ Failed to fetch purchases:", err.response?.data || err.message);
+      }
+    };
+
+    fetchPurchases();
+  }, [providerId, token]);
+
+  const filteredGifts = gifts.filter(
+    (gift) =>
+      (gift.title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      gift.recipient?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      gift.senderName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) return <p className="text-center py-6">Loading gifts...</p>;
+  if (loading) return <p className="text-center py-6">Loading...</p>;
   if (error) return <p className="text-red-600 text-center">{error}</p>;
 
   return (
-    <div className="px-4 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-center">Gifts for Your Service</h1>
+    <div className="px-4 max-w-4xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4 text-center">Gifts & Purchases</h1>
 
+      {/* Service Selector */}
+      {services.length > 1 && (
+        <select
+          className="w-full mb-4 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={serviceId || ""}
+          onChange={(e) => setServiceId(e.target.value)}
+        >
+          {services.map((s) => (
+            <option key={s._id} value={s._id}>
+              {s.title}
+            </option>
+          ))}
+        </select>
+      )}
+
+      {/* Gift Search */}
       <input
         type="text"
         placeholder="Search gifts..."
@@ -114,9 +152,10 @@ const GiftListForProvider = () => {
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
-      <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
+      {/* Gifts */}
+      <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 mb-6">
         {filteredGifts.length === 0 ? (
-          <p className="text-center col-span-full">No gifts found for your service.</p>
+          <p className="text-center col-span-full">No gifts found for this service.</p>
         ) : (
           filteredGifts.map((gift) => (
             <div key={gift._id} className="bg-white shadow-lg rounded-lg p-4 border">
@@ -136,6 +175,41 @@ const GiftListForProvider = () => {
         )}
       </div>
 
+      {/* Purchases */}
+      <h2 className="text-xl font-semibold mb-2">All Purchases</h2>
+      {purchases.length === 0 ? (
+        <p>No purchases yet.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="py-2 px-4 border">Item</th>
+                <th className="py-2 px-4 border">Type</th>
+                <th className="py-2 px-4 border">Buyer</th>
+                <th className="py-2 px-4 border">Email</th>
+                <th className="py-2 px-4 border">Amount</th>
+                <th className="py-2 px-4 border">Purchase Date</th>
+                <th className="py-2 px-4 border">Delivery Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {purchases.map((p) => (
+                <tr key={p._id} className="text-center border-b">
+                  <td className="py-2 px-4">{p.itemId.title}</td>
+                  <td className="py-2 px-4">{p.itemType}</td>
+                  <td className="py-2 px-4">{p.buyerName}</td>
+                  <td className="py-2 px-4">{p.buyerEmail}</td>
+                  <td className="py-2 px-4">{p.amount}</td>
+                  <td className="py-2 px-4">{new Date(p.purchaseDate).toLocaleDateString()}</td>
+                  <td className="py-2 px-4">{p.deliveryDate ? new Date(p.deliveryDate).toLocaleDateString() : "-"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
       {selectedGiftId && (
         <div className="mt-8">
           <h2 className="text-xl font-semibold mb-2">Confirm Gift Delivery</h2>
@@ -153,7 +227,3 @@ const GiftListForProvider = () => {
 };
 
 export default GiftListForProvider;
-
-
-
-

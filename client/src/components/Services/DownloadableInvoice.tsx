@@ -9,7 +9,8 @@ interface GiftRecipient {
   message?: string;
   itemTitle?: string;
   price?: number;
-  type?: "standard" | "vip"; // Added type for VIP/Standard
+  type?: "standard" | "vip";
+  giftCode?: string; // Gift code
 }
 
 interface ServiceProvider {
@@ -19,8 +20,7 @@ interface ServiceProvider {
 }
 
 interface DownloadableInvoiceProps {
-  fullName: string; // Buyer / sender full name
-  email: string; // Buyer / sender email
+  fullName: string; 
   cart?: { title: string; price: number }[];
   total: number;
   giftRecipient?: GiftRecipient;
@@ -29,7 +29,6 @@ interface DownloadableInvoiceProps {
 
 const DownloadableInvoice = ({
   fullName,
-  email,
   cart = [],
   total,
   giftRecipient,
@@ -56,10 +55,9 @@ const DownloadableInvoice = ({
     return `INV-${initials}-${date}-${unique}`;
   }, [fullName]);
 
-  // Adjusted total for VIP gifts
   const adjustedTotal = useMemo(() => {
     if (giftRecipient?.type === "vip" && giftRecipient.price) {
-      return total + giftRecipient.price * 0.25; // 25% VIP surcharge
+      return total + giftRecipient.price * 0.25;
     }
     return total;
   }, [total, giftRecipient]);
@@ -86,7 +84,6 @@ const DownloadableInvoice = ({
 
   return (
     <div>
-      {/* Invoice Container */}
       <div
         ref={invoiceRef}
         style={{
@@ -169,16 +166,13 @@ const DownloadableInvoice = ({
           </div>
         )}
 
-        {/* Buyer / Sender Info */}
+        {/* Buyer Info */}
         <div style={{ marginBottom: "1rem", fontSize: "0.875rem" }}>
           <p>
             <strong>Customer Name:</strong> {fullName}
           </p>
-          <p>
-            <strong>Email:</strong> {email}
-          </p>
-          <p>
-            <strong>Status:</strong> ✅ Completed
+          <p style={{ color: "orange", fontWeight: "bold" }}>
+            ⏳ Status: Pending Payment
           </p>
         </div>
 
@@ -224,34 +218,25 @@ const DownloadableInvoice = ({
             <p>
               <strong>Recipient Email:</strong> {giftRecipient.email}
             </p>
-            {giftRecipient.phone && (
-              <p>
-                <strong>Phone:</strong> {giftRecipient.phone}
-              </p>
-            )}
-            {giftRecipient.itemTitle && (
-              <p>
-                <strong>Gift Item:</strong> {giftRecipient.itemTitle}
-              </p>
-            )}
-            {giftRecipient.price !== undefined && (
-              <p>
-                <strong>Gift Price:</strong> {giftRecipient.price.toFixed(2)} ETB
-              </p>
-            )}
-            {giftRecipient.message && (
-              <p>
-                <strong>Message:</strong> {giftRecipient.message}
+            {giftRecipient.phone && <p><strong>Phone:</strong> {giftRecipient.phone}</p>}
+            {giftRecipient.itemTitle && <p><strong>Gift Item:</strong> {giftRecipient.itemTitle}</p>}
+            {giftRecipient.price !== undefined && <p><strong>Gift Price:</strong> {giftRecipient.price.toFixed(2)} ETB</p>}
+            {giftRecipient.message && <p><strong>Message:</strong> {giftRecipient.message}</p>}
+            {giftRecipient.giftCode && (
+              <p style={{ fontSize: "1rem", fontWeight: "bold", color: "#D4AF37" }}>
+                🎁 Gift Code: {giftRecipient.giftCode}
               </p>
             )}
           </div>
         ) : (
-          <p style={{ marginBottom: "1rem", fontSize: "0.875rem" }}>No purchase or gift details available.</p>
+          <p style={{ marginBottom: "1rem", fontSize: "0.875rem" }}>
+            No purchase or gift details available.
+          </p>
         )}
 
         {/* Total Amount */}
         <div style={{ textAlign: "right", fontWeight: "600", fontSize: "1rem" }}>
-          Total Paid Amount: {adjustedTotal.toFixed(2)} ETB
+          Total Amount Due: {adjustedTotal.toFixed(2)} ETB
           {giftRecipient?.type === "vip" && giftRecipient.price && (
             <span style={{ fontSize: "0.75rem", color: "#6b7280", display: "block" }}>
               (Includes 25% VIP surcharge: {(giftRecipient.price * 0.25).toFixed(2)} ETB)
@@ -269,7 +254,6 @@ const DownloadableInvoice = ({
           </div>
         </div>
 
-        {/* Gold Ribbon Footer */}
         <div
           style={{
             height: "30px",
@@ -281,7 +265,6 @@ const DownloadableInvoice = ({
         />
       </div>
 
-      {/* Download Button */}
       <div style={{ textAlign: "center" }}>
         <button
           onClick={handleDownload}
@@ -304,6 +287,8 @@ const DownloadableInvoice = ({
 };
 
 export default DownloadableInvoice;
+
+
 
 
 

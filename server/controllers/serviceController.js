@@ -3,27 +3,39 @@ const User = require("../models/User");
 
 const { notifyProviderOfPurchase } = require("../controllers/notificationController");
 
+const Purchase = require("../models/Purchase");
+
 exports.purchaseService = async (req, res) => {
   try {
     const { buyerName, buyerEmail, deliveryDate } = req.body;
+
     if (!buyerName || !buyerEmail) {
       return res.status(400).json({ msg: "Buyer name and email are required" });
     }
 
-    const service = await Service.findById(req.params.id).populate("providerId", "fullName location email phone whatsapp telegram");
+    const service = await Service.findById(req.params.id).populate("providerId");
     if (!service) return res.status(404).json({ msg: "Service not found" });
 
-    // Call notification function here instead of sending email directly
+    // 1️⃣ Create a purchase record
+    await Purchase.create({
+      itemType: "service",
+      itemId: service._id,
+      providerId: service.providerId._id,
+      buyerName,
+      buyerEmail,
+      amount: service.price,
+      deliveryDate,
+    });
+
+    // 2️⃣ Notify provider (if you already have this)
     await notifyProviderOfPurchase(service, { buyerName, buyerEmail }, deliveryDate);
 
-    res.json({ msg: "Service purchased. Notifications sent." });
+    res.json({ msg: "Service purchased and purchase record saved." });
   } catch (err) {
-    console.error("Purchase error:", err.message);
+    console.error("Purchase error:", err);
     res.status(500).json({ msg: "Purchase failed." });
   }
 };
-
-
 
 
 // Normalize category helper

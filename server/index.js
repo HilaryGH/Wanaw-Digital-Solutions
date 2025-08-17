@@ -113,6 +113,7 @@ const subscribeRoute = require("./routes/subscribe");
 app.use("/api/subscribe", subscribeRoute);
 
 
+app.use("/api/purchase", require("./routes/purchase"));
 
 // Adjust path as needed
 
