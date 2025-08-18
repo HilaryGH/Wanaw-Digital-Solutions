@@ -2,81 +2,52 @@ import { useState } from "react";
 import axios from "axios";
 import BASE_URL from "../api/api";
 
-type ConfirmGiftProps = {
-  giftId: string;      // <-- add giftId here
-  providerId?: string; // optional, if needed later
-};
+interface ConfirmGiftProps {
+  giftId: string; // Pass this as a prop
+}
 
-const ConfirmGift = ({ giftId, }: ConfirmGiftProps) => {
+const ConfirmGift: React.FC<ConfirmGiftProps> = ({ giftId }) => {
   const [giftCode, setGiftCode] = useState("");
   const [message, setMessage] = useState("");
-  const [isSuccess, setIsSuccess] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState(false);
 
-const handleConfirm = async () => {
-  if (!giftId || !giftCode) {
-    setMessage("Gift ID and code are required.");
-    setIsSuccess(false);
-    return;
-  }
+  const handleConfirm = async () => {
+    if (!giftId || !giftCode) {
+      setMessage("Gift ID and code are required");
+      return;
+    }
 
-  setLoading(true);
-  try {
     console.log("Sending confirmation for Gift ID:", giftId, "with code:", giftCode);
 
-    const response = await axios.post(
-      `${BASE_URL}/gift/${giftId}/confirm-gift`,
-      { code: giftCode }, // Make sure the backend expects this key
-      {
-        headers: {
-          "Content-Type": "application/json",
-          // Authorization: `Bearer ${token}`, // If needed
-        },
-      }
-    );
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/gift/${giftId}/confirm-gift`,
+        { code: giftCode }
+      );
 
-    setMessage(response.data.msg || "Confirmed successfully.");
-    setIsSuccess(true);
-  } catch (err: any) {
-    console.error("Confirmation error:", err.response || err);
-    setMessage(err.response?.data?.msg || "Something went wrong.");
-    setIsSuccess(false);
-  } finally {
-    setLoading(false);
-  }
-};
-
+      console.log("Response:", response.data);
+      setMessage(response.data.msg);
+    } catch (error: any) {
+      console.error("Confirmation error:", error.response || error);
+      setMessage(
+        error.response?.data?.msg || "An error occurred during confirmation"
+      );
+    }
+  };
 
   return (
-    <div className="p-4 bg-white shadow rounded max-w-sm mx-auto mt-10">
-      <h2 className="text-xl font-bold mb-4 text-center text-gray-800">Confirm Gift Delivery</h2>
+    <div>
       <input
         type="text"
+        placeholder="Enter gift code"
         value={giftCode}
         onChange={(e) => setGiftCode(e.target.value)}
-        placeholder="Enter 4-digit gift code"
-        maxLength={4}
-        className="border p-2 w-full mb-4 rounded outline-none focus:ring-2 focus:ring-blue-500"
       />
-      <button
-        onClick={handleConfirm}
-        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded w-full transition duration-200"
-        disabled={loading || giftCode.length !== 4}
-      >
-        {loading ? "Confirming..." : "Confirm Gift"}
-      </button>
-      {message && (
-        <p
-          className={`mt-4 text-center text-sm font-medium ${
-            isSuccess ? "text-green-600" : "text-red-600"
-          }`}
-        >
-          {message}
-        </p>
-      )}
+      <button onClick={handleConfirm}>Confirm Gift</button>
+      {message && <p>{message}</p>}
     </div>
   );
 };
 
 export default ConfirmGift;
+
 

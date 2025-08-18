@@ -1,4 +1,6 @@
 const Purchase = require("../models/Purchase");
+const Service = require("../models/Service"); // ✅ import this
+
 
 exports.getProviderPurchases = async (req, res) => {
   try {

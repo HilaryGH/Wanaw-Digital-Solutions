@@ -6,37 +6,6 @@ const mongoose = require("mongoose");
 
 
 const Gift = require('../models/Gift');
-const Purchase = require("../models/Purchase");
-
-exports.purchaseGift = async (req, res) => {
-  try {
-    const { buyerName, buyerEmail, deliveryDate, recipientId, message } = req.body;
-
-    const gift = await Gift.findById(req.params.id).populate("providerId");
-    if (!gift) return res.status(404).json({ msg: "Gift not found" });
-
-    // 1️⃣ Create a purchase record
-    await Purchase.create({
-      itemType: "gift",
-      itemId: gift._id,
-      providerId: gift.providerId._id,
-      buyerName,
-      buyerEmail,
-      amount: gift.price || 0,
-      deliveryDate,
-      extraInfo: { recipientId, message },
-    });
-
-    // 2️⃣ Notify provider
-    await notifyProviderOfPurchase(gift, { buyerName, buyerEmail }, deliveryDate);
-
-    res.json({ msg: "Gift purchased and purchase record saved." });
-  } catch (err) {
-    console.error("Gift purchase error:", err);
-    res.status(500).json({ msg: "Gift purchase failed." });
-  }
-};
-
 // controllers/giftController.js
 exports.createGift = async (req, res) => {
   const {
@@ -91,7 +60,7 @@ exports.createGift = async (req, res) => {
   }
 
 };
-
+// Get all gifts
 // Get all gifts (optionally filter by serviceId)
 exports.getGifts = async (req, res) => {
   try {
@@ -132,13 +101,16 @@ exports.getGiftsByService = async (req, res) => {
       .populate("recipient", "name email phone")
       .sort({ createdAt: -1 });
 
-    res.status(200).json(gifts); // always return array
+    if (!gifts.length) {
+      return res.status(200).json({ msg: "No gifts found for this service", gifts: [] });
+    }
+
+    res.status(200).json(gifts);
   } catch (err) {
     console.error("❌ Error fetching service gifts:", err);
     res.status(500).json({ msg: "Server error" });
   }
 };
-
 
 // Delete a gift by ID
 exports.deleteGift = async (req, res) => {

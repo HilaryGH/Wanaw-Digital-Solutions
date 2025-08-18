@@ -106,22 +106,44 @@ const CartPage = () => {
         ))}
       </div>
 
-      {/* 👤 Guest Info */}
+           {/* 👤 Guest Info (Only for not logged in users) */}
       {!isLoggedIn && (
-        <div className="max-w-md mx-auto mt-10 space-y-4">
+        <div className="max-w-md mx-auto mt-10 space-y-4 bg-white shadow p-6 rounded-lg">
+          <h2 className="text-lg font-semibold text-[#1c2b21] mb-2">Guest Information</h2>
+
           <input
             type="text"
             placeholder="Your Full Name"
             value={guestName}
             onChange={(e) => setGuestName(e.target.value)}
-            className="w-full px-4 py-2 border rounded"
+            className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-[#D4AF37] focus:outline-none"
+            required
           />
+
           <input
             type="email"
             placeholder="Your Email"
             value={guestEmail}
             onChange={(e) => setGuestEmail(e.target.value)}
-            className="w-full px-4 py-2 border rounded"
+            className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-[#D4AF37] focus:outline-none"
+            required
+          />
+
+          <input
+            type="tel"
+            placeholder="Your Phone Number"
+            value={user?.phone || ""}
+            onChange={(e) => user.phone = e.target.value}
+            className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-[#D4AF37] focus:outline-none"
+            required
+          />
+
+          <textarea
+            placeholder="Your Address"
+            rows={3}
+            onChange={(e) => user.address = e.target.value}
+            className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-[#D4AF37] focus:outline-none"
+            required
           />
         </div>
       )}

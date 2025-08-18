@@ -1,25 +1,43 @@
+// routes/purchase.js (or controllers/purchaseController.js)
 const express = require("express");
 const router = express.Router();
-const Purchase = require("../models/Purchase"); // your purchase model
-const verifyToken = require("../middleware/verifyToken");
+const Purchase = require("../models/Purchase");
+const Gift = require("../models/Gift");
+const Service = require("../models/Service");
 
-// GET all purchases for a provider
-router.get("/provider/:providerId/purchases", verifyToken, async (req, res) => {
+// GET purchases for a provider
+router.get("/provider/:providerId/purchases", async (req, res) => {
+  const { providerId } = req.params;
+
   try {
-    const { providerId } = req.params;
+    // 1️⃣ Fetch all purchases for this provider
+    const purchases = await Purchase.find({ providerId }).sort({ createdAt: -1 });
 
-    // Validate providerId
-    if (!providerId.match(/^[0-9a-fA-F]{24}$/)) {
-      return res.status(400).json({ msg: "Invalid provider ID" });
-    }
+    // 2️⃣ Populate itemId manually based on itemType
+    const populatedPurchases = await Promise.all(
+      purchases.map(async (p) => {
+        let populatedItem = null;
 
-    const purchases = await Purchase.find({ providerId }).populate("itemId");
-    res.status(200).json(purchases);
+        if (p.itemType === "gift") {
+          populatedItem = await Gift.findById(p.itemId).populate("providerId", "name email");
+        } else if (p.itemType === "service") {
+          populatedItem = await Service.findById(p.itemId).populate("providerId", "name email");
+        }
+
+        return {
+          ...p.toObject(),
+          itemId: populatedItem,
+        };
+      })
+    );
+
+    res.json(populatedPurchases);
   } catch (err) {
     console.error("❌ Error fetching provider purchases:", err);
-    res.status(500).json({ msg: "Server error fetching purchases" });
+    res.status(500).json({ msg: "Failed to fetch purchases", error: err.message });
   }
 });
 
 module.exports = router;
+
 

@@ -10,24 +10,28 @@ const giftSchema = new mongoose.Schema({
   tags: [String],
   isActive: { type: Boolean, default: true },
 
-  senderName: { type: String }, // NEW: Optional sender name
+  senderName: { type: String },
 
   recipient: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User", // assuming you store recipients in the User collection
+    ref: "User",
   },
 
   service: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Service", // assuming services are stored separately
+    ref: "Service",
   },
 
   providerId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User", // or "Provider" if separate
+    ref: "User",
     required: true,
   },
+
+  // ← Add this field
+  code: { type: String },
+
 }, { timestamps: true });
 
-
 module.exports = mongoose.model("Gift", giftSchema);
+
