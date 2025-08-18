@@ -49,6 +49,11 @@ exports.register = async (req, res) => {
     const timestampPart = Date.now().toString().slice(-6);
     return `MEM${randomPart}${timestampPart}`;
   };
+  // Helper: generate referral code
+  const generateReferralCode = () => {
+    return "REF-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+  };
+
 
   try {
     /* 1️⃣ Duplicate email check */
@@ -91,6 +96,7 @@ exports.register = async (req, res) => {
 
     /* 8️⃣ Generate membership ID */
     const membershipId = generateMembershipId();
+    const referralCode = generateReferralCode();
 
     /* 9️⃣ Build user object */
     const newUser = {
@@ -113,6 +119,8 @@ exports.register = async (req, res) => {
       photoUrls,
       videoUrl,
       priceListUrl,
+      referralCode,   // ✅ added
+      referralClicks: 0, // ✅ added
     };
 
     /* 🔟 Create user in DB */
@@ -184,6 +192,63 @@ With care,
 The Wanaw Team
   `
     });
+    await sendEmail({
+      to: user.email,
+      subject: "Your Wanaw Health & Wellness Referral Code 🎁",
+      html: `
+  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+    <div style="background-color:#1c2b21; padding: 20px; text-align: center;">
+      <h1 style="margin: 0; color: #D4AF37;">Wanaw Health and Wellness Referral</h1>
+    </div>
+    <div style="padding: 30px; background-color: #fff;">
+      <h2 style="color: #1c2b21;">Hello, ${user.fullName}!</h2>
+
+      <p style="font-size: 16px; color: #333;">
+        🎉 Share your unique referral code with friends and family to earn rewards!
+      </p>
+
+      <div style="margin: 30px 0; padding: 15px; background-color: #f7f7f7; border-left: 4px solid #D4AF37;">
+        <p style="font-size: 18px; color: #1c2b21; margin: 0;">Your Referral Code:</p>
+        <p style="font-size: 28px; font-weight: bold; color: #D4AF37; margin: 5px 0 0;">${user.referralCode}</p>
+      </div>
+
+      <p style="font-size: 16px; color: #333;">Your unique referral link:</p>
+      <a href="https://wanawhealthandwellness.netlify.app/register?ref=${user.referralCode}" style="display: inline-block; margin-top: 15px; padding: 12px 24px; background-color: #D4AF37; color: #1c2b21; text-decoration: none; border-radius: 4px; font-weight: bold;">
+        Invite Friends
+      </a>
+
+      <p style="font-size: 16px; color: #333; margin-top: 20px;">
+        🌟 For every <strong>20 clicks</strong> on your referral link, you will earn Wanaw Health & Wellness gifts for free!
+      </p>
+
+      <p style="font-size: 16px; color: #333; margin-top: 20px;">
+        Share via WhatsApp, Telegram, Email, or Social Media today!
+      </p>
+
+      <p style="font-size: 16px; color: #333;">
+        With care,<br/>
+        <strong>The Wanaw Team</strong>
+      </p>
+    </div>
+    <div style="background-color: #1c2b21; padding: 15px; text-align: center; font-size: 13px; color:#D4AF37;">
+      &copy; ${new Date().getFullYear()} Wanaw Health and Wellness Digital Solution. All rights reserved.
+    </div>
+  </div>
+  `,
+      text: `
+Hello ${user.fullName},
+
+Your referral code: ${user.referralCode}
+Your referral link: https://wanawhealthandwellness.netlify.app/register?ref=${user.referralCode}
+
+🎁 For every 20 clicks on your referral link, you’ll earn Wanaw Health & Wellness gifts for free!
+
+Share via WhatsApp, Telegram, Email, or Social Media today.
+
+- The Wanaw Team
+  `
+    });
+
 
 
     /* 1️⃣2️⃣ Respond with JWT + user info */
@@ -395,5 +460,26 @@ exports.updateCurrentUserProfile = async (req, res) => {
   } catch (err) {
     console.error("Error updating profile:", err);
     res.status(500).json({ msg: "Server error while updating profile" });
+  }
+};
+exports.trackReferral = async (req, res) => {
+  try {
+    const { code } = req.params;
+    const user = await User.findOne({ referralCode: code });
+
+    if (!user) return res.status(404).json({ msg: "Referral code not found" });
+
+    user.referralClicks += 1;
+    await user.save();
+
+    // Optional: Check rewards
+    if (user.referralClicks % 20 === 0) {
+      // grant reward logic here
+    }
+
+    res.redirect("https://wanawhealthandwellness.netlify.app/");
+  } catch (err) {
+    console.error("Referral tracking error:", err);
+    res.status(500).json({ msg: "Error tracking referral" });
   }
 };

@@ -70,6 +70,7 @@ router.post("/resolve-issue", verifyToken, checkRole(["customer_support_admin", 
 // Get user by ID
 router.get("/users/:id", verifyToken, authController.getUserProfile);
 
+
 module.exports = router;
 
 

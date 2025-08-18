@@ -13,6 +13,9 @@ const userSchema = new mongoose.Schema(
 
       default: "individual",
     },
+    referralCode: { type: String, unique: true },
+    referralClicks: { type: Number, default: 0 },
+
     membership: {
       type: String,
       enum: [

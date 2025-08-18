@@ -31,7 +31,7 @@ export default function Cards() {
         {/* Membership */}
 <div className="bg-white border-l-4 border-yellow-500 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-transform transform hover:-translate-y-1">
   <h3 className="text-2xl font-semibold text-[#1c2b21] mb-3 hover:text-yellow-500 transition-colors">
-    Join the Community
+    Join Wanaw Community
   </h3>
   <p className="text-gray-600 leading-relaxed">
     Are you Diaspora, Individual seeking to provide support & volunteer, Healthcare Professional, or a Fresh Graduate? Join Wanaw Community to connect, collaborate, and contribute.

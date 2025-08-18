@@ -110,6 +110,12 @@ export default function SuperAdminDashboard() {
       route: "/admin/partner",
       color: "bg-pink-100",
     },
+     {
+      title: "Referal code",
+      description: "Review registerd referal codes ",
+      route: "/admin/referal-code",
+      color: "bg-pink-100",
+    },
   ];
 
   return (

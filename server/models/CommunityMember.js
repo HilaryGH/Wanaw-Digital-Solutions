@@ -3,15 +3,18 @@ const mongoose = require("mongoose");
 const communityMemberSchema = new mongoose.Schema({
   memberType: {
     type: String,
-    enum: ["healthcare", "freshGraduate"],
+    enum: ["healthcare and wellness", "freshGraduate"],
     required: true,
   },
+
   name: { type: String, required: true },
   email: {
     type: String,
     required: true,
     match: [/^\S+@\S+\.\S+$/, "Invalid email address"],
   },
+
+
   phone: { type: String, required: true },
   whatsapp: String,
   location: String,
@@ -21,3 +24,4 @@ const communityMemberSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 module.exports = mongoose.model("CommunityMember", communityMemberSchema);
+

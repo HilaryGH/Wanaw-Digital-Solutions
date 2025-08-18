@@ -17,6 +17,7 @@ const SupportCommunityForm = () => {
     roles: {
       gifter: false,
       influencer: false,
+      digitalCreator: false,
       brandAmbassador: false,
       serviceProvider: false,
       volunteer: false,
@@ -24,6 +25,8 @@ const SupportCommunityForm = () => {
     gifterLevel: "individual",
     influencerLevel: "",
     influencerRoles: [] as string[],
+    digitalCreatorLevel: "",
+    digitalCreatorRoles: [] as string[],
     brandAmbassadorLevel: "",
     brandAmbassadorRoles: [] as string[],
     serviceProviderLevel: "",
@@ -39,6 +42,7 @@ const SupportCommunityForm = () => {
         ? {
             ...(role === "gifter" && { gifterLevel: "individual" }),
             ...(role === "influencer" && { influencerLevel: "", influencerRoles: [] }),
+            ...(role === "digitalCreator" && { digitalCreatorLevel: "", digitalCreatorRoles: [] }),
             ...(role === "brandAmbassador" && { brandAmbassadorLevel: "", brandAmbassadorRoles: [] }),
             ...(role === "serviceProvider" && { serviceProviderLevel: "" }),
             ...(role === "volunteer" && { volunteerLevel: "" }),
@@ -51,6 +55,7 @@ const SupportCommunityForm = () => {
     roleLevelKey:
       | "gifterLevel"
       | "influencerLevel"
+      | "digitalCreatorLevel"
       | "brandAmbassadorLevel"
       | "serviceProviderLevel"
       | "volunteerLevel",
@@ -63,7 +68,7 @@ const SupportCommunityForm = () => {
   };
 
   const handleMultiRoleChange = (
-    roleKey: "influencerRoles" | "brandAmbassadorRoles",
+    roleKey: "influencerRoles" | "digitalCreatorRoles" | "brandAmbassadorRoles",
     value: string,
     checked: boolean
   ) => {
@@ -103,6 +108,7 @@ const SupportCommunityForm = () => {
       const rolesArray: string[] = [];
       if (formData.roles.gifter) rolesArray.push("Gifter");
       if (formData.roles.influencer) rolesArray.push("Influencer");
+      if (formData.roles.digitalCreator) rolesArray.push("Digital Creator");
       if (formData.roles.brandAmbassador) rolesArray.push("Brand Ambassador");
       if (formData.roles.serviceProvider) rolesArray.push("Service Provider");
       if (formData.roles.volunteer) rolesArray.push("Volunteer");
@@ -146,6 +152,7 @@ const SupportCommunityForm = () => {
         level:
           formData.gifterLevel ||
           formData.influencerLevel ||
+          formData.digitalCreatorLevel ||
           formData.brandAmbassadorLevel ||
           formData.serviceProviderLevel ||
           formData.volunteerLevel,
@@ -196,9 +203,10 @@ const SupportCommunityForm = () => {
         {[
           { key: "gifter", label: "A. Gifters — Send Gift for preferable Hemodialysis Patients Treatments", select: { options: ["individual", "corporate"] } },
           { key: "influencer", label: "B. Influencers — Promote your preferable Hemodialysis Patient" },
-          { key: "brandAmbassador", label: "C. Brand Ambassadors — Promote Wanaw Support Community Program" },
-          { key: "serviceProvider", label: "D. Service Providers — Provide Health Service" },
-          { key: "volunteer", label: "E. Volunteers — Support Community Program" }
+          { key: "digitalCreator", label: "C. Digital Creators — Share Content to Support Hemodialysis Patients" },
+          { key: "brandAmbassador", label: "D. Brand Ambassadors — Promote Wanaw Support Community Program" },
+          { key: "serviceProvider", label: "E. Service Providers — Provide Health Service" },
+          { key: "volunteer", label: "F. Volunteers — Support Community Program" }
         ].map((role, index) => (
           <div key={index} className="border p-4 rounded">
             <label className="flex items-start sm:items-center gap-2 mb-2 font-semibold text-[#1c2b21] text-sm sm:text-base">
@@ -227,6 +235,25 @@ const SupportCommunityForm = () => {
                   {["Tiktok live", "YouTube live", "Post/Share Content", "Instagram live"].map((item) => (
                     <label key={item} className="flex items-center gap-2">
                       <input type="checkbox" checked={formData.influencerRoles.includes(item)} onChange={(e) => handleMultiRoleChange("influencerRoles", item, e.target.checked)} />
+                      <span className="text-sm sm:text-base">{item}</span>
+                    </label>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {role.key === "digitalCreator" && formData.roles.digitalCreator && (
+              <>
+                <select value={formData.digitalCreatorLevel} onChange={(e) => handleLevelChange("digitalCreatorLevel", e.target.value)} className="p-2 border rounded border-gray-300 w-full sm:w-auto mt-2">
+                  <option value="">Select Level</option>
+                  <option value="Professional Creator">Professional Creator</option>
+                  <option value="Community Creator">Community Creator</option>
+                  <option value="Casual Creator">Casual Creator</option>
+                </select>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                  {["Video Content", "Blog/Articles", "Graphics/Designs", "Photography"].map((item) => (
+                    <label key={item} className="flex items-center gap-2">
+                      <input type="checkbox" checked={formData.digitalCreatorRoles.includes(item)} onChange={(e) => handleMultiRoleChange("digitalCreatorRoles", item, e.target.checked)} />
                       <span className="text-sm sm:text-base">{item}</span>
                     </label>
                   ))}

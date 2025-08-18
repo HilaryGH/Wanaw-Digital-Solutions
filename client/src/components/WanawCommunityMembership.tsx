@@ -6,6 +6,8 @@ const healthcareSpecializations = [
   "Nurse",
   "Health Officer",
   "Pharmacist",
+  "Health Coach",
+  "Beauty Consultants"
 ];
 
 const freshGraduateSpecializations = [
@@ -19,7 +21,7 @@ const freshGraduateSpecializations = [
   "Sales",
 ];
 
-type MemberType = "healthcare" | "freshGraduate";
+type MemberType = "healthcare and wellness" | "freshGraduate";
 
 interface FormData {
   name: string;
@@ -35,7 +37,7 @@ interface FormData {
 }
 
 export default function WanawCommunityMembership() {
-  const [memberType, setMemberType] = useState<MemberType>("healthcare");
+  const [memberType, setMemberType] = useState<MemberType>("healthcare and wellness");
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
@@ -106,7 +108,7 @@ export default function WanawCommunityMembership() {
   };
 
   const specializations =
-    memberType === "healthcare"
+    memberType === "healthcare and wellness"
       ? healthcareSpecializations
       : freshGraduateSpecializations;
 
@@ -122,7 +124,7 @@ export default function WanawCommunityMembership() {
         </div>
 
         <h2 className="text-2xl font-bold text-center text-[#1c2b21] mb-1">
-          Wanaw Community Membership
+          Professionals Community
         </h2>
         <p className="text-center text-gray-600 text-sm mb-6">
           Join us by filling the form below
@@ -134,11 +136,11 @@ export default function WanawCommunityMembership() {
             <input
               type="radio"
               value="healthcare"
-              checked={memberType === "healthcare"}
-              onChange={() => setMemberType("healthcare")}
+              checked={memberType === "healthcare and wellness"}
+              onChange={() => setMemberType("healthcare and wellness")}
               className="form-radio text-[#D4AF37]"
             />
-            <span>Healthcare</span>
+            <span>healthcare and wellness</span>
           </label>
           <label className="inline-flex items-center space-x-2">
             <input

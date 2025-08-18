@@ -24,7 +24,7 @@ export default function CommunitySelection() {
           tabIndex={0}
           onKeyDown={() => navigate("/community/membership")}
         >
-          <h3 className={headingClasses}>Wanaw Membership</h3>
+          <h3 className={headingClasses}>Professionals Community</h3>
           <p className={paragraphClasses}>
             Are you a healthcare professional? Join the Wanaw Community for various strategic opportunities,
             partnerships, and internship programs for fresh graduates.

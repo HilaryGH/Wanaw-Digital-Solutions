@@ -11,7 +11,7 @@ type User = {
   fullName: string;
 };
 
-const diasporaDashboard = () => {
+const DiasporaDashboard = () => {
   const storedUser = localStorage.getItem("user");
   const user: User | null = storedUser ? JSON.parse(storedUser) : null;
 
@@ -114,7 +114,7 @@ const diasporaDashboard = () => {
         )}
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col md:ml-64 transition-all duration-300">
+        <div className="flex-1 flex flex-col  transition-all duration-300">
           <Navbar />
 
           <main className="p-4 md:p-6 flex-1">
@@ -136,4 +136,4 @@ const diasporaDashboard = () => {
   );
 };
 
-export default diasporaDashboard;
+export default DiasporaDashboard;
