@@ -10,6 +10,7 @@ const categories = [
   "Premium Package",
   "Family Package",
   "Community Package",
+  "Diaspora Package"
   
 ];
 

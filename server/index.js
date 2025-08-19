@@ -115,6 +115,10 @@ app.use("/api/subscribe", subscribeRoute);
 
 app.use("/api/purchase", require("./routes/purchase"));
 
+// ✅ Chatbot routes
+const chatRoutes = require("./routes/chatRoutes");
+app.use("/api/chat", chatRoutes);
+
 // Adjust path as needed
 
 

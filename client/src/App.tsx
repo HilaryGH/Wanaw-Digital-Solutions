@@ -61,7 +61,7 @@ import MembershipLookup from "./components/MembershipLookup";
 import AdminGiftCodes from "./components/Dashbords/Admin/AdminGiftCodes";
 
 import RegisteredPartners from "./components/RegisteredPartners";
-import DiasporaDashboard from "./components/Dashbords/Diaspora/diasporaDashboard";
+import DiasporaDashboard from "./components/Dashbords/Diaspora/DiasporaDashboard";
 import ReferralsDashboard from "./components/Dashbords/Admin/ReferralsDashboard";
 
 
@@ -111,6 +111,7 @@ const AppWrapper = () => {
   <Route path="/community/diaspora" element={<DiasporaJoinForm />} />
 <Route path="/community/support" element={<SupportCommunityForm />} />
 <Route path="/admin/partner" element={<RegisteredPartners/>} />
+   
 
 
 

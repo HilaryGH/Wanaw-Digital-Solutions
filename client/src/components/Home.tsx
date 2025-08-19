@@ -10,6 +10,7 @@ import FestivitiesT from "./FestivitiesT";
 
 
 import Cards from "./Cards";
+import ChatBox from "./ChatBox";
 
 
 
@@ -112,6 +113,7 @@ const Home = () => {
       <GiftShowcase />
       <FestivitiesT />
      <MembershipPreview />
+     <ChatBox/>
    
       <Footer />
     </>
