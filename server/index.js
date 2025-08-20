@@ -99,8 +99,6 @@ app.use('/api/applications', applicationRoutes);
 const kidneyPatientRoutes = require("./routes/kidneyPatientRoutes");
 app.use("/api/kidney-patients", kidneyPatientRoutes);
 
-const hotelRoutes = require('./routes/hotelRoutes');
-app.use('/hotel', hotelRoutes);
 
 
 const supportCommunityRoutes = require("./routes/supportCommunityRoutes");
@@ -111,6 +109,9 @@ app.use("/api/diaspora-members", diasporaRoutes)
 
 const subscribeRoute = require("./routes/subscribe");
 app.use("/api/subscribe", subscribeRoute);
+
+const hotelRoutes = require("./routes/hotel");
+app.use("/hotel", hotelRoutes);
 
 
 app.use("/api/purchase", require("./routes/purchase"));

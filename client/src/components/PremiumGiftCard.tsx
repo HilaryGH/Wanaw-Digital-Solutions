@@ -3,6 +3,7 @@ import html2pdf from "html2pdf.js";
 import QRCode from "react-qr-code";
 
 interface PremiumGiftCardProps {
+  fullName: string;
   senderName: string;
   recipientName: string;
   giftItem: string;

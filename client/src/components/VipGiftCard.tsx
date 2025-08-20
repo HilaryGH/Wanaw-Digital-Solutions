@@ -28,75 +28,49 @@ const VipGiftCard: React.FC<VipGiftCardProps> = ({
   providerName,
 }) => {
   return (
-    <div
-      style={{
-        width: "400px",
-        borderRadius: "20px",
-        background: "linear-gradient(145deg, #fffaf5, #fff3e0)",
-        padding: "25px",
-        fontFamily: "'Poppins', sans-serif",
-        boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
+    <div className="w-full max-w-md mx-auto bg-gradient-to-br from-[#fff8f0] to-[#fff1e6] rounded-3xl shadow-2xl p-6 sm:p-8 flex flex-col items-center font-poppins relative overflow-hidden">
+      {/* Decorative Brand Circles */}
+      <div className="absolute -top-16 -left-16 w-36 h-36 bg-gradient-to-br from-[#D4AF37] to-[#1c2b21] rounded-full opacity-20 animate-spin-slow"></div>
+      <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-gradient-to-tr from-[#D4AF37] to-[#1c2b21] rounded-full opacity-20 animate-pulse"></div>
+
       {/* Header */}
-      <h2 style={{ fontSize: "26px", color: "#D4AF37", marginBottom: "15px", fontWeight: "700", letterSpacing: "1px" }}>
+      <h2 className="text-3xl font-bold text-[#D4AF37] mb-4 tracking-wide">
         VIP Gift Card
       </h2>
 
       {/* Recipient Info */}
-      <div style={{ width: "100%", textAlign: "left", marginBottom: "15px" }}>
-        <p style={{ fontSize: "16px", margin: "3px 0" }}><strong>To:</strong> {recipientName}</p>
-        <p style={{ fontSize: "16px", margin: "3px 0" }}><strong>From:</strong> {senderName}</p>
-        {recipientEmail && <p style={{ fontSize: "14px", color: "#555", margin: "2px 0" }}><strong>Email:</strong> {recipientEmail}</p>}
-        {recipientPhone && <p style={{ fontSize: "14px", color: "#555", margin: "2px 0" }}><strong>Phone:</strong> {recipientPhone}</p>}
-        {providerName && <p style={{ fontSize: "14px", color: "#555", margin: "2px 0" }}><strong>Provider:</strong> {providerName}</p>}
+      <div className="w-full text-left mb-6 space-y-1">
+        <p className="text-gray-800 font-medium"><strong>To:</strong> {recipientName}</p>
+        <p className="text-gray-800 font-medium"><strong>From:</strong> {senderName}</p>
+        {recipientEmail && <p className="text-gray-500 text-sm"><strong>Email:</strong> {recipientEmail}</p>}
+        {recipientPhone && <p className="text-gray-500 text-sm"><strong>Phone:</strong> {recipientPhone}</p>}
+        {providerName && <p className="text-gray-500 text-sm"><strong>Provider:</strong> {providerName}</p>}
       </div>
 
       {/* Gift Code Box */}
-      <div
-        style={{
-          width: "90%",
-          padding: "15px 20px",
-          backgroundColor: "#fff8f0",
-          border: "2px dashed #D4AF37",
-          borderRadius: "12px",
-          textAlign: "center",
-          marginBottom: "20px",
-          boxShadow: "inset 0 0 10px rgba(212,175,55,0.2)",
-        }}
-      >
-        <p style={{ fontSize: "18px", color: "#D4AF37", margin: "0", fontWeight: "600" }}>🎉 Gift Code</p>
-        <p style={{ fontSize: "32px", fontWeight: "700", margin: "8px 0 0" }}>{code}</p>
+      <div className="w-full bg-[#fff4e6] border-2 border-dashed border-[#D4AF37] rounded-xl py-4 flex flex-col items-center mb-6 shadow-inner">
+        <p className="text-[#D4AF37] font-semibold text-lg">🎉 Gift Code</p>
+        <p className="text-3xl font-bold text-[#1c2b21] mt-1">{code}</p>
       </div>
 
       {/* Service Info */}
-      <div style={{ width: "100%", textAlign: "left", marginBottom: "20px" }}>
-        <p style={{ margin: "4px 0", fontSize: "15px", color: "#555" }}><strong>Service Provider:</strong> {serviceProvider}</p>
-        <p style={{ margin: "4px 0", fontSize: "15px", color: "#555" }}><strong>Service Title:</strong> {serviceTitle}</p>
-        <p style={{ margin: "4px 0", fontSize: "15px", color: "#555" }}><strong>Category:</strong> {serviceCategory}</p>
-        <p style={{ margin: "4px 0", fontSize: "15px", color: "#555" }}><strong>Location:</strong> {serviceLocation}</p>
-        <p style={{ marginTop: "10px", fontStyle: "italic", fontSize: "14px", color: "#666" }}>
-          {message || "No personal message included."}
-        </p>
+      <div className="w-full text-left mb-6 space-y-1">
+        <p className="text-gray-600 text-sm"><strong>Service Provider:</strong> {serviceProvider}</p>
+        <p className="text-gray-600 text-sm"><strong>Service Title:</strong> {serviceTitle}</p>
+        <p className="text-gray-600 text-sm"><strong>Category:</strong> {serviceCategory}</p>
+        <p className="text-gray-600 text-sm"><strong>Location:</strong> {serviceLocation}</p>
+        <p className="mt-2 text-gray-500 italic text-sm">{message || "No personal message included."}</p>
       </div>
 
       {/* Footer */}
-      <div
-        style={{
-          width: "100%",
-          paddingTop: "15px",
-          borderTop: "1px solid #D4AF37",
-          textAlign: "center",
-        }}
-      >
-        <p style={{ margin: "3px 0", fontSize: "14px", color: "#1c2b21", fontWeight: "600" }}>
-          <a href="https://wanawhealthandwellness.netlify.app/" target="_blank" style={{ color: "#D4AF37", textDecoration: "none" }}>www.wanawhealthandwellness.netlify.app</a>
+      <div className="w-full border-t border-[#D4AF37] pt-4 text-center space-y-1">
+        <p className="text-[#1c2b21] font-semibold text-sm">
+          <a href="https://wanawhealthandwellness.netlify.app/" target="_blank" className="text-[#D4AF37] hover:underline">
+            www.wanawhealthandwellness.netlify.app
+          </a>
         </p>
-        <p style={{ margin: "3px 0", fontSize: "14px", color: "#1c2b21" }}>📞 +251 912 345 678</p>
-        <p style={{ margin: "3px 0", fontSize: "14px", color: "#1c2b21" }}>✉️ info@wanaw.com</p>
+        <p className="text-[#1c2b21] text-sm">📞  +251-989-177-777</p>
+        <p className="text-[#1c2b21] text-sm">✉️ info@wanaw.com</p>
       </div>
     </div>
   );

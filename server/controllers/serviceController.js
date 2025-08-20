@@ -179,7 +179,7 @@ exports.deleteService = async (req, res) => {
 };
 
 exports.updateServiceStatus = async (req, res) => {
-  const { status } = req.body;
+  const { status, checkInDate, checkOutDate, guests, roomPref } = req.body;
 
   if (!["approved", "denied"].includes(status)) {
     return res.status(400).json({ msg: "Invalid status. Must be 'approved' or 'denied'" });
@@ -192,11 +192,20 @@ exports.updateServiceStatus = async (req, res) => {
     service.status = status;
     await service.save();
 
+    // Only create hotel availability if service is a hotel
+    if (service.category === "Hotel Rooms") {
+      await HotelAvailability.create({
+        serviceId: service._id,
+        checkInDate: new Date(checkInDate),
+        checkOutDate: new Date(checkOutDate),
+        guests: guests || 1,
+        roomPref: roomPref || "Any",
+      });
+    }
+
     res.json({ msg: `Service ${status}`, service });
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Failed to update service status" });
   }
 };
-
-

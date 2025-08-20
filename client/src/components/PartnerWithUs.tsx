@@ -6,7 +6,19 @@ export default function PartnerWithUs() {
   const [tab, setTab] = useState<"Investor" | "Strategic Partner" | "Co Branding">("Investor");
 
   const investmentOptions = ["Equity", "Debt", "Convertible Bonds"];
-  const sectorOptions = ["Bank", "Hotel", "Business Company", "NGOs", "Health Sectors"];
+ const sectorOptions = [
+  "Technology",
+  "Healthcare",
+  "Finance",
+  "Manufacturing",
+  "Real Estate",
+  "Education",
+  "Hospitality & Tourism",
+  "Agriculture",
+  "Media & Entertainment",
+  "Construction"
+];
+
 
   const [formData, setFormData] = useState({
     investmentType: "",

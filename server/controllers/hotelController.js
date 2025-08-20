@@ -1,50 +1,58 @@
-const HotelRoom = require('../models/HotelRoom');
+const HotelAvailability = require("../models/HotelAvailability");
+const Service = require("../models/Service");
+const User = require("../models/User"); // optional, for notifications
 
+// POST /hotel/check-availability
 exports.checkAvailability = async (req, res) => {
   try {
-    const { checkInDate, checkOutDate, guests, roomPref } = req.body;
+    const { serviceId, checkInDate, checkOutDate, guests, roomPref, userId } = req.body;
 
-    if (!checkInDate || !checkOutDate || !guests) {
-      return res.status(400).json({ status: 'Error', message: 'Missing required fields' });
+    if (!serviceId || !checkInDate || !checkOutDate || !userId) {
+      return res.status(400).json({ msg: "Missing required fields" });
     }
 
-    // Find rooms matching preference & capacity
-    const rooms = await HotelRoom.find({
-      capacity: { $gte: guests },
-      ...(roomPref ? { type: roomPref } : {})
+    const service = await Service.findById(serviceId);
+    if (!service) return res.status(404).json({ msg: "Service not found" });
+
+    const inDate = new Date(checkInDate);
+    const outDate = new Date(checkOutDate);
+    if (outDate <= inDate) {
+      return res.status(400).json({ msg: "Check-out must be after check-in" });
+    }
+
+    // Check existing approved bookings
+    const overlapping = await HotelAvailability.find({
+      serviceId,
+      status: "approved",
+      $or: [
+        { checkInDate: { $lt: outDate }, checkOutDate: { $gt: inDate } },
+      ],
     });
 
-    if (!rooms.length) {
-      return res.json({
-        status: 'Booked',
-        availableRooms: 0,
-        message: 'No rooms match the search criteria'
-      });
-    }
+    const totalRooms = service.subcategory?.includes("Room") ? 10 : 1;
+    const availableRooms = Math.max(totalRooms - overlapping.length, 0);
 
-    // Check date overlaps
-    const availableRoom = rooms.find(room => {
-      return !room.bookedDates.some(booking =>
-        !(new Date(checkOutDate) <= booking.checkIn || new Date(checkInDate) >= booking.checkOut)
-      );
+    // If rooms available, create a pending request
+    const newRequest = await HotelAvailability.create({
+      serviceId,
+      userId,
+      checkInDate: inDate,
+      checkOutDate: outDate,
+      guests: guests || 1,
+      roomPref: roomPref || "Any",
+      status: "pending",
     });
 
-    if (availableRoom) {
-      return res.json({
-        status: 'Available',
-        availableRooms: 1,
-        roomType: availableRoom.type,
-        message: 'Room is available'
-      });
-    } else {
-      return res.json({
-        status: 'Booked',
-        availableRooms: 0,
-        message: 'No rooms available for the selected dates'
-      });
-    }
+    // TODO: Send notification to the service provider (email, SMS, or push)
+    console.log(`Notify provider for request ID: ${newRequest._id}`);
+
+    res.json({
+      msg: "Request sent to provider for approval",
+      request: newRequest,
+      availableRooms,
+    });
   } catch (err) {
-    console.error('Availability check error:', err);
-    res.status(500).json({ status: 'Error', message: 'Server error' });
+    console.error(err);
+    res.status(500).json({ msg: "Error checking availability" });
   }
 };

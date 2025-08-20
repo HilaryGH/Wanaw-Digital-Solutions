@@ -84,7 +84,7 @@ const AppWrapper = () => {
         <Route path="/oauth-success" element={<OAuthSuccessRedirect />} />
         <Route path="/gifting-options" element={<GiftingOptions />} />
         <Route path="/services" element={<ServiceList />} />
-        <Route path="/membership" element={<SelectMembership />} />
+        <Route path="/membership/select" element={<SelectMembership/>} />
         
         <Route path="/cart" element={<CartPage />} />
         <Route path="/send-gift" element={<SendGiftForm />} />
@@ -98,9 +98,6 @@ const AppWrapper = () => {
         <Route path="/individual-dashboard" element={<IndividualDashboard />} />
         <Route path="/provider-dashboard" element={<ProviderDashboard />} />
         <Route path="/diaspora-dashboard" element={<DiasporaDashboard/>} />
-
-        
-
         <Route path="/payment-options" element={<PaymentOptions />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />

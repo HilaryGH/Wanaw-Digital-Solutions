@@ -55,6 +55,43 @@ type AvailabilityResponse = {
   ticketId?: string; // when request routed to support
 };
 
+const hotelRoomSubcategories = [
+  {
+    label: "3 Star Hotel",
+    options: [
+      "Standard Room",
+      "Deluxe Room",
+      "Twin Room",
+      "Suit Room",
+      "Royal Suite Room",
+    ],
+  },
+  {
+    label: "4 Star Hotel",
+    options: [
+      "Standard Room",
+      "Deluxe Room",
+      "Twin Room",
+      "Suit Room",
+      "Royal Suite Room",
+    ],
+  },
+  {
+    label: "5 Star Hotel",
+    options: [
+      "Standard Room",
+      "Deluxe Room",
+      "Twin Room",
+      "Suit Room",
+      "Royal Suite Room",
+      "Presidential Room",
+    ],
+  },
+  {
+    label: "Pensions",
+    options: ["Standard Pension Room"],
+  },
+];
 /* ------------------------- Helper utilities ------------------------ */
 function parseDateAsLocal(dateString: string) {
   // dateString expected as YYYY-MM-DD
@@ -143,7 +180,7 @@ const [recipients, setRecipients] = useState<Recipient[]>([
   /* ------------------ Hotel availability states ------------------ */
   const [checkInDate, setCheckInDate] = useState<string>("");
   const [checkOutDate, setCheckOutDate] = useState<string>("");
-  const [guests, setGuests] = useState<number>(1);
+  const [guests] = useState<number>(1);
   const [roomPref, setRoomPref] = useState<string>("Any");
 
   const [contactEmail, setContactEmail] = useState<string>("");
@@ -483,26 +520,25 @@ const [recipients, setRecipients] = useState<Recipient[]>([
               className="w-full p-3 border border-gray-300 rounded-lg mb-4"
             />
 
-            <label className="block mb-2 font-medium text-[#1c2b21]">Number of Guests</label>
-            <input
-              type="number"
-              min={1}
-              value={guests}
-              onChange={(e) => setGuests(Number(e.target.value))}
-              className="w-full p-3 border border-gray-300 rounded-lg mb-4"
-            />
 
             <label className="block mb-2 font-medium text-[#1c2b21]">Room Preference</label>
-            <select
-              value={roomPref}
-              onChange={(e) => setRoomPref(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg mb-4"
-            >
-              <option>Any</option>
-              <option>Single</option>
-              <option>Double</option>
-              <option>Suite</option>
-            </select>
+<select
+  value={roomPref}
+  onChange={(e) => setRoomPref(e.target.value)}
+  className="w-full p-3 border border-gray-300 rounded-lg mb-4"
+>
+  <option value="">Any</option>
+  {hotelRoomSubcategories.map((category, idx) => (
+    <optgroup key={idx} label={category.label}>
+      {category.options.map((option, i) => (
+        <option key={i} value={option}>
+          {option}
+        </option>
+      ))}
+    </optgroup>
+  ))}
+</select>
+
 
             <p className="mt-2 mb-2 text-sm text-gray-600">Contact (so we can notify you):</p>
             <input
@@ -777,12 +813,14 @@ const [recipients, setRecipients] = useState<Recipient[]>([
 )}
 
 
-            <button
-              onClick={handlePayAndSend}
-              className="w-full bg-[#1c2b21] text-white py-2 rounded hover:bg-[#151e18] transition"
-            >
-              Pay&nbsp;&amp;&nbsp;Send Gift
-            </button>
+           <button
+  onClick={handlePayAndSend}
+  disabled={hotelCategory && !availabilityVerified && !proceedAnyway}
+  className="w-full bg-[#1c2b21] text-white py-2 rounded hover:bg-[#151e18] transition"
+>
+  Pay&nbsp;&amp;&nbsp;Send Gift
+</button>
+
           </div>
         )
       </div>

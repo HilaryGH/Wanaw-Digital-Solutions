@@ -1,209 +1,139 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import BASE_URL from "../api/api";
 
 type Gift = {
   _id: string;
   title: string;
-  category: string;
+  category: "corporate" | "individual";
   occasion?: string;
 };
 
 const GiftingOptions = () => {
-  const [corporateGifts, setCorporateGifts] = useState<Gift[]>([]);
-  const [individualGifts, setIndividualGifts] = useState<Gift[]>([]);
-  const [selectedCorporateGift, setSelectedCorporateGift] = useState("");
-  const [selectedIndividualGift, setSelectedIndividualGift] = useState("");
-  const [selectedDiasporaGift, setSelectedDiasporaGift] = useState("");
+  const [gifts, setGifts] = useState<Gift[]>([]);
+  const [selectedGift, setSelectedGift] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<"corporate" | "individual" | "diaspora" | "">("");
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Set category from query param on mount
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const type = params.get("type");
+    if (type === "individual" || type === "corporate" || type === "diaspora") {
+      setSelectedCategory(type);
+    }
+  }, [location.search]);
 
   useEffect(() => {
-  const fetchGifts = async () => {
-    try {
-      const res = await fetch(`${BASE_URL}/gift`);
-      if (!res.ok) throw new Error("Failed to fetch gifts");
-      const data: Gift[] = await res.json();
+    const fetchGifts = async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/gift`);
+        if (!res.ok) throw new Error("Failed to fetch gifts");
+        const data: Gift[] = await res.json();
+        setGifts(data);
+      } catch (err) {
+        console.error("Error fetching gifts:", err);
+      }
+    };
+    fetchGifts();
+  }, []);
 
-      const getUniqueByTitle = (gifts: Gift[]) => {
-        const seen = new Set<string>();
-        return gifts.filter(g => (seen.has(g.title) ? false : seen.add(g.title)));
-      };
+  const categories: Array<"corporate" | "individual" | "diaspora"> = ["corporate", "individual", "diaspora"];
 
-      const sortByTitle = (gifts: Gift[]) => {
-        return gifts.sort((a, b) => a.title.localeCompare(b.title));
-      };
-
-      const safeFilter = (gifts: Gift[], category: string) =>
-        gifts.filter(g => g.category?.toLowerCase() === category);
-
-      setCorporateGifts(
-        sortByTitle(getUniqueByTitle(safeFilter(data, "corporate")))
-      );
-
-      setIndividualGifts(
-        sortByTitle(getUniqueByTitle(safeFilter(data, "individual")))
-      );
-    } catch (err) {
-      console.error("Error fetching gifts:", err);
+  const filteredGifts = (category: typeof categories[number]) => {
+    if (category === "diaspora") {
+      return gifts.filter(g => g.category === "individual");
     }
+    return gifts.filter(g => g.category === category);
   };
-
-  fetchGifts();
-}, []);
-
-
 
   const slugify = (text: string) =>
     text.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
 
+  const handleProceed = () => {
+    if (!selectedGift || !selectedCategory) {
+      alert("Please select a gift and category.");
+      return;
+    }
+    navigate(`/gifts/${slugify(selectedGift)}`);
+  };
+
   return (
-    <section className="min-h-screen bg-gradient-to-b from-[#f3f4f6] to-[#fefefe] py-24 px-6 sm:px-10 md:px-20">
-      <div className="max-w-6xl mx-auto text-center">
-        <h1 className="text-4xl md:text-5xl font-bold text-[#1c2b21] mb-4">
-          Select a Gifting Experience
-        </h1>
-        <p className="text-gray-600 text-lg mb-14">
-          Whether you're honoring a corporate milestone, celebrating a personal
-          memory, or surprising loved ones in Ethiopia, we've got something special
-          for every occasion.
+    <div className="min-h-screen flex items-center justify-center bg-[#FFF8E1] p-6">
+      <div className="w-full max-w-md bg-zinc-50 shadow-3xl rounded-2xl p-8 relative overflow-hidden">
+        <div className="absolute -top-16 -left-16 w-40 h-40 bg-gradient-to-br from-[#D4AF37] to-[#1c2b21] rounded-full opacity-20 animate-spin-slow"></div>
+        <div className="absolute -bottom-16 -right-16 w-60 h-60 bg-gradient-to-tr from-[#D4AF37] to-[#1c2b21] rounded-full opacity-20 animate-pulse"></div>
+
+        <div className="absolute -top-5 left-5 bg-[#D4AF37] text-white text-xs px-3 py-1 rounded-full shadow-md z-10">
+          Wanaw Member Access
+        </div>
+
+        <div className="flex justify-center mb-6 mt-4 relative z-10">
+          <img src="/WHW.jpg" alt="Wanaw Logo" className="h-16 w-16 rounded-full object-cover" />
+        </div>
+
+        <h2 className="text-2xl font-bold text-[#1c2b21] mb-4 text-center relative z-10">
+          Select a Gift
+        </h2>
+        <p className="text-center text-gray-600 mb-6 relative z-10">
+          Choose a gift for Corporate, Individual, or Ethiopian Diaspora.
         </p>
 
-        {/* GRID → 3‑column row on md+, stacks on small */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-14">
-          {/* ─── Corporate ─────────────────────────────── */}
-          <div className="bg-[#1c2b21] text-gold p-10 rounded-3xl shadow-xl hover:shadow-2xl transition duration-300 transform hover:scale-[1.015] relative z-10">
-            <h3 className="text-2xl font-semibold mb-3 text-center">
-              Corporate&nbsp;Gifting
-            </h3>
-            <p className="text-gold text-sm mb-6 text-center">
-              Thoughtful gifts that strengthen business relationships —
-              perfect for teams, partners, and clients.
-            </p>
+        <select
+          value={selectedCategory}
+          onChange={(e) => {
+            setSelectedCategory(e.target.value as typeof categories[number]);
+            setSelectedGift("");
+          }}
+          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-[#1c2b21] transition mb-4 text-gray-700 font-medium relative z-10"
+        >
+          <option value="">-- Select Category --</option>
+          {categories.map(cat =>
+            filteredGifts(cat).length > 0 ? (
+              <option key={cat} value={cat}>
+                {cat === "diaspora" ? "Ethiopian Diaspora" : cat.charAt(0).toUpperCase() + cat.slice(1)}
+              </option>
+            ) : null
+          )}
+        </select>
 
-            <label htmlFor="corporateGift" className="block mb-2 text-sm font-medium">
-              Select a Gift:
-            </label>
-            <select
-              id="corporateGift"
-              value={selectedCorporateGift}
-              onChange={e => setSelectedCorporateGift(e.target.value)}
-              className="w-full mt-1 mb-2 px-2 py-1 rounded-lg text-[13px] md:text-sm text-gray-700 bg-white border border-gray-300 focus:ring-2 focus:ring-green-400 focus:border-green-500 shadow-sm transition-all duration-200 ease-in-out"
-              style={{ minHeight: "50px" }}
-            >
-              <option value="">-- Choose Corporate Gift --</option>
-              {corporateGifts.map(g => (
-                <option key={g._id} value={g.title}>
-                  {g.title}
-                </option>
-              ))}
-            </select>
+        {selectedCategory && (
+          <select
+            value={selectedGift}
+            onChange={(e) => setSelectedGift(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-[#1c2b21] transition mb-6 text-gray-700 font-medium relative z-10"
+          >
+            <option value="">-- Choose Occasion --</option>
+            {filteredGifts(selectedCategory).map(g => (
+              <option key={g._id} value={g.title}>
+                {g.title}
+              </option>
+            ))}
+          </select>
+        )}
 
-            {selectedCorporateGift && (
-              <>
-                <p className="mt-2 text-[#d4af37] font-medium text-sm">
-                  ✅ Selected: {selectedCorporateGift}
-                </p>
-                <button
-                  onClick={() => navigate(`/gifts/${slugify(selectedCorporateGift)}`)}
-                  className="mt-5 w-full bg-[#d4af37] text-[#1c2b21] py-2.5 rounded-full shadow-md hover:rounded-md font-semibold transition duration-300"
-                >
-                  Continue to Details
-                </button>
-              </>
-            )}
-          </div>
+        <button
+          onClick={handleProceed}
+          className="w-full bg-gradient-to-r from-[#1c2b21] to-[#3c4f3b] text-[#D4AF37] font-semibold py-3 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transform transition-all relative z-10"
+        >
+          Continue
+        </button>
 
-          {/* ─── Individual ────────────────────────────── */}
-          <div className="bg-[#D4AF37] text-[#1c2b21] p-10 rounded-3xl shadow-xl hover:shadow-2xl transition duration-300 transform hover:scale-[1.015] relative z-10">
-            <h3 className="text-2xl font-semibold mb-3 text-center">
-              Individual&nbsp;Gifting
-            </h3>
-            <p className="text-gray-600 text-sm mb-6 text-center">
-              Celebrate birthdays, anniversaries, and every little win with
-              hand‑picked, heartfelt gifts.
-            </p>
-
-            <label htmlFor="individualGift" className="block mb-1 text-sm font-medium">
-              Select a Gift:
-            </label>
-            <select
-              id="individualGift"
-              value={selectedIndividualGift}
-              onChange={e => setSelectedIndividualGift(e.target.value)}
-              className="w-full mt-1 mb-1 px-1 py-1 rounded-lg text-[12px] md:text-sm text-gray-700 bg-white border border-gray-300 focus:ring-2 focus:ring-green-400 focus:border-green-500 shadow-sm transition-all duration-200 ease-in-out"
-              style={{ minHeight: "50px" }}
-            >
-              <option value="">-- Choose Individual Gift --</option>
-              {individualGifts.map(g => (
-                <option key={g._id} value={g.title}>
-                  {g.title}
-                </option>
-              ))}
-            </select>
-
-            {selectedIndividualGift && (
-              <>
-                <p className="mt-2 text-black font-medium text-sm">
-                  ✅ Selected: {selectedIndividualGift}
-                </p>
-                <button
-                  onClick={() => navigate(`/gifts/${slugify(selectedIndividualGift)}`)}
-                  className="mt-1 mb-2 px-2 py-1 w-full bg-[#1c2b21] text-gold  rounded-full shadow-md hover:rounded-md font-semibold transition duration-300"
-                >
-                  Continue to Details
-                </button>
-              </>
-            )}
-          </div>
-
-          {/* ─── Ethiopian Diaspora (re‑uses individual list) ─── */}
-          <div className="bg-green text-gold p-10 rounded-3xl shadow-xl hover:shadow-2xl transition duration-300 transform hover:scale-[1.015] relative z-10">
-            <h3 className="text-2xl font-semibold mb-3 text-center">
-              Ethiopian&nbsp;Diaspora
-            </h3>
-            <p className="text-[#FDF6E3]/80 text-sm mb-6 text-center">
-              Send a taste of home to friends and family in Ethiopia —
-              crafted with love and Ethiopian pride.
-            </p>
-
-            <label htmlFor="diasporaGift" className="block mb-1 text-sm font-medium">
-              Select a Gift:
-            </label>
-            <select
-              id="diasporaGift"
-              value={selectedDiasporaGift}
-              onChange={e => setSelectedDiasporaGift(e.target.value)}
-              className="w-full mt-1 mb-1 px-1 py-1 rounded-lg text-[12px] md:text-sm text-gray-700 bg-white border border-gray-300 focus:ring-2 focus:ring-green-400 focus:border-green-500 shadow-sm transition-all duration-200 ease-in-out"
-              style={{ minHeight: "50px" }}
-            >
-              <option value="">-- Choose Diaspora Gift --</option>
-              {individualGifts.map(g => (
-                <option key={g._id} value={g.title}>
-                  {g.title}
-                </option>
-              ))}
-            </select>
-
-            {selectedDiasporaGift && (
-              <>
-                <p className="mt-2 text-[#FDF6E3] font-medium text-sm">
-                  ✅ Selected: {selectedDiasporaGift}
-                </p>
-                <button
-                  onClick={() => navigate(`/gifts/${slugify(selectedDiasporaGift)}`)}
-                  className="mt-5 w-full bg-[#FDF6E3] text-[#254E70] py-2.5 rounded-full shadow-md hover:rounded-md font-semibold transition duration-300"
-                >
-                  Continue to Details
-                </button>
-              </>
-            )}
-          </div>
-        </div>
+        <p className="text-center text-gray-400 mt-4 text-sm relative z-10">
+          Your selection is secure and will be processed safely.
+        </p>
       </div>
-    </section>
+    </div>
   );
 };
 
 export default GiftingOptions;
+
+
+
+
+
+
 
 
