@@ -237,16 +237,19 @@ const [recipients, setRecipients] = useState<Recipient[]>([
 
     setCheckingAvailability(true);
 
-    const payload: AvailabilityPayload = {
-      serviceId: service._id,
-      checkInDate,
-      checkOutDate,
-      guests,
-      roomPref,
-      contactEmail,
-      contactWhatsApp,
-      contactTelegram,
-    };
+
+// prepare payload for availability
+const payload: AvailabilityPayload = {
+  serviceId: service._id,
+  checkInDate,
+  checkOutDate,
+  guests,
+  roomPref,
+  contactEmail,
+  contactWhatsApp,
+  contactTelegram,
+};
+
 
     try {
       const res = await fetch(`${BASE_URL}/hotel/check-availability`, {

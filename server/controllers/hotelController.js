@@ -7,7 +7,8 @@ exports.checkAvailability = async (req, res) => {
   try {
     const { serviceId, checkInDate, checkOutDate, guests, roomPref, userId } = req.body;
 
-    if (!serviceId || !checkInDate || !checkOutDate || !userId) {
+    // userId is optional now
+    if (!serviceId || !checkInDate || !checkOutDate) {
       return res.status(400).json({ msg: "Missing required fields" });
     }
 
@@ -32,10 +33,10 @@ exports.checkAvailability = async (req, res) => {
     const totalRooms = service.subcategory?.includes("Room") ? 10 : 1;
     const availableRooms = Math.max(totalRooms - overlapping.length, 0);
 
-    // If rooms available, create a pending request
+    // Create a pending request
     const newRequest = await HotelAvailability.create({
       serviceId,
-      userId,
+      userId: userId || null, // allow null for guests
       checkInDate: inDate,
       checkOutDate: outDate,
       guests: guests || 1,
@@ -43,13 +44,13 @@ exports.checkAvailability = async (req, res) => {
       status: "pending",
     });
 
-    // TODO: Send notification to the service provider (email, SMS, or push)
     console.log(`Notify provider for request ID: ${newRequest._id}`);
 
     res.json({
       msg: "Request sent to provider for approval",
       request: newRequest,
       availableRooms,
+      status: availableRooms > 0 ? "Available" : "Booked", // optional convenience
     });
   } catch (err) {
     console.error(err);
