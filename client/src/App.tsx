@@ -61,8 +61,9 @@ import MembershipLookup from "./components/MembershipLookup";
 import AdminGiftCodes from "./components/Dashbords/Admin/AdminGiftCodes";
 
 import RegisteredPartners from "./components/RegisteredPartners";
-import DiasporaDashboard from "./components/Dashbords/Diaspora/DiasporaDashboard";
+
 import ReferralsDashboard from "./components/Dashbords/Admin/ReferralsDashboard";
+import DiasporaDashboard from "./components/Dashbords/Diaspora/DiasporaDashboard";
 
 
 
@@ -96,7 +97,7 @@ const AppWrapper = () => {
         <Route path="/blogs/:slug" element={<BlogDetail />} />
         <Route path="/individual-dashboard" element={<IndividualDashboard />} />
         <Route path="/provider-dashboard" element={<ProviderDashboard />} />
-        <Route path="/diaspora-dashboard" element={<DiasporaDashboard />} />
+        <Route path="/diaspora-dashboard" element={<DiasporaDashboard/>} />
 
         
 
@@ -170,7 +171,6 @@ const AppWrapper = () => {
 
 
 
-        {/* 🔐 Admin-only routes */}
     {/* 🔐 Super Admin Only */}
 <Route
   path="/admin/manage-membership"
