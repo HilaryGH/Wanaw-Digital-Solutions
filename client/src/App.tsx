@@ -216,6 +216,15 @@ const AppWrapper = () => {
   }
 />
 <Route
+  path="/admin/gift-list-confirm"
+  element={
+    <PrivateRoute requiredRole="super_admin">
+      <GiftListAndConfirm/>
+    </PrivateRoute>
+  }
+/>
+
+<Route
   path="/admin/subscrpition-list"
   element={
     <PrivateRoute requiredRole="super_admin">

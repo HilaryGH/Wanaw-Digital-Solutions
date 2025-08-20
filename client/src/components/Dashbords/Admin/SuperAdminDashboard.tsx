@@ -116,6 +116,12 @@ export default function SuperAdminDashboard() {
       route: "/admin/referal-code",
       color: "bg-pink-100",
     },
+    {
+      title: "gift-list",
+      description: "Review gifts ",
+      route: "/admin/gift-list-confirm",
+      color: "bg-pink-100",
+    },
   ];
 
   return (

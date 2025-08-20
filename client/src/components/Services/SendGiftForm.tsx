@@ -437,6 +437,11 @@ const [recipients, setRecipients] = useState<Recipient[]>([
   const hotelCategory = service.category === "Hotel Rooms";
   const availabilityVerified = availability?.status === "Available";
 
+  const totalAmount = service.price
+  ? (service.price * (hotelCategory ? nights : 1) * recipients.length)
+  : 0;
+
+
   return (
     <div className="max-w-lg mx-auto bg-white shadow-xl rounded-2xl overflow-hidden my-10">
       <div className="p-6 sm:p-8">
@@ -765,11 +770,12 @@ const [recipients, setRecipients] = useState<Recipient[]>([
               </div>
             )}
 
-            {service.price !== undefined && (
-              <p className="text-right text-gray-700 mb-4">
-                <span className="font-semibold">Total:</span> {service.price.toLocaleString()} ETB
-              </p>
-            )}
+           {service.price !== undefined && (
+  <p className="text-right text-gray-700 mb-4">
+    <span className="font-semibold">Total:</span> {totalAmount.toLocaleString()} ETB
+  </p>
+)}
+
 
             <button
               onClick={handlePayAndSend}

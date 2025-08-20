@@ -2,6 +2,8 @@ import { useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import BASE_URL from "../../api/api";
 import DownloadableInvoice from "../Services/DownloadableInvoice";
+import BasicGiftCard from "../BasicGiftCard";
+import VipGiftCard from "../VipGiftCard";
 
 const PaymentOptions = () => {
   const { state } = useLocation();
@@ -32,46 +34,51 @@ const PaymentOptions = () => {
 
   // ✅ Compute invoice total (matches DownloadableInvoice)
   const invoiceTotal = isCartPayment
-    ? cart.reduce((sum: number, item: any) => sum + (item.price * (item.quantity || 1)), 0)
+    ? cart.reduce(
+        (sum: number, item: any) => sum + item.price * (item.quantity || 1),
+        0
+      )
     : amount || 0;
 
   // ✅ Assign gift code from backend
-  useEffect(() => {
-    if (!isGiftPayment) return;
+useEffect(() => {
+  if (!isGiftPayment) return;
 
-    const assignGiftCode = async () => {
-      const token = localStorage.getItem("token");
-      const giftId = recipients[0]?._id;
-      if (!giftId) return;
+  const fetchGiftWithCode = async () => {
+    const token = localStorage.getItem("token");
+    const giftId = recipients[0]?.giftId; // Make sure you pass gift._id here
+    if (!giftId) return;
 
-      try {
-        const res = await fetch(`${BASE_URL}/gift/${giftId}/assign-delivery-code`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-          body: JSON.stringify({
-            recipient: recipients[0],
-            service,
-            senderName: buyerFullName,
-            message: providerMessage,
-          }),
-        });
+    try {
+      const res = await fetch(`${BASE_URL}/gift/${giftId}/assign-delivery-code`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: JSON.stringify({
+          recipient: recipients[0],
+          serviceId: service?._id,
+          senderName: buyerFullName,
+          message: providerMessage,
+        }),
+      });
 
-        const data = await res.json();
-        if (res.ok && data.code) {
-          setGiftCode(data.code); // 🎁 Set the actual gift code
-        } else {
-          console.error("Failed to assign gift code:", data);
-        }
-      } catch (err) {
-        console.error("Error assigning gift code:", err);
+      const data = await res.json();
+
+      if (res.ok && data.code) {
+        setGiftCode(data.code);
+      } else {
+        console.error("Gift code API error:", data);
       }
-    };
+    } catch (err) {
+      console.error("Error fetching gift code:", err);
+    }
+  };
 
-    assignGiftCode();
-  }, [isGiftPayment, recipients, service, buyerFullName, providerMessage]);
+  fetchGiftWithCode();
+}, [isGiftPayment, recipients, service, buyerFullName, providerMessage]);
+
 
   const handleChapaPayment = async () => {
     const token = localStorage.getItem("token");
@@ -152,6 +159,37 @@ const PaymentOptions = () => {
         }
       />
 
+      {/* 🎁 Conditionally render Gift Card */}
+{isGiftPayment && (
+  <div className="my-6 flex justify-center">
+    {recipients[0]?.type === "vip" ? (
+      <VipGiftCard
+        recipientName={recipients[0]?.name || "Recipient"}
+        code={giftCode || "Generating..."}
+        senderName={buyerFullName}
+        serviceTitle={service?.title || "Unknown Service"}
+        serviceCategory={service?.category || "Unknown Category"}
+        serviceProvider={service?.provider?.name || "Unknown Provider"}
+        serviceLocation={service?.location || "Unknown Location"}
+        message={providerMessage || "No personal message"}
+      />
+
+    ) : (
+      <BasicGiftCard
+  recipientName={recipients[0]?.name || "Recipient"}
+  code={giftCode || "Generating..."}
+  senderName={buyerFullName}      // ❌ This is not defined in BasicGiftCardProps
+  serviceTitle={service?.title}
+  serviceCategory={service?.category}
+  serviceProvider={service?.provider?.name || "Not specified"}
+  serviceLocation={service?.location || "Not specified"}
+  message={providerMessage || recipients[0]?.message}
+/>
+
+    )}
+  </div>
+)}
+
       {/* Payment summary */}
       <h2 className="text-2xl font-bold mb-4">Choose Payment Method</h2>
 
@@ -161,7 +199,7 @@ const PaymentOptions = () => {
             Items in Cart: <strong>{cart.length}</strong>
           </p>
           <p className="mb-4">
-            Total Amount: <strong>{invoiceTotal} ETB</strong> {/* ✅ consistent total */}
+            Total Amount: <strong>{invoiceTotal} ETB</strong>{" "}
           </p>
         </>
       ) : isGiftPayment ? (
@@ -170,7 +208,7 @@ const PaymentOptions = () => {
             Gift Item: <strong>{service?.title}</strong>
           </p>
           <p className="mb-4">
-            Total Amount: <strong>{invoiceTotal} ETB</strong> {/* ✅ consistent total */}
+            Total Amount: <strong>{invoiceTotal} ETB</strong>{" "}
           </p>
         </>
       ) : (
@@ -181,27 +219,55 @@ const PaymentOptions = () => {
       <div className="grid gap-4 grid-cols-1">
         {[
           { text: "Pay with Telebirr", img: "/telebirr.png", onClick: null },
-          { text: "Pay with Bank Transfer", img: "/assets/telebirr.png", onClick: null },
+          {
+            text: "Pay with Bank Transfer",
+            img: "/assets/telebirr.png",
+            onClick: null,
+          },
           { text: "Pay with Card", img: "/assets/telebirr.png", onClick: null },
-          { text: "Pay with Bank App", img: "/assets/telebirr.png", onClick: null },
-          { text: "Pay with Wallet", img: "/assets/telebirr.png", onClick: handleWalletPayment, bg: "bg-purple-700", hover: "hover:bg-purple-800", textColor: "text-white" },
-          { text: "Pay with Chapa", img: "/chapa.png", onClick: handleChapaPayment, bg: "bg-green-600", hover: "hover:bg-green-700", textColor: "text-white" },
-        ].map(({ text, img, onClick, bg = "bg-green", hover = "", textColor = "text-gold" }, i) => (
-          <button
-            key={i}
-            onClick={onClick || undefined}
-            className={`payment-button ${bg} ${textColor} ${hover}`}
-          >
-            <img src={img} className="h-6 w-auto mr-2" />
-            {text}
-          </button>
-        ))}
+          {
+            text: "Pay with Bank App",
+            img: "/assets/telebirr.png",
+            onClick: null,
+          },
+          {
+            text: "Pay with Wallet",
+            img: "/assets/telebirr.png",
+            onClick: handleWalletPayment,
+            bg: "bg-purple-700",
+            hover: "hover:bg-purple-800",
+            textColor: "text-white",
+          },
+          {
+            text: "Pay with Chapa",
+            img: "/chapa.png",
+            onClick: handleChapaPayment,
+            bg: "bg-green-600",
+            hover: "hover:bg-green-700",
+            textColor: "text-white",
+          },
+        ].map(
+          (
+            { text, img, onClick, bg = "bg-green", hover = "", textColor = "text-gold" },
+            i
+          ) => (
+            <button
+              key={i}
+              onClick={onClick || undefined}
+              className={`payment-button ${bg} ${textColor} ${hover}`}
+            >
+              <img src={img} className="h-6 w-auto mr-2" />
+              {text}
+            </button>
+          )
+        )}
       </div>
     </div>
   );
 };
 
 export default PaymentOptions;
+
 
 
 

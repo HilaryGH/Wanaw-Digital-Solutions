@@ -18,6 +18,7 @@ type Purchase = {
   purchaseDate: string;
   deliveryDate?: string;
   extraInfo?: any;
+  giftCode?: string; // <- make sure this exists if backend sends it directly
 };
 
 const GiftListForProvider = () => {
@@ -51,12 +52,12 @@ const GiftListForProvider = () => {
           (p: Purchase) => p.itemType === "service"
         );
 
-        // Initialize giftCodes state
+        // Initialize giftCodes state with correct giftCode
         const initialGiftCodes: typeof giftCodes = {};
         servicePurchases.forEach((p: Purchase) => {
           initialGiftCodes[p._id] = {
-            _id: p.extraInfo?.giftId || "",        // Gift ID from backend
-            giftCode: p.extraInfo?.giftCode || "", // Pre-existing gift code if any
+            _id: p.extraInfo?.giftId || p._id,          // fallback to purchase _id
+            giftCode: p.extraInfo?.giftCode || p.giftCode || "", // try extraInfo first, then direct
           };
         });
 
@@ -122,9 +123,7 @@ const GiftListForProvider = () => {
 
   return (
     <div className="px-4 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-center">
-        Purchased Services
-      </h1>
+      <h1 className="text-2xl font-bold mb-4 text-center">Purchased Services</h1>
 
       <input
         type="text"
@@ -157,7 +156,10 @@ const GiftListForProvider = () => {
               </tr>
             ) : (
               filteredPurchases.map((p) => (
-                <tr key={p._id} className="border-t hover:bg-gray-50 transition">
+                <tr
+                  key={p._id}
+                  className="border-t hover:bg-gray-50 transition"
+                >
                   <td className="px-4 py-2">{p.itemId.title}</td>
                   <td className="px-4 py-2">{p.buyerName}</td>
                   <td className="px-4 py-2">{p.buyerEmail}</td>
@@ -185,7 +187,7 @@ const GiftListForProvider = () => {
                           setGiftCodes((prev) => ({
                             ...prev,
                             [p._id]: {
-                              _id: prev[p._id]?._id || "",
+                              _id: prev[p._id]?._id || p._id,
                               giftCode: e.target.value,
                             },
                           }))
