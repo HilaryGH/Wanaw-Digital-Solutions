@@ -19,36 +19,44 @@ const PaymentOptions = () => {
   const invoiceTotal = amount || 0;
 
   useEffect(() => {
-    if (!isGiftPayment) return;
+  if (!isGiftPayment) return;
 
-    const fetchGiftWithCode = async () => {
-      const giftId = recipients[0]?.giftId;
-      if (!giftId) return;
+  const fetchGiftWithCode = async () => {
+    const giftId = recipients[0]?.giftId;
+    if (!giftId) {
+      console.warn("No giftId found in recipients[0]");
+      return;
+    }
 
-      try {
-        const res = await fetch(
-          `${BASE_URL}/gift/${giftId}/assign-delivery-code`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              recipient: recipients[0],
-              serviceId: service?._id,
-              senderName: buyerFullName,
-              message: recipients[0]?.message || "",
-            }),
-          }
-        );
+    try {
+      const res = await fetch(`${BASE_URL}/gift/${giftId}/assign-delivery-code`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          recipient: recipients[0],
+          serviceId: service?._id,
+          senderName: buyerFullName,
+          message: recipients[0]?.message || "",
+        }),
+      });
 
-        const data = await res.json();
-        if (res.ok && data.code) setGiftCode(data.code);
-      } catch (err) {
-        console.error("Error fetching gift code:", err);
+      const data = await res.json();
+      console.log("Gift API response:", data);
+
+      if (res.ok && data.code) {
+        setGiftCode(data.code);
+      } else {
+        setGiftCode("Error: no code");
       }
-    };
+    } catch (err) {
+      console.error("Error fetching gift code:", err);
+      setGiftCode("Error: request failed");
+    }
+  };
 
-    fetchGiftWithCode();
-  }, [isGiftPayment, recipients, service, buyerFullName]);
+  fetchGiftWithCode();
+}, [isGiftPayment, recipients, service, buyerFullName]);
+
 
   const handleWalletPayment = () => alert("Wallet payment coming soon.");
   const handlePaymentRedirect = (method: string) => alert(`${method} payment coming soon.`);
@@ -59,6 +67,8 @@ const PaymentOptions = () => {
     { text: "Card", img: "/card.png", onClick: () => handlePaymentRedirect("Card") },
     { text: "Bank App", img: "/bankapp.png", onClick: () => handlePaymentRedirect("Bank App") },
     { text: "Wallet", img: "/wallet.png", onClick: handleWalletPayment, bg: "bg-[#1c2b21]", hover: "hover:bg-[#162118]", textColor: "text-[#D4AF37]" },
+    { text: "Chapa", img: "/chapa.png", onClick: handleWalletPayment, bg: "bg-[#1c2b21]", hover: "hover:bg-[#162118]", textColor: "text-[#D4AF37]" },
+
   ];
 
   return (
@@ -78,8 +88,6 @@ const PaymentOptions = () => {
               isGiftPayment
                 ? {
                     name: recipients[0]?.name,
-                    email: recipients[0]?.email,
-                    phone: recipients[0]?.phone,
                     message: recipients[0]?.message,
                     itemTitle: service?.title,
                     price: invoiceTotal,

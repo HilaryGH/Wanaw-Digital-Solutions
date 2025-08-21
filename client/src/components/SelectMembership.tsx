@@ -20,9 +20,17 @@ const SelectMembership = () => {
     }
   }, [token, navigate]);
 
-  const membershipOptions: Record<string, Record<string, number>> = {
-    user: { standard: 200, gold: 500, premium: 1000 },
-    provider: { basic: 300, Premium: 800 },
+  // Membership options (set free for active ones, disable others)
+  const membershipOptions: Record<string, { label: string; price: number; active: boolean }[]> = {
+    user: [
+      { label: "Standard", price: 0, active: true },
+      { label: "Gold", price: 500, active: false },
+      { label: "Premium", price: 1000, active: false },
+    ],
+    provider: [
+      { label: "Basic", price: 0, active: true },
+      { label: "Premium", price: 800, active: false },
+    ],
   };
 
   const handleProceed = () => {
@@ -31,9 +39,11 @@ const SelectMembership = () => {
       return;
     }
 
-    // Navigate to PaymentOptions page with state or query params
+    const chosenPlan = membershipOptions[role].find((p) => p.label === selected);
+    if (!chosenPlan) return;
+
     navigate(`/payment-options`, {
-      state: { selectedPlan: selected, role, price: membershipOptions[role][selected] },
+      state: { selectedPlan: selected, role, price: chosenPlan.price },
     });
   };
 
@@ -48,7 +58,9 @@ const SelectMembership = () => {
           Select Membership Plan
         </h2>
         <p className="text-center text-gray-600 mb-6">
-          {role === "user" ? "User Membership Options" : "Service Provider Membership Options"}
+          {role === "user"
+            ? "User Membership Options"
+            : "Service Provider Membership Options"}
         </p>
 
         <select
@@ -57,16 +69,25 @@ const SelectMembership = () => {
           className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-[#1c2b21] transition mb-6 text-gray-700 font-medium"
         >
           <option value="">-- Choose Plan --</option>
-          {Object.keys(membershipOptions[role]).map((plan) => (
-            <option key={plan} value={plan}>
-              {plan.charAt(0).toUpperCase() + plan.slice(1)} — {membershipOptions[role][plan]} ETB
+          {membershipOptions[role].map((plan) => (
+            <option
+              key={plan.label}
+              value={plan.label}
+              disabled={!plan.active}
+            >
+              {plan.label} — {plan.price === 0 ? "Free" : `${plan.price} ETB`}
             </option>
           ))}
         </select>
 
         <button
           onClick={handleProceed}
-          className="w-full bg-gradient-to-r from-[#1c2b21] to-[#3c4f3b] text-[#D4AF37] font-semibold py-3 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transform transition-all"
+          disabled={!selected}
+          className={`w-full font-semibold py-3 rounded-xl shadow-lg transform transition-all
+            ${selected
+              ? "bg-gradient-to-r from-[#1c2b21] to-[#3c4f3b] text-[#D4AF37] hover:shadow-2xl hover:scale-105"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"}
+          `}
         >
           Proceed to Payment
         </button>
@@ -80,4 +101,5 @@ const SelectMembership = () => {
 };
 
 export default SelectMembership;
+
 

@@ -642,6 +642,8 @@ fd.append("banks", JSON.stringify(providerForm.banks));
   <option value="Ahadu Bank">Ahadu Bank</option>
   <option value="Amhara Bank">Amhara Bank</option>
   <option value="Anbesa International Bank">Anbesa International Bank</option>
+  <option value="Awash International Bank">Awash International Bank</option>
+
   <option value="Bank of Abyssinia">Bank of Abyssinia</option>
   <option value="Berhan Bank">Berhan Bank</option>
   <option value="Buna Bank">Buna Bank</option>
@@ -681,7 +683,7 @@ fd.append("banks", JSON.stringify(providerForm.banks));
 
                 
   <label htmlFor="priceList" className="block text-sm font-medium text-gray-700 mb-1">
-    Price List / Quotation Document (PDF)
+    Service Price List / Quotation Document (PDF)
   </label>
   <input
     type="file"

@@ -4,7 +4,7 @@ import QRCode from "react-qr-code";
 
 interface GiftRecipient {
   name: string;
-  email: string;
+  email?: string;
   phone?: string;
   message?: string;
   itemTitle?: string;
@@ -155,8 +155,6 @@ const DownloadableInvoice = ({
         ) : giftRecipient ? (
           <div style={{ marginBottom: "1rem", fontSize: "0.875rem" }}>
             <p><strong>Gift Recipient:</strong> {giftRecipient.name} {giftRecipient.type === "vip" && "⭐ VIP"}</p>
-            <p><strong>Email:</strong> {giftRecipient.email}</p>
-            {giftRecipient.phone && <p><strong>Phone:</strong> {giftRecipient.phone}</p>}
             {giftRecipient.itemTitle && <p><strong>Gift Item:</strong> {giftRecipient.itemTitle}</p>}
             {giftRecipient.price !== undefined && <p><strong>Gift Price:</strong> {giftRecipient.price.toFixed(2)} ETB</p>}
             {giftRecipient.message && <p><strong>Message:</strong> {giftRecipient.message}</p>}
