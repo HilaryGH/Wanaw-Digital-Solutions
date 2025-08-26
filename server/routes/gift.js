@@ -5,9 +5,8 @@ const verifyToken = require("../middleware/verifyToken");
 
 const {
   createGift,
-  getGifts,
+  getAllGifts,
   deleteGift,
-  assignDeliveryCode,
   confirmGiftCode,
   getGiftsByService,  // ✅ updated
   getAllGiftCodes,
@@ -18,7 +17,7 @@ const {
 router.get("/codes", verifyToken, getAllGiftCodes);
 
 // ✅ Assign + confirm codes
-router.post("/:giftId/assign-delivery-code", assignDeliveryCode);
+
 router.post("/:giftId/confirm-gift", confirmGiftCode);
 router.get("/with-codes", getAllGiftsWithCodes);
 
@@ -26,11 +25,12 @@ router.get("/with-codes", getAllGiftsWithCodes);
 // ✅ Protected route for admins to create gifts
 router.post("/", verifyToken, createGift);
 
-// ✅ Get all gifts (optionally filter by serviceId in query)
-router.get("/", getGifts);
+
 
 // ✅ Delete gift
 router.delete("/:id", deleteGift);
+// Get all gifts
+router.get("/", getAllGifts);
 
 // ✅ Get gifts by service (instead of provider)
 router.get("/service/:serviceId", verifyToken, getGiftsByService);

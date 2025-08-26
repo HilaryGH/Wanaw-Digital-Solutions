@@ -124,3 +124,48 @@ exports.sendTelegram = async ({ chatId, message }) => {
   }
 };
 
+exports.sendMultiChannel = async ({ email, phone, whatsapp, telegram, subject, html, text }) => {
+  const results = {};
+
+  if (email) {
+    try {
+      await exports.sendEmail({ to: email, subject, html });
+      results.email = true;
+    } catch (err) {
+      console.error("Email failed:", err.message);
+      results.email = false;
+    }
+  }
+
+  if (phone) {
+    try {
+      await exports.sendSMS({ to: phone, message: text || subject });
+      results.sms = true;
+    } catch (err) {
+      console.error("SMS failed:", err.message);
+      results.sms = false;
+    }
+  }
+
+  if (whatsapp) {
+    try {
+      await exports.sendWhatsApp({ to: whatsapp, message: text || subject });
+      results.whatsapp = true;
+    } catch (err) {
+      console.error("WhatsApp failed:", err.message);
+      results.whatsapp = false;
+    }
+  }
+
+  if (telegram) {
+    try {
+      await exports.sendTelegram({ chatId: telegram, message: text || subject });
+      results.telegram = true;
+    } catch (err) {
+      console.error("Telegram failed:", err.message);
+      results.telegram = false;
+    }
+  }
+
+  return results;
+};

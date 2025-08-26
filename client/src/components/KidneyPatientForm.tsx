@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import type { ChangeEvent, FormEvent } from "react";
+import React, { useState, type ChangeEvent, type FormEvent } from "react";
 import BASE_URL from "../api/api";
 
 interface KidneyPatientFormData {
@@ -35,19 +34,20 @@ const KidneyPatientForm: React.FC = () => {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, files } = e.target;
     if (!files) return;
     if (name === "videos") {
-      setFormData((prev) => ({ ...prev, videos: files }));
+      setFormData(prev => ({ ...prev, videos: files }));
     } else {
-      setFormData((prev) => ({ ...prev, [name]: files[0] }));
+      setFormData(prev => ({ ...prev, [name]: files[0] }));
     }
   };
 
@@ -55,38 +55,54 @@ const KidneyPatientForm: React.FC = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
-
-    const form = new FormData();
-    form.append("name", formData.name);
-    form.append("age", formData.age);
-    form.append("phone", formData.phone);
-    form.append("whatsapp", formData.whatsapp);
-    form.append("telegram", formData.telegram);
-    form.append("email", formData.email);
-    form.append("facility", formData.facility);
-    form.append("location", formData.location);
-    form.append("message", formData.message);
-
-    if (formData.idDocument) form.append("idDocument", formData.idDocument);
-    if (formData.medicalCertificate) form.append("medicalCertificate", formData.medicalCertificate);
-    if (formData.videos) {
-      Array.from(formData.videos).forEach((video) => {
-        form.append("videos", video);
-      });
-    }
+    setLoading(true);
 
     try {
+      const form = new FormData();
+      form.append("name", formData.name);
+      form.append("age", formData.age);
+      form.append("phone", formData.phone);
+      form.append("whatsapp", formData.whatsapp);
+      form.append("telegram", formData.telegram);
+      form.append("email", formData.email);
+      form.append("facilityName", formData.facility);
+      form.append("location", formData.location);
+      form.append("message", formData.message);
+
+      if (formData.idDocument) form.append("idDocument", formData.idDocument);
+      if (formData.medicalCertificate) form.append("medicalCertificate", formData.medicalCertificate);
+      if (formData.videos) {
+        Array.from(formData.videos).forEach(video => form.append("videos", video));
+      }
+
       const res = await fetch(`${BASE_URL}/kidney-patients`, {
         method: "POST",
-        body: form,
+        body: form, // Send as FormData
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Submission failed");
+
       setSuccess("Submission successful");
+      setFormData({
+        name: "",
+        age: "",
+        phone: "",
+        whatsapp: "",
+        telegram: "",
+        email: "",
+        facility: "",
+        location: "",
+        message: "",
+        idDocument: null,
+        medicalCertificate: null,
+        videos: null,
+      });
     } catch (err: any) {
       console.error(err);
-      setError(`Submission failed: ${err.message}`);
+      setError(err.message || "Submission failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -98,11 +114,7 @@ const KidneyPatientForm: React.FC = () => {
         </div>
 
         <div className="flex justify-center mb-6">
-          <img
-            src="/WHW.jpg"
-            alt="Wanaw Logo"
-            className="h-16 w-16 rounded-full object-cover"
-          />
+          <img src="/WHW.jpg" alt="Wanaw Logo" className="h-16 w-16 rounded-full object-cover" />
         </div>
 
         <h2 className="text-2xl font-bold mb-2 text-center text-[#1c2b21]">
@@ -115,126 +127,58 @@ const KidneyPatientForm: React.FC = () => {
 
         {error && <p className="text-red-600 mb-4 text-sm text-center">{error}</p>}
         {success && <p className="text-green-600 mb-4 text-sm text-center">{success}</p>}
+        {loading && <p className="text-yellow-600 mb-4 text-sm text-center">Submitting...</p>}
 
         <form onSubmit={handleSubmit} className="grid gap-4">
-          <input
-            name="name"
-            placeholder="Full Name"
-            onChange={handleChange}
-            required
-            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"
-          />
-          <input
-            name="age"
-            type="number"
-            placeholder="Age"
-            onChange={handleChange}
-            required
-            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"
-          />
-          <input
-            name="phone"
-            placeholder="Phone"
-            onChange={handleChange}
-            required
-            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"
-          />
-          <input
-            name="whatsapp"
-            placeholder="WhatsApp"
-            onChange={handleChange}
-            required
-            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"
-          />
-          <input
-            name="telegram"
-            placeholder="Telegram"
-            onChange={handleChange}
-            required
-            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"
-          />
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            onChange={handleChange}
-            required
-            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"
-          />
-          <input
-            name="facility"
-            placeholder="Health Facility Name"
-            onChange={handleChange}
-            required
-            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"
-          />
-          <input
-            name="location"
-            placeholder="Location"
-            onChange={handleChange}
-            required
-            className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"
-          />
-          <textarea
-            name="message"
-            placeholder="Additional Information"
-            onChange={handleChange}
-            className="p-2 border border-gray-300 rounded-md text-sm resize-none h-24 focus:ring-2 focus:ring-yellow-400"
-          />
+          <input name="name" placeholder="Full Name" onChange={handleChange} required className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"/>
+          <input name="age" type="number" placeholder="Age" onChange={handleChange} required className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"/>
+          <input name="phone" placeholder="Phone" onChange={handleChange} required className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"/>
+          <input name="whatsapp" placeholder="WhatsApp" onChange={handleChange} required className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"/>
+          <input name="telegram" placeholder="Telegram" onChange={handleChange} required className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"/>
+          <input name="email" type="email" placeholder="Email" onChange={handleChange} required className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"/>
+          <input name="facility" placeholder="Health Facility Name" onChange={handleChange} required className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"/>
+          <input name="location" placeholder="Location" onChange={handleChange} required className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"/>
+          <textarea name="message" placeholder="Additional Information" onChange={handleChange} className="p-2 border border-gray-300 rounded-md text-sm resize-none h-24 focus:ring-2 focus:ring-yellow-400"/>
 
           <div>
             <label className="block text-sm text-gray-600 mb-1">ID / Passport / License</label>
-            <input
-              type="file"
-              name="idDocument"
-              accept=".jpg,.jpeg,.png,.pdf"
-              onChange={handleFileChange}
-              className="w-full text-sm"
-              required
-            />
+            <input type="file" name="idDocument" accept=".jpg,.jpeg,.png,.pdf" onChange={handleFileChange} className="w-full text-sm" required/>
+            {formData.idDocument && <p className="text-xs mt-1 text-gray-500">Selected: {formData.idDocument.name}</p>}
           </div>
 
           <div>
             <label className="block text-sm text-gray-600 mb-1">Medical Certificate</label>
-            <input
-              type="file"
-              name="medicalCertificate"
-              accept=".jpg,.jpeg,.png,.pdf"
-              onChange={handleFileChange}
-              className="w-full text-sm"
-              required
-            />
+            <input type="file" name="medicalCertificate" accept=".jpg,.jpeg,.png,.pdf" onChange={handleFileChange} className="w-full text-sm" required/>
+            {formData.medicalCertificate && <p className="text-xs mt-1 text-gray-500">Selected: {formData.medicalCertificate.name}</p>}
           </div>
 
           <div>
             <label className="block text-sm text-gray-600 mb-1">Short Video (30s–1min)</label>
-            <input
-              type="file"
-              name="videos"
-              accept="video/*"
-              multiple
-              onChange={handleFileChange}
-              className="w-full text-sm"
-            />
+            <input type="file" name="videos" accept="video/*" multiple onChange={handleFileChange} className="w-full text-sm"/>
+            {formData.videos && (
+              <div className="mt-2 flex gap-2 overflow-x-auto">
+                {Array.from(formData.videos).map((file, i) => (
+                  <video key={i} src={URL.createObjectURL(file)} controls className="w-32 h-20 object-cover rounded-md"/>
+                ))}
+              </div>
+            )}
           </div>
 
-          <button
-            type="submit"
-            className="bg-[#D4AF37] text-[#1c2b21] font-semibold py-2 rounded-full hover:rounded-md transition"
-          >
+          <button type="submit" className="bg-[#D4AF37] text-[#1c2b21] font-semibold py-2 rounded-full hover:rounded-md transition">
             Submit Form
           </button>
         </form>
 
-        <p className="text-center text-xs text-gray-400 mt-6">
-          Ⓒ All rights reserved by Wanaw
-        </p>
+        <p className="text-center text-xs text-gray-400 mt-6">Ⓒ All rights reserved by Wanaw</p>
       </div>
     </div>
   );
 };
 
 export default KidneyPatientForm;
+
+
+
 
 
 

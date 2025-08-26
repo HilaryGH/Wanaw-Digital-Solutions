@@ -13,9 +13,9 @@ interface Patient {
   facilityName: string;
   location: string;
   message?: string;
-  idDocument: string;
-  medicalCertificate: string;
-  videos: string[];
+  idDocument: string;          // Cloudinary URL
+  medicalCertificate: string;  // Cloudinary URL
+  videos: string[];            // Cloudinary URLs
 }
 
 interface UserRoles {
@@ -26,7 +26,6 @@ interface UserRoles {
   volunteer: boolean;
 }
 
-// Load user roles from localStorage or default to false
 const getUserRoles = (): UserRoles => {
   const stored = localStorage.getItem("userRoles");
   return stored
@@ -62,8 +61,6 @@ const HemodialysisPatientsList: React.FC = () => {
       });
   }, []);
 
-  const fileBase = BASE_URL.replace("/api", "");
-
   const handleAction = (patient: Patient, action: keyof UserRoles) => {
     switch (action) {
       case "gifter":
@@ -92,6 +89,7 @@ const HemodialysisPatientsList: React.FC = () => {
         Loading patients...
       </div>
     );
+
   if (error)
     return (
       <div className="text-center mt-10 text-red-600">{error}</div>
@@ -115,7 +113,7 @@ const HemodialysisPatientsList: React.FC = () => {
                 <video
                   controls
                   className="w-full h-full object-cover"
-                  src={`${fileBase}/uploads/${patient.videos[0]}`}
+                  src={patient.videos[0]} // ✅ Cloudinary URL directly
                 />
               </div>
             )}
@@ -169,27 +167,28 @@ const HemodialysisPatientsList: React.FC = () => {
                 <strong className="block text-gray-800 mb-1">Documents:</strong>
                 <ul className="space-y-1">
                   <li className="flex items-center gap-2">
-                    <FileText size={16} />
-                    <a
-                      href={`${fileBase}/uploads/${patient.idDocument}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      ID Document
-                    </a>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <FileText size={16} />
-                    <a
-                      href={`${fileBase}/uploads/${patient.medicalCertificate}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      Medical Certificate
-                    </a>
-                  </li>
+  <FileText size={16} />
+  <a
+    href={`${BASE_URL}/uploads/${patient.idDocument}`} // ✅ Static PDF link
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-blue-600 hover:underline"
+  >
+    ID Document
+  </a>
+</li>
+<li className="flex items-center gap-2">
+  <FileText size={16} />
+  <a
+    href={`${BASE_URL}/uploads/${patient.medicalCertificate}`} // ✅ Static PDF link
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-blue-600 hover:underline"
+  >
+    Medical Certificate
+  </a>
+</li>
+
                 </ul>
               </div>
             </div>
@@ -200,7 +199,7 @@ const HemodialysisPatientsList: React.FC = () => {
                 isActive ? (
                   <button
                     key={role}
-                    type="button" // Prevents page refresh
+                    type="button"
                     onClick={() => handleAction(patient, role as keyof UserRoles)}
                     className="flex-1 py-2 px-3 rounded-lg bg-[#D4AF37] text-[#1c2b21] font-semibold hover:rounded-full transition text-sm"
                   >
@@ -221,6 +220,7 @@ const HemodialysisPatientsList: React.FC = () => {
 };
 
 export default HemodialysisPatientsList;
+
 
 
 

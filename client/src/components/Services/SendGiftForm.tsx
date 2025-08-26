@@ -191,6 +191,8 @@ const [recipients, setRecipients] = useState<Recipient[]>([
   const [checkingAvailability, setCheckingAvailability] = useState(false);
   const [availabilityError, setAvailabilityError] = useState<string | null>(null);
   const [proceedAnyway, setProceedAnyway] = useState(false);
+  const [referralCode, setReferralCode] = useState<string>("");
+
 
   const [nights, setNights] = useState<number>(1);
 
@@ -370,108 +372,97 @@ const payload: AvailabilityPayload = {
   };
 
   /* ------------------ Main purchase + send ------------------ */
-  const handlePayAndSend = async () => {
-    // For hotels, ensure availability was checked and status is Available unless user forces proceed
-    if (service.category === "Hotel Rooms") {
-      if (!availability || (availability.status !== "Available" && !proceedAnyway)) {
-        alert(
-          "Please check room availability first and ensure rooms are available. You can override by checking 'Proceed anyway', but that's at your own risk."
-        );
-        return;
-      }
-
-      // validate dates again
-      if (!checkInDate || !checkOutDate) {
-        alert("Please select check-in and check-out dates.");
-        return;
-      }
-    }
-
-    if (!recipients.some((r) => r.email || r.phone || r.whatsapp || r.telegram)) {
-      alert("Please enter at least one recipient contact.");
-      return;
-    }
-    if (!isLoggedIn && !senderEmailInput) {
-      alert("Please enter your email.");
-      return;
-    }
-
-    try {
-      const purchasePayload: any = {
-        buyerName: senderName,
-        buyerEmail: senderEmail,
-        deliveryDate,
-      };
-
-      if (service.category === "Hotel Rooms") {
-        purchasePayload.checkInDate = checkInDate;
-        purchasePayload.checkOutDate = checkOutDate;
-        purchasePayload.nights = nights;
-      }
-
-      const purchaseRes = await fetch(
-        `${BASE_URL}/services/${service._id}/purchase`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(purchasePayload),
-        }
+const handlePayAndSend = async () => {
+  // --- Hotel validation ---
+  if (service.category === "Hotel Rooms") {
+    if (!availability || (availability.status !== "Available" && !proceedAnyway)) {
+      alert(
+        "Please check room availability first and ensure rooms are available. You can override by checking 'Proceed anyway', but that's at your own risk."
       );
-
-      if (!purchaseRes.ok) throw new Error("Failed to register gift");
-
-      let successfulRecipients = 0;
-
-      for (const recipient of recipients) {
-        try {
-          const assignRes = await fetch(
-            `${BASE_URL}/gift/${service._id}/assign-delivery-code`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ recipient, senderName, message, service, checkInDate, checkOutDate, nights }),
-            }
-          );
-
-          if (!assignRes.ok) {
-            console.warn("Failed to assign delivery code to:", recipient);
-            continue;
-          }
-
-          const { code: deliveryCode } = await assignRes.json();
-          await notifyAllChannels(deliveryCode, recipient);
-          successfulRecipients++;
-        } catch (err) {
-          console.error("Error assigning or notifying recipient:", err);
-        }
-      }
-
-      if (successfulRecipients === 0) {
-        alert("❌ Failed to send gift. Please check recipient details.");
-        return;
-      }
-
-      alert("🎉 Gift sent and purchase recorded!");
-
-      const totalAmount = (service.price || 0) * successfulRecipients;
-
-      navigate("/payment-options", {
-        state: {
-          service,
-          senderName,
-          senderEmail,
-          amount: totalAmount,
-          recipients,
-          occasion,
-          notifyProvider,
-          providerMessage,
-        },
-      });
-    } catch (error) {
-      console.error("Send gift error:", error);
-      alert("❌ Something went wrong while sending the gift.");
+      return;
     }
-  };
+
+    if (!checkInDate || !checkOutDate) {
+      alert("Please select check-in and check-out dates.");
+      return;
+    }
+  }
+
+  // --- Recipient and sender validation ---
+  if (!recipients.some((r) => r.email || r.phone || r.whatsapp || r.telegram)) {
+    alert("Please enter at least one recipient contact.");
+    return;
+  }
+
+  if (!isLoggedIn && !senderEmailInput) {
+    alert("Please enter your email.");
+    return;
+  }
+
+  try {
+    // --- Prepare purchase payload ---
+    const purchasePayload: any = {
+      buyerName: senderName,
+      buyerEmail: senderEmail,
+      deliveryDate,
+      recipients, // send all recipients at once
+      message,
+      serviceId: service._id,
+    };
+
+    if (service.category === "Hotel Rooms") {
+      purchasePayload.checkInDate = checkInDate;
+      purchasePayload.checkOutDate = checkOutDate;
+      purchasePayload.nights = nights;
+    }
+
+    // --- Make the purchase request ---
+    const purchaseRes = await fetch(`${BASE_URL}/services/${service._id}/purchase`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(purchasePayload),
+    });
+
+    if (!purchaseRes.ok) {
+      const errorData = await purchaseRes.json();
+      console.error("Purchase failed:", errorData);
+      alert(`❌ Failed to send gift: ${errorData.message || purchaseRes.statusText}`);
+      return;
+    }
+
+    const { codes: deliveryCodes } = await purchaseRes.json();
+
+    // --- Notify recipients ---
+    for (let i = 0; i < recipients.length; i++) {
+      try {
+        await notifyAllChannels(deliveryCodes[i], recipients[i]);
+      } catch (err) {
+        console.error("Error notifying recipient:", recipients[i], err);
+      }
+    }
+
+    alert("🎉 Gift sent and purchase recorded!");
+
+    const totalAmount = (service.price || 0) * recipients.length;
+
+    // --- Navigate to payment options ---
+    navigate("/payment-options", {
+      state: {
+        service,
+        senderName,
+        senderEmail,
+        amount: totalAmount,
+        recipients,
+        occasion,
+        notifyProvider,
+        providerMessage,
+      },
+    });
+  } catch (error) {
+    console.error("Send gift error:", error);
+    alert("❌ Something went wrong while sending the gift.");
+  }
+};
 
   /* ------------------ Render ------------------ */
   const hotelCategory = service.category === "Hotel Rooms";
@@ -814,6 +805,16 @@ const payload: AvailabilityPayload = {
     <span className="font-semibold">Total:</span> {totalAmount.toLocaleString()} ETB
   </p>
 )}
+<label className="block mb-2 font-medium text-[#1c2b21]">
+  Referral Code (optional)
+</label>
+<input
+  type="text"
+  placeholder="Enter referral code if you have one"
+  value={referralCode}
+  onChange={(e) => setReferralCode(e.target.value)}
+  className="w-full p-3 border border-gray-300 rounded-lg mb-6"
+/>
 
 
            <button

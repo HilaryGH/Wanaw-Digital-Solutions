@@ -97,7 +97,7 @@ ${hotelDetails ? "\n" + hotelDetails : ""}
     if (recipientEmail)
       await sendEmail({
         to: recipientEmail,
-        subject: `You've received a thoughtful gift from <strong>${senderDisplayName}</strong>!`,
+        subject: `You've received a thoughtful gift from ${senderDisplayName} !`,
         html: `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
       <div style="background-color:#1c2b21; padding: 20px; text-align: center;">

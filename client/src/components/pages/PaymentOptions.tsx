@@ -81,22 +81,23 @@ const PaymentOptions = () => {
 
           <h2 className="text-3xl font-bold text-center text-[#1c2b21] mb-6">Payment Summary</h2>
 
-          <DownloadableInvoice
-            fullName={buyerFullName}
-            total={invoiceTotal}
-            giftRecipient={
-              isGiftPayment
-                ? {
-                    name: recipients[0]?.name,
-                    message: recipients[0]?.message,
-                    itemTitle: service?.title,
-                    price: invoiceTotal,
-                    type: recipients[0]?.type || "standard",
-                    giftCode: giftCode || "Generating...",
-                  }
-                : undefined
-            }
-          />
+       <DownloadableInvoice
+  fullName={buyerFullName}
+  total={invoiceTotal}
+  giftRecipient={
+    isGiftPayment
+      ? {
+          name: recipients[0]?.name,
+          message: recipients[0]?.message,
+          itemTitle: service?.title, // ✅ this is still correct
+          price: invoiceTotal,
+          type: recipients[0]?.type || "standard",
+        giftCode: recipients[0]?.code || "Generating...",  // ✅ use actual backend code
+        }
+      : undefined
+  }
+/>
+
 
           {isGiftPayment && (
             <div className="mt-6">

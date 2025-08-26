@@ -34,22 +34,22 @@ const SupportCommunityForm = () => {
     message: "",
   });
 
-  const handleRoleToggle = (role: keyof typeof formData.roles) => {
-    setFormData((prev) => ({
-      ...prev,
-      roles: { ...prev.roles, [role]: !prev.roles[role] },
-      ...(prev.roles[role]
-        ? {
-            ...(role === "gifter" && { gifterLevel: "individual" }),
-            ...(role === "influencer" && { influencerLevel: "", influencerRoles: [] }),
-            ...(role === "digitalCreator" && { digitalCreatorLevel: "", digitalCreatorRoles: [] }),
-            ...(role === "brandAmbassador" && { brandAmbassadorLevel: "", brandAmbassadorRoles: [] }),
-            ...(role === "serviceProvider" && { serviceProviderLevel: "" }),
-            ...(role === "volunteer" && { volunteerLevel: "" }),
-          }
-        : {}),
-    }));
-  };
+const handleRoleToggle = (role: keyof typeof formData.roles) => {
+  setFormData((prev) => ({
+    ...prev,
+    roles: Object.keys(prev.roles).reduce(
+      (acc, key) => ({ ...acc, [key]: key === role }),
+      {} as typeof prev.roles
+    ),
+    ...(role === "gifter" ? { gifterLevel: "individual" } : { gifterLevel: "" }),
+    ...(role === "influencer" ? { influencerLevel: "", influencerRoles: [] } : { influencerLevel: "", influencerRoles: [] }),
+    ...(role === "digitalCreator" ? { digitalCreatorLevel: "", digitalCreatorRoles: [] } : { digitalCreatorLevel: "", digitalCreatorRoles: [] }),
+    ...(role === "brandAmbassador" ? { brandAmbassadorLevel: "", brandAmbassadorRoles: [] } : { brandAmbassadorLevel: "", brandAmbassadorRoles: [] }),
+    ...(role === "serviceProvider" ? { serviceProviderLevel: "" } : { serviceProviderLevel: "" }),
+    ...(role === "volunteer" ? { volunteerLevel: "" } : { volunteerLevel: "" }),
+  }));
+};
+
 
   const handleLevelChange = (
     roleLevelKey:

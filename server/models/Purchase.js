@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const PurchaseSchema = new mongoose.Schema({
-  itemType: { type: String, enum: ["service", "gift"], required: true },
+  itemType: { type: String, enum: ["Service", "gift"], required: true },
   itemId: { type: mongoose.Schema.Types.ObjectId, required: true, refPath: "itemType" },
   providerId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   buyerName: { type: String, required: true },

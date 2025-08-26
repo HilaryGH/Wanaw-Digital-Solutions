@@ -8,10 +8,12 @@ const Service = require("../models/Service");
 const {
   createService,
   getAllServices,
+  getPurchases,
   getServiceById,
   deleteService,
   updateServiceStatus,
   purchaseService,
+  getSubcategories,
 } = require("../controllers/serviceController");
 
 const verifyToken = require("../middleware/verifyToken");
@@ -33,7 +35,7 @@ const upload = multer({ storage });
 // GET all services
 router.get("/", getAllServices);
 
-// GET provider services (must come before /:id)
+// GET provider services
 router.get("/provider/:providerId/services", verifyToken, async (req, res) => {
   try {
     const { providerId } = req.params;
@@ -50,20 +52,25 @@ router.get("/provider/:providerId/services", verifyToken, async (req, res) => {
   }
 });
 
+// Subcategories route (must be before :id)
+router.get("/subcategories", getSubcategories);
+router.get("/purchase", getPurchases); // ✅ pass the function reference
+
+
 // GET service by id
 router.get("/:id", getServiceById);
 
 // POST create service
 router.post("/", verifyToken, upload.single("image"), createService);
 
-// Purchase service
+// Purchase service (protect if needed)
 router.post("/:id/purchase", purchaseService);
-
 // DELETE service
 router.delete("/:id", verifyToken, deleteService);
 
 // Update service status
 router.put("/:id/status", verifyToken, updateServiceStatus);
+
 
 
 module.exports = router;

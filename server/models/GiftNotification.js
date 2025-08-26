@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const giftNotificationSchema = new mongoose.Schema(
   {
+
     occasionId: mongoose.Types.ObjectId,
     serviceId: mongoose.Types.ObjectId,
 
@@ -41,10 +42,16 @@ const giftNotificationSchema = new mongoose.Schema(
 
     providerName: String,             // <-- Add this
     serviceLocation: String,
+
+    purchaseId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Purchase',
+    },
     giftId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Gift'
-    },
+      ref: "Gift",
+    }
+
   },
   { timestamps: true }
 );

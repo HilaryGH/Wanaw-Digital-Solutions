@@ -99,6 +99,9 @@ app.use('/api/applications', applicationRoutes);
 const kidneyPatientRoutes = require("./routes/kidneyPatientRoutes");
 app.use("/api/kidney-patients", kidneyPatientRoutes);
 
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
 
 
 const supportCommunityRoutes = require("./routes/supportCommunityRoutes");

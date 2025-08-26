@@ -2,12 +2,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { OAuth2Client } = require("google-auth-library");
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-const crypto = require("crypto"); // make sure it's required at the top if not already
-const { sendEmail } = require("../utils/notification");
-
-
+const { sendMultiChannel } = require("../utils/notification");
 
 /* ────── role sets ────── */
 const allowedRoles = ["individual", "provider", "corporate", "diaspora", "admin", "super_admin", "marketing_admin", "customer_support_admin"];
@@ -19,10 +14,9 @@ exports.register = async (req, res) => {
   const email = req.body.email?.trim();
   const password = req.body.password;
   const role = req.body.role || "individual";
-  let membership = req.body.membership?.trim();  // `let` because you may override it later
+  let membership = req.body.membership?.trim();
   const adminKey = req.body.adminKey;
 
-  // For provider-specific
   const companyName = req.body.companyName?.trim();
   const serviceType = req.body.serviceType?.trim();
   const phone = req.body.phone?.trim();
@@ -31,10 +25,8 @@ exports.register = async (req, res) => {
   const city = req.body.city?.trim();
   const location = req.body.location?.trim();
 
-
   const getUrl = (f) => (f ? `/uploads/${f.filename}` : undefined);
   const priceListUrl = getUrl(req.files?.priceList?.[0]);
-
 
   const membershipOptions = {
     individual: ["Standard Member", "Gold Member", "Platinum Member"],
@@ -43,62 +35,45 @@ exports.register = async (req, res) => {
     provider: ["Basic Provider", "Premium Provider"],
   };
 
-  // Helper function to generate membership ID
   const generateMembershipId = () => {
     const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
     const timestampPart = Date.now().toString().slice(-6);
     return `MEM${randomPart}${timestampPart}`;
   };
-  // Helper: generate referral code
-  const generateReferralCode = () => {
-    return "REF-" + Math.random().toString(36).substring(2, 8).toUpperCase();
-  };
 
+  const generateReferralCode = () => "REF-" + Math.random().toString(36).substring(2, 8).toUpperCase();
 
   try {
-    /* 1️⃣ Duplicate email check */
     if (await User.findOne({ email }))
       return res.status(400).json({ msg: "User already exists" });
 
-    /* 2️⃣ Validate role */
     if (!allowedRoles.includes(role))
       return res.status(400).json({ msg: `Invalid role: ${role}` });
 
-    /* 3️⃣ Admin guard */
     if (role === "admin" && adminKey !== process.env.ADMIN_KEY)
       return res.status(403).json({ msg: "Unauthorized to register as admin" });
 
-    /* 4️⃣ If provider-type role, validate required provider fields */
-    if (providerRoles.includes(role)) {
-      if (!companyName || !serviceType)
-        return res.status(400).json({ msg: "Company name & service type are required" });
-    }
+    if (providerRoles.includes(role) && (!companyName || !serviceType))
+      return res.status(400).json({ msg: "Company name & service type are required" });
 
-    /* 5️⃣ Validate membership if provided */
     if (membership) {
       if (!membershipOptions[role]?.includes(membership)) {
         return res.status(400).json({ msg: `Invalid membership for role ${role}: ${membership}` });
       }
     } else {
-      // Default membership if none provided
       membership = providerRoles.includes(role) ? "Basic Provider" : "Standard Member";
     }
 
-    /* 6️⃣ Hash password (if supplied) */
     const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
-
-    /* 7️⃣ Extract file URLs if multipart */
 
     const licenseUrl = getUrl(req.files?.license?.[0]);
     const tradeRegUrl = getUrl(req.files?.tradeRegistration?.[0]);
     const photoUrls = (req.files?.servicePhotos || []).map(getUrl);
     const videoUrl = getUrl(req.files?.video?.[0]);
 
-    /* 8️⃣ Generate membership ID */
     const membershipId = generateMembershipId();
     const referralCode = generateReferralCode();
 
-    /* 9️⃣ Build user object */
     const newUser = {
       fullName,
       email,
@@ -106,7 +81,6 @@ exports.register = async (req, res) => {
       role,
       membership,
       membershipId,
-
       companyName,
       serviceType,
       phone,
@@ -119,142 +93,80 @@ exports.register = async (req, res) => {
       photoUrls,
       videoUrl,
       priceListUrl,
-      referralCode,   // ✅ added
-      referralClicks: 0, // ✅ added
+      referralCode,
+      referralClicks: 0,
     };
 
-    /* 🔟 Create user in DB */
     const user = await User.create(newUser);
 
-    /* 1️⃣1️⃣ Send welcome email */
-    await sendEmail({
-      to: user.email,
-      subject: "Welcome to Wanaw Health and Wellness!",
-      html: `
-  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-    <div style="background-color:#1c2b21; padding: 20px; text-align: center;">
-      <h1 style="margin: 0; color: #D4AF37;">Wanaw Health and Wellness Digital Solution</h1>
-    </div>
-    <div style="padding: 30px; background-color: #fff;">
-      <h2 style="color: #1c2b21;">Welcome, ${user.fullName}!</h2>
-
-      <p style="font-size: 16px; color: #333;">
-        Thank you for registering as a <strong>${user.membership}</strong> on our platform.
-      </p>
-
-      <div style="margin: 30px 0; padding: 15px; background-color: #f7f7f7; border-left: 4px solid #D4AF37;">
-        <p style="font-size: 18px; color: #1c2b21; margin: 0;">
-          🎉 Your Membership ID:
-        </p>
-        <p style="font-size: 28px; font-weight: bold; color: #D4AF37; margin: 5px 0 0;">${user.membershipId}</p>
-      </div>
-
-      <p style="font-size: 16px; color: #333;">
-        We’re excited to have you onboard and look forward to supporting your health and wellness journey.
-      </p>
-
-      <a href="https://wanawhealthandwellness.netlify.app/" style="display: inline-block; margin-top: 15px; padding: 12px 24px; background-color: #D4AF37; color: #1c2b21; text-decoration: none; border-radius: 4px; font-weight: bold;">
-        Visit Wanaw Health and Wellness
-      </a>
-
-      <p style="font-size: 16px; color: #333; margin-top: 30px;">
-        If you have any questions or need assistance, just reply to this email.
-      </p>
-<p style="font-size: 16px; color: #333; margin-top: 20px;">
-  ⭐ Don’t miss out! Your feedback, reviews, and ratings help us improve and provide better services tailored to your needs.
-</p>
-
-      <p style="font-size: 16px; color: #333;">
-        With care,<br/>
-        <strong>The Wanaw Team</strong>
-      </p>
-    </div>
-    <div style="background-color: #1c2b21; padding: 15px; text-align: center; font-size: 13px; color:#D4AF37;">
-      &copy; ${new Date().getFullYear()} Wanaw Health and Wellness Digital Solution. All rights reserved.
-    </div>
+    const subject = "Welcome to Wanaw Health & Wellness!";
+    const html = `
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+  <div style="background-color:#1c2b21; padding: 20px; text-align: center;">
+    <h1 style="margin: 0; color: #D4AF37;">Welcome to Wanaw Health & Wellness!</h1>
   </div>
-  `,
-      text: `
-Hello ${user.fullName},
+  <div style="padding: 30px; background-color: #fff;">
+    <h2 style="color: #1c2b21;">Hello, ${user.fullName}!</h2>
+    <p style="font-size: 16px; color: #333;">
+      🎉 Thank you for joining Wanaw Health & Wellness. We are excited to have you on board!
+    </p>
+    <div style="margin: 20px 0; padding: 15px; background-color: #f7f7f7; border-left: 4px solid #D4AF37;">
+      <p style="font-size: 18px; color: #1c2b21; margin: 0;">Your Membership ID:</p>
+      <p style="font-size: 22px; font-weight: bold; color: #D4AF37; margin: 5px 0 0;">${user.membershipId}</p>
+    </div>
+    <div style="margin: 20px 0; padding: 15px; background-color: #f7f7f7; border-left: 4px solid #D4AF37;">
+      <p style="font-size: 18px; color: #1c2b21; margin: 0;">Your Referral Code:</p>
+      <p style="font-size: 28px; font-weight: bold; color: #D4AF37; margin: 5px 0 0;">${user.referralCode}</p>
+    </div>
+    <p style="font-size: 16px; color: #333;">Share your referral link with friends and family:</p>
+    <a href="https://wanawhealthandwellness.netlify.app/register?ref=${user.referralCode}" style="display: inline-block; margin-top: 10px; padding: 12px 24px; background-color: #D4AF37; color: #1c2b21; text-decoration: none; border-radius: 4px; font-weight: bold;">
+      Invite Friends
+    </a>
+    <p style="font-size: 16px; color: #333; margin-top: 20px;">
+      🌟 For every <strong>20 clicks</strong> on your referral link, you will earn Wanaw Health & Wellness gifts for free!
+    </p>
+    <p style="font-size: 16px; color: #333; margin-top: 20px;">
+      Share via WhatsApp, Telegram, Email, or Social Media today!
+    </p>
+    <p style="font-size: 16px; color: #333;">
+      With care,<br/>
+      <strong>The Wanaw Team</strong>
+    </p>
+  </div>
+  <div style="background-color: #1c2b21; padding: 15px; text-align: center; font-size: 13px; color:#D4AF37;">
+    &copy; ${new Date().getFullYear()} Wanaw Health and Wellness Digital Solution. All rights reserved.
+  </div>
+</div>
+`;
 
-Thank you for registering as a ${user.membership} on our platform.
+    const text = `
+Hello ${user.fullName} 👋
+
+Welcome to Wanaw Health & Wellness! We're excited to have you on board.
 
 Your Membership ID: ${user.membershipId}
+Your Referral Code: ${user.referralCode}
+Referral Link: https://wanawhealthandwellness.netlify.app/register?ref=${user.referralCode}
 
-We’re excited to have you onboard!
-
-Visit Wanaw Health and Wellness: https://wanawhealthandwellness.netlify.app/
-
-If you have any questions or need assistance, just reply to this email.
-
-
-With care,
-The Wanaw Team
-  `
-    });
-    await sendEmail({
-      to: user.email,
-      subject: "Your Wanaw Health & Wellness Referral Code 🎁",
-      html: `
-  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-    <div style="background-color:#1c2b21; padding: 20px; text-align: center;">
-      <h1 style="margin: 0; color: #D4AF37;">Wanaw Health and Wellness Referral</h1>
-    </div>
-    <div style="padding: 30px; background-color: #fff;">
-      <h2 style="color: #1c2b21;">Hello, ${user.fullName}!</h2>
-
-      <p style="font-size: 16px; color: #333;">
-        🎉 Share your unique referral code with friends and family to earn rewards!
-      </p>
-
-      <div style="margin: 30px 0; padding: 15px; background-color: #f7f7f7; border-left: 4px solid #D4AF37;">
-        <p style="font-size: 18px; color: #1c2b21; margin: 0;">Your Referral Code:</p>
-        <p style="font-size: 28px; font-weight: bold; color: #D4AF37; margin: 5px 0 0;">${user.referralCode}</p>
-      </div>
-
-      <p style="font-size: 16px; color: #333;">Your unique referral link:</p>
-      <a href="https://wanawhealthandwellness.netlify.app/register?ref=${user.referralCode}" style="display: inline-block; margin-top: 15px; padding: 12px 24px; background-color: #D4AF37; color: #1c2b21; text-decoration: none; border-radius: 4px; font-weight: bold;">
-        Invite Friends
-      </a>
-
-      <p style="font-size: 16px; color: #333; margin-top: 20px;">
-        🌟 For every <strong>20 clicks</strong> on your referral link, you will earn Wanaw Health & Wellness gifts for free!
-      </p>
-
-      <p style="font-size: 16px; color: #333; margin-top: 20px;">
-        Share via WhatsApp, Telegram, Email, or Social Media today!
-      </p>
-
-      <p style="font-size: 16px; color: #333;">
-        With care,<br/>
-        <strong>The Wanaw Team</strong>
-      </p>
-    </div>
-    <div style="background-color: #1c2b21; padding: 15px; text-align: center; font-size: 13px; color:#D4AF37;">
-      &copy; ${new Date().getFullYear()} Wanaw Health and Wellness Digital Solution. All rights reserved.
-    </div>
-  </div>
-  `,
-      text: `
-Hello ${user.fullName},
-
-Your referral code: ${user.referralCode}
-Your referral link: https://wanawhealthandwellness.netlify.app/register?ref=${user.referralCode}
-
-🎁 For every 20 clicks on your referral link, you’ll earn Wanaw Health & Wellness gifts for free!
+🎁 For every 20 clicks on your referral link, you’ll earn free gifts from Wanaw Health & Wellness!
 
 Share via WhatsApp, Telegram, Email, or Social Media today.
 
 - The Wanaw Team
-  `
+`;
+
+    // ✅ Correct call to sendMultiChannel
+    await sendMultiChannel({
+      email: user.email,
+      phone: user.phone,
+      whatsapp: user.whatsapp,
+      telegram: user.telegram,
+      subject,
+      html,
+      text,
     });
 
-
-
-    /* 1️⃣2️⃣ Respond with JWT + user info */
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
     res.status(201).json({
       token,
@@ -268,12 +180,12 @@ Share via WhatsApp, Telegram, Email, or Social Media today.
         membershipId: user.membershipId,
       },
     });
+
   } catch (err) {
     console.error("Register Error:", err);
     res.status(500).json({ msg: "Error registering user" });
   }
 };
-
 
 /* ─────────────────── LOGIN (unchanged except extra log) ─────────────────── */
 exports.login = async (req, res) => {
