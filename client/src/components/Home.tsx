@@ -31,41 +31,51 @@ const Home = () => {
         </div>
 
         {/* 🌟 Main Hero Content */}
-        <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-5 h-auto px-4 sm:px-6 md:px-16 lg:px-28 py-10 md:py-0">
-          {/* 📄 Left: Text */}
-          <div className="w-full md:w-1/2 flex flex-col justify-center items-center text-left space-y-5">
-            <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-[#1c2b21] text-center leading-snug md:leading-tight">
-              Wanaw Health and Wellness Digital Solution
-            </h1>
-            <p className="text-sm sm:text-base md:text-lg text-gray-700 text-center max-w-md">
-              Book, gift, and manage health, wellness, and hotel room services — all in one platform.
-            </p>
+       <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-5 h-auto px-4 sm:px-6 md:px-16 lg:px-28 py-10 md:py-0">
+  {/* 📄 Left: Text */}
+  <div className="w-full md:w-1/2 flex flex-col justify-center items-center text-left space-y-5">
+    {/* English Title */}
+    <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-5xl font-bold text-[#1c2b21] text-center leading-snug md:leading-tight">
+      Wanaw Health and Wellness Digital Solution
+    </h1>
 
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
-              <Link
-                to="/login"
-                className="w-full sm:w-auto text-center bg-[#D4AF37] text-[#1c2b21] font-semibold px-6 py-2.5 rounded-full border border-gray-300 shadow-sm hover:rounded transition"
-              >
-                Sign in 
-              </Link>
-              <Link
-                to="/gifting-options"
-                className="w-full sm:w-auto text-center bg-[#1c2b21] text-[#D4AF37] font-semibold px-6 py-2.5 rounded-full shadow hover:rounded transition"
-              >
-                Send a Gift
-              </Link>
-            </div>
-          </div>
+    {/* Amharic Title */}
+    <h2 className="text-xl sm:text-2xl md:text-4xl lg:text-4xl font-semibold text-[#D4AF37] text-center leading-snug md:leading-tight">
+      ዋናው ሄልዝ ኤንድ ዌልነስ ድጅታል ሶልሸን
+    </h2>
 
-          {/* 🖼️ Right: Hero Image */}
-          <div className="w-full md:w-1/2 flex justify-center items-center mb-8 md:mb-0">
-            <img
-              src="/hero.svg"
-              alt="Digital Innovation"
-              className="w-4/5 sm:w-3/4 md:w-full max-h-[500px] object-contain animate-fade-slide-in"
-            />
-          </div>
-        </div>
+    {/* Subtitle */}
+    <p className="text-sm sm:text-base md:text-lg text-gray-700 text-center max-w-md">
+      Book, gift, and manage health, wellness, and hotel room services — all in one platform.
+    </p>
+
+    {/* CTA Buttons */}
+    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
+      <Link
+        to="/login"
+        className="w-full sm:w-auto text-center bg-[#D4AF37] text-[#1c2b21] font-semibold px-6 py-2.5 rounded-full border border-gray-300 shadow-sm hover:rounded-lg hover:shadow-md transition"
+      >
+        Sign in
+      </Link>
+      <Link
+        to="/gifting-options"
+        className="w-full sm:w-auto text-center bg-[#1c2b21] text-[#D4AF37] font-semibold px-6 py-2.5 rounded-full shadow hover:rounded-lg hover:shadow-md transition"
+      >
+        Send a Gift
+      </Link>
+    </div>
+  </div>
+
+  {/* 🖼️ Right: Hero Image */}
+  <div className="w-full md:w-1/2 flex justify-center items-center mb-8 md:mb-0">
+    <img
+      src="/hero.svg"
+      alt="Digital Innovation"
+      className="w-4/5 sm:w-3/4 md:w-full max-h-[500px] object-contain animate-fade-slide-in"
+    />
+  </div>
+</div>
+
       </div>
       <div></div>
       {/* 🟣 Section with Animated Inner Circle */}

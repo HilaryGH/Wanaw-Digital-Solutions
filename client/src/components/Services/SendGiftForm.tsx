@@ -400,27 +400,40 @@ const handlePayAndSend = async () => {
   }
 
   try {
-    // --- Prepare purchase payload ---
-    const purchasePayload: any = {
-      buyerName: senderName,
-      buyerEmail: senderEmail,
-      deliveryDate,
-      recipients, // send all recipients at once
-      message,
-      serviceId: service._id,
-    };
+    // --- Prepare FormData for file upload ---
+    const formData = new FormData();
+    formData.append("buyerName", senderName);
+    formData.append("buyerEmail", senderEmail);
+    formData.append("deliveryDate", deliveryDate);
+    formData.append("message", message);
+    formData.append("serviceId", service._id);
 
     if (service.category === "Hotel Rooms") {
-      purchasePayload.checkInDate = checkInDate;
-      purchasePayload.checkOutDate = checkOutDate;
-      purchasePayload.nights = nights;
+      formData.append("checkInDate", checkInDate);
+      formData.append("checkOutDate", checkOutDate);
+      formData.append("nights", nights.toString());
     }
 
-    // --- Make the purchase request ---
+    recipients.forEach((r, i) => {
+      formData.append(`recipients[${i}][name]`, r.name);
+      formData.append(`recipients[${i}][email]`, r.email);
+      formData.append(`recipients[${i}][phone]`, r.phone || "");
+      formData.append(`recipients[${i}][whatsapp]`, r.whatsapp || "");
+      formData.append(`recipients[${i}][telegram]`, r.telegram || "");
+      formData.append(`recipients[${i}][type]`, r.type);
+      if (r.type === "vip" && r.photo instanceof File) {
+        formData.append(`recipients[${i}][photo]`, r.photo); // actual file upload
+      }
+    });
+
+    if (referralCode) {
+      formData.append("referralCode", referralCode);
+    }
+
+    // --- Send purchase request ---
     const purchaseRes = await fetch(`${BASE_URL}/services/${service._id}/purchase`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(purchasePayload),
+      body: formData, // 👈 FormData handles files
     });
 
     if (!purchaseRes.ok) {
@@ -443,7 +456,7 @@ const handlePayAndSend = async () => {
 
     alert("🎉 Gift sent and purchase recorded!");
 
-    const totalAmount = (service.price || 0) * recipients.length;
+    const totalAmount = (service.price || 0) * (service.category === "Hotel Rooms" ? nights : 1) * recipients.length;
 
     // --- Navigate to payment options ---
     navigate("/payment-options", {

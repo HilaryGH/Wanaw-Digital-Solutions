@@ -11,8 +11,27 @@ const Gift = require("../models/Gift");
 ───────────────────────────── */
 exports.purchaseService = async (req, res) => {
   try {
-    const { buyerName, buyerEmail, recipients = [], message, deliveryDate } = req.body;
+    // ✅ ensure req.body is at least an empty object
+    const body = req.body || {};
 
+    let { buyerName, buyerEmail, message, deliveryDate } = body;
+    let recipients = [];
+
+    if (req.body.recipients) {
+      try {
+        if (typeof req.body.recipients === "string") {
+          recipients = JSON.parse(req.body.recipients); // parse string
+        } else {
+          recipients = req.body.recipients; // already an object/array
+        }
+      } catch (err) {
+        console.error("❌ Invalid recipients JSON:", err.message);
+        return res.status(400).json({ error: "Invalid recipients format" });
+      }
+    }
+
+
+    // Validation
     if (!buyerName || !buyerEmail) {
       return res.status(400).json({ msg: "Buyer name and email are required" });
     }
@@ -20,6 +39,19 @@ exports.purchaseService = async (req, res) => {
       return res.status(400).json({ msg: "At least one recipient is required" });
     }
 
+    // ⬇️ Handle uploaded VIP photos here
+    if (req.files && req.files.length > 0) {
+      req.files.forEach((file) => {
+        const match = file.fieldname.match(/recipients\[(\d+)\]\[photo\]/);
+        if (match) {
+          const index = parseInt(match[1], 10);
+          if (recipients[index]) {
+            // store filename or path in recipient
+            recipients[index].photo = file.filename || file.originalname;
+          }
+        }
+      });
+    }
     // Find service and populate the provider's fullName and email
     const service = await Service.findById(req.params.id)
       .populate("providerId", "fullName email");
@@ -350,36 +382,43 @@ exports.getSubcategories = async (req, res) => {
 
 exports.getPurchases = async (req, res) => {
   try {
+    // 1️⃣ Fetch purchases with item and provider info
     const purchases = await Purchase.find({ itemType: "Service" })
-      .populate("itemId", "title category location providerId")
-      .populate("providerId", "fullName email")
+      .populate("itemId", "title category location providerId") // item info
+      .populate("providerId", "fullName email") // provider info
       .lean();
 
     const purchaseIds = purchases.map(p => p._id);
 
-    // Populate GiftNotifications and join with Gift to get occasion
+    // 2️⃣ Fetch gift notifications and populate gift info
     const giftNotifications = await GiftNotification.find({ purchaseId: { $in: purchaseIds } })
-      .populate({ path: "giftId", select: "occasion" })
+      .populate({ path: "giftId", select: "occasion" }) // ensures occasion is populated
       .lean();
 
-
+    // 3️⃣ Map purchases with gifts and provider info
     const result = purchases.map(purchase => {
-      const gifts = giftNotifications.filter(g => g.purchaseId.toString() === purchase._id.toString());
+      const gifts = giftNotifications.filter(
+        g => g.purchaseId.toString() === purchase._id.toString()
+      );
 
       return {
         id: purchase._id,
         itemType: purchase.itemType,
-        service: purchase.itemId ? {
-          id: purchase.itemId._id,
-          title: purchase.itemId.title,
-          category: purchase.itemId.category,
-          location: purchase.itemId.location,
-        } : null,
-        provider: purchase.providerId ? {
-          id: purchase.providerId._id,
-          fullName: purchase.providerId.fullName,
-          email: purchase.providerId.email,
-        } : null,
+        service: purchase.itemId
+          ? {
+            id: purchase.itemId._id,
+            title: purchase.itemId.title,
+            category: purchase.itemId.category,
+            location: purchase.itemId.location,
+          }
+          : null,
+        provider: purchase.providerId
+          ? {
+            id: purchase.providerId._id,
+            fullName: purchase.providerId.fullName,
+            email: purchase.providerId.email,
+          }
+          : null,
         buyerName: purchase.buyerName,
         buyerEmail: purchase.buyerEmail,
         amount: purchase.amount,
@@ -389,7 +428,7 @@ exports.getPurchases = async (req, res) => {
           giftCode: g.giftCode,
           recipient: g.recipient,
           deliveryStatus: g.deliveryStatus,
-          occasion: g.giftId?.occasion || "Not specified",
+          occasion: g.giftId?.occasion || "Not specified", // ✅ fix for occasion
         })),
       };
     });
@@ -400,3 +439,4 @@ exports.getPurchases = async (req, res) => {
     res.status(500).json({ msg: "Failed to fetch purchases", error: err.message });
   }
 };
+

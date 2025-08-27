@@ -64,7 +64,9 @@ router.get("/:id", getServiceById);
 router.post("/", verifyToken, upload.single("image"), createService);
 
 // Purchase service (protect if needed)
-router.post("/:id/purchase", purchaseService);
+// Purchase service with support for fields + optional recipient photos
+router.post("/:id/purchase", upload.any(), purchaseService);
+
 // DELETE service
 router.delete("/:id", verifyToken, deleteService);
 

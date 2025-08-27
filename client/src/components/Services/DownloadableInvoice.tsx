@@ -23,7 +23,7 @@ interface DownloadableInvoiceProps {
   fullName: string;
   cart?: { title: string; price: number }[];
   total: number;
-  giftRecipient?: GiftRecipient;
+  giftRecipients?: GiftRecipient[]; // note plural
   provider?: ServiceProvider;
 }
 
@@ -31,7 +31,7 @@ const DownloadableInvoice = ({
   fullName,
   cart = [],
   total,
-  giftRecipient,
+  giftRecipients = [],
   provider,
 }: DownloadableInvoiceProps) => {
   const invoiceRef = useRef<HTMLDivElement>(null);
@@ -53,11 +53,12 @@ const DownloadableInvoice = ({
   }, [fullName]);
 
   const adjustedTotal = useMemo(() => {
-    if (giftRecipient?.type === "vip" && giftRecipient.price) {
-      return total + giftRecipient.price * 0.25;
-    }
-    return total;
-  }, [total, giftRecipient]);
+    let vipSurcharge = 0;
+    giftRecipients.forEach(r => {
+      if (r.type === "vip" && r.price) vipSurcharge += r.price * 0.25;
+    });
+    return total + vipSurcharge;
+  }, [total, giftRecipients]);
 
   const handleDownload = async () => {
     if (!invoiceRef.current) return;
@@ -152,13 +153,17 @@ const DownloadableInvoice = ({
               ))}
             </tbody>
           </table>
-        ) : giftRecipient ? (
+        ) : giftRecipients.length > 0 ? (
           <div style={{ marginBottom: "1rem", fontSize: "0.875rem" }}>
-            <p><strong>Gift Recipient:</strong> {giftRecipient.name} {giftRecipient.type === "vip" && "⭐ VIP"}</p>
-            {giftRecipient.itemTitle && <p><strong>Gift Item:</strong> {giftRecipient.itemTitle}</p>}
-            {giftRecipient.price !== undefined && <p><strong>Gift Price:</strong> {giftRecipient.price.toFixed(2)} ETB</p>}
-            {giftRecipient.message && <p><strong>Message:</strong> {giftRecipient.message}</p>}
-            {giftRecipient.giftCode && <p style={{ fontWeight: "bold", color: "#D4AF37" }}>🎁 Gift Code: {giftRecipient.giftCode}</p>}
+            {giftRecipients.map((recipient, idx) => (
+              <div key={idx} style={{ marginBottom: "1rem" }}>
+                <p><strong>Gift Recipient:</strong> {recipient.name} {recipient.type === "vip" && "⭐ VIP"}</p>
+                {recipient.itemTitle && <p><strong>Gift Item:</strong> {recipient.itemTitle}</p>}
+                {recipient.price !== undefined && <p><strong>Gift Price:</strong> {recipient.price.toFixed(2)} ETB</p>}
+                {recipient.message && <p><strong>Message:</strong> {recipient.message}</p>}
+                {recipient.giftCode && <p style={{ fontWeight: "bold", color: "#D4AF37" }}>🎁 Gift Code: {recipient.giftCode}</p>}
+              </div>
+            ))}
           </div>
         ) : (
           <p style={{ marginBottom: "1rem", fontSize: "0.875rem" }}>No purchase or gift details available.</p>
@@ -167,9 +172,9 @@ const DownloadableInvoice = ({
         {/* Total */}
         <div style={{ textAlign: "right", fontWeight: "600", fontSize: "1rem" }}>
           Total Amount Due: {adjustedTotal.toFixed(2)} ETB
-          {giftRecipient?.type === "vip" && giftRecipient.price && (
+          {giftRecipients.some(r => r.type === "vip" && r.price) && (
             <span style={{ fontSize: "0.75rem", color: "#6b7280", display: "block" }}>
-              (Includes 25% VIP surcharge: {(giftRecipient.price * 0.25).toFixed(2)} ETB)
+              (Includes 25% VIP surcharge)
             </span>
           )}
         </div>
@@ -207,6 +212,7 @@ const DownloadableInvoice = ({
 };
 
 export default DownloadableInvoice;
+
 
 
 

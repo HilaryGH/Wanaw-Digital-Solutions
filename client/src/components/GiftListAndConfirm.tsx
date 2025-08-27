@@ -16,6 +16,11 @@ interface Service {
   category?: string;
 }
 
+interface Provider {
+  fullName?: string;
+  email?: string;
+}
+
 interface GiftWithCode {
   _id: string;
   recipient?: Recipient;
@@ -24,6 +29,7 @@ interface GiftWithCode {
   giftCode?: string;
   deliveryStatus?: "pending" | "delivered";
   senderName?: string;
+  provider?: Provider;
 }
 
 const GiftListAndConfirm: React.FC = () => {
@@ -39,15 +45,21 @@ const GiftListAndConfirm: React.FC = () => {
         const res = await axios.get(`${BASE_URL}/services/purchase`);
         const fetchedPurchases = res.data || [];
 
-        const flattenedGifts: GiftWithCode[] = fetchedPurchases.flatMap(
-          (purchase: any) =>
-            (purchase.gifts || []).map((gift: any) => ({
-              ...gift,
-              service: purchase.service,
-              senderName: purchase.buyerName,
-              occasion: gift.occasion, // ✅ add this
-            }))
-        );
+      const flattenedGifts: GiftWithCode[] = fetchedPurchases.flatMap(
+  (purchase: any) =>
+    (purchase.gifts || []).map((gift: any) => ({
+      _id: gift.giftCode || gift._id,
+      service: purchase.service || undefined, // use 'service' from backend
+      senderName: purchase.buyerName,
+      provider: purchase.provider || undefined,
+      occasion: gift.occasion || gift.occasion || "Not specified", // backend field
+      giftCode: gift.giftCode,
+      deliveryStatus: gift.deliveryStatus,
+      recipient: gift.recipient,
+    }))
+);
+
+    
 
         setGifts(flattenedGifts);
       } catch (err) {
@@ -69,6 +81,8 @@ const GiftListAndConfirm: React.FC = () => {
       (gift.recipient?.name || "").toLowerCase().includes(term) ||
       (gift.recipient?.email || "").toLowerCase().includes(term) ||
       (gift.senderName || "").toLowerCase().includes(term) ||
+      (gift.provider?.fullName || "").toLowerCase().includes(term) ||
+      (gift.provider?.email || "").toLowerCase().includes(term) ||
       (gift.occasion || "").toLowerCase().includes(term) ||
       (gift.giftCode || "").toLowerCase().includes(term)
     );
@@ -79,15 +93,15 @@ const GiftListAndConfirm: React.FC = () => {
 
   return (
     <div className="px-2 sm:px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
-      <h1 className="text-xl sm:text-2xl font-bold mb-4 text-center text-gray-800">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center text-purple-700">
         Your Gifts
       </h1>
 
       {/* Search Input */}
       <input
         type="text"
-        placeholder="Search by gift, sender, recipient, occasion or code..."
-        className="w-full mb-4 sm:mb-6 p-2 sm:p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
+        placeholder="Search by gift, sender, provider, recipient, occasion or code..."
+        className="w-full mb-4 sm:mb-6 p-3 rounded-lg border border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm sm:text-base shadow-sm"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
@@ -98,14 +112,16 @@ const GiftListAndConfirm: React.FC = () => {
           No matching gifts found.
         </p>
       ) : (
-        <div className="overflow-x-auto shadow-lg rounded-lg">
-          <table className="min-w-full border-collapse text-sm sm:text-base">
-            <thead>
-              <tr className="bg-blue-600 text-white text-left uppercase text-xs sm:text-sm">
+        <div className="overflow-x-auto shadow-lg rounded-lg border border-purple-200">
+          <table className="min-w-full text-sm sm:text-base">
+            <thead className="bg-purple-600 text-white text-left uppercase text-xs sm:text-sm">
+              <tr>
                 <th className="py-2 px-3 sm:px-4 border">Title</th>
                 <th className="py-2 px-3 sm:px-4 border">Category</th>
                 <th className="py-2 px-3 sm:px-4 border">Occasion</th>
                 <th className="py-2 px-3 sm:px-4 border">Sender</th>
+                <th className="py-2 px-3 sm:px-4 border">Provider</th>
+                <th className="py-2 px-3 sm:px-4 border">Provider Email</th>
                 <th className="py-2 px-3 sm:px-4 border">Recipient</th>
                 <th className="py-2 px-3 sm:px-4 border">Email</th>
                 <th className="py-2 px-3 sm:px-4 border">Phone</th>
@@ -117,15 +133,17 @@ const GiftListAndConfirm: React.FC = () => {
             <tbody>
               {filteredGifts.map((gift, index) => (
                 <tr
-                  key={gift._id}
+                  key={`${gift._id}-${index}`}
                   className={`${
                     index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                  } hover:bg-blue-50 transition-colors duration-200`}
+                  } hover:bg-purple-50 transition-colors duration-200`}
                 >
                   <td className="py-1 sm:py-2 px-2 sm:px-3 border">{gift.service?.title || "Untitled"}</td>
                   <td className="py-1 sm:py-2 px-2 sm:px-3 border">{gift.service?.category || "Uncategorized"}</td>
-                  <td className="py-1 sm:py-2 px-2 sm:px-3 border">{gift.occasion || "Not specified"}</td>
+                  <td className="py-1 sm:py-2 px-2 sm:px-3 border">{gift.occasion}</td>
                   <td className="py-1 sm:py-2 px-2 sm:px-3 border">{gift.senderName || "Unknown"}</td>
+                  <td className="py-1 sm:py-2 px-2 sm:px-3 border">{gift.provider?.fullName || "N/A"}</td>
+                  <td className="py-1 sm:py-2 px-2 sm:px-3 border">{gift.provider?.email || "—"}</td>
                   <td className="py-1 sm:py-2 px-2 sm:px-3 border">{gift.recipient?.name || "N/A"}</td>
                   <td className="py-1 sm:py-2 px-2 sm:px-3 border">{gift.recipient?.email || "—"}</td>
                   <td className="py-1 sm:py-2 px-2 sm:px-3 border">{gift.recipient?.phone || "—"}</td>
@@ -144,7 +162,7 @@ const GiftListAndConfirm: React.FC = () => {
                   <td className="py-1 sm:py-2 px-2 sm:px-3 border text-center">
                     <button
                       onClick={() => setSelectedGiftId(gift._id)}
-                      className="bg-blue-600 text-white px-2 sm:px-3 py-1 rounded-md hover:bg-blue-700 transition-colors duration-200 text-xs sm:text-sm"
+                      className="bg-purple-600 text-white px-2 sm:px-3 py-1 rounded-md hover:bg-purple-700 transition-colors duration-200 text-xs sm:text-sm"
                     >
                       Confirm
                     </button>
@@ -159,7 +177,7 @@ const GiftListAndConfirm: React.FC = () => {
       {/* Confirm Gift Section */}
       {selectedGiftId && (
         <div className="mt-6 sm:mt-8">
-          <h2 className="text-lg sm:text-xl font-semibold mb-2 text-gray-800">
+          <h2 className="text-lg sm:text-xl font-semibold mb-2 text-purple-700">
             Confirm Gift Delivery
           </h2>
           <ConfirmGift giftId={selectedGiftId} />
@@ -176,6 +194,7 @@ const GiftListAndConfirm: React.FC = () => {
 };
 
 export default GiftListAndConfirm;
+
 
 
 

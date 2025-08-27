@@ -7,59 +7,60 @@ import VipGiftCard from "../VipGiftCard";
 
 const PaymentOptions = () => {
   const { state } = useLocation();
-
   const { service, recipients = [], amount, senderName } = state || {};
 
+  const [recipientsWithCodes, setRecipientsWithCodes] = useState(recipients);
+  const [currency, setCurrency] = useState<"ETB" | "USD">("ETB"); // Currency selection
   const [giftCode, setGiftCode] = useState<string | null>(null);
 
   const isGiftPayment = recipients.length > 0;
-
   const buyerFullName = senderName || "User";
-
   const invoiceTotal = amount || 0;
+  const exchangeRate = 55; // Example: 1 USD = 55 ETB
 
+  const displayAmount = currency === "ETB" ? invoiceTotal : (invoiceTotal / exchangeRate).toFixed(2);
+
+  // Fetch gift codes for recipients
   useEffect(() => {
-  if (!isGiftPayment) return;
+    if (!isGiftPayment || !service?._id || !recipients.length) return;
 
-  const fetchGiftWithCode = async () => {
-    const giftId = recipients[0]?.giftId;
-    if (!giftId) {
-      console.warn("No giftId found in recipients[0]");
-      return;
-    }
+    const fetchGiftCodes = async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/services/${service._id}/purchase`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            recipients,
+            serviceId: service._id,
+            senderName: buyerFullName,
+          }),
+        });
 
-    try {
-      const res = await fetch(`${BASE_URL}/gift/${giftId}/assign-delivery-code`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          recipient: recipients[0],
-          serviceId: service?._id,
-          senderName: buyerFullName,
-          message: recipients[0]?.message || "",
-        }),
-      });
+        const data = await res.json();
+        console.log("Gift API response:", data);
 
-      const data = await res.json();
-      console.log("Gift API response:", data);
-
-      if (res.ok && data.code) {
-        setGiftCode(data.code);
-      } else {
-        setGiftCode("Error: no code");
+        if (res.ok && data.codes?.length > 0) {
+          const updated = recipients.map((r: any, idx: number) => ({
+            ...r,
+            giftCode: data.codes[idx] || "No code",
+          }));
+          setRecipientsWithCodes(updated);
+          setGiftCode(updated[0].giftCode);
+        } else {
+          setGiftCode("Error: no code");
+        }
+      } catch (err) {
+        console.error("Error fetching gift codes:", err);
+        setGiftCode("Error: request failed");
       }
-    } catch (err) {
-      console.error("Error fetching gift code:", err);
-      setGiftCode("Error: request failed");
-    }
-  };
+    };
 
-  fetchGiftWithCode();
-}, [isGiftPayment, recipients, service, buyerFullName]);
+    fetchGiftCodes();
+  }, [isGiftPayment, recipients, service, buyerFullName]);
 
-
-  const handleWalletPayment = () => alert("Wallet payment coming soon.");
-  const handlePaymentRedirect = (method: string) => alert(`${method} payment coming soon.`);
+  // Payment handlers
+  const handleWalletPayment = () => alert(`Wallet payment in ${currency} coming soon.`);
+  const handlePaymentRedirect = (method: string) => alert(`${method} payment in ${currency} coming soon.`);
 
   const paymentMethods = [
     { text: "Telebirr", img: "/telebirr.png", onClick: () => handlePaymentRedirect("Telebirr") },
@@ -68,66 +69,79 @@ const PaymentOptions = () => {
     { text: "Bank App", img: "/bankapp.png", onClick: () => handlePaymentRedirect("Bank App") },
     { text: "Wallet", img: "/wallet.png", onClick: handleWalletPayment, bg: "bg-[#1c2b21]", hover: "hover:bg-[#162118]", textColor: "text-[#D4AF37]" },
     { text: "Chapa", img: "/chapa.png", onClick: handleWalletPayment, bg: "bg-[#1c2b21]", hover: "hover:bg-[#162118]", textColor: "text-[#D4AF37]" },
-
   ];
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4">
       <div className="max-w-4xl mx-auto space-y-8">
+
+
         {/* Invoice / Gift Card Section */}
         <div className="bg-white rounded-3xl shadow-2xl p-8 relative overflow-hidden">
-          <div className="absolute -top-20 -left-20 w-52 h-52 bg-gradient-to-br from-[#D4AF37] to-[#1c2b21] rounded-full opacity-20 animate-spin-slow"></div>
-          <div className="absolute -bottom-20 -right-20 w-72 h-72 bg-gradient-to-tr from-[#D4AF37] to-[#1c2b21] rounded-full opacity-20 animate-pulse"></div>
-
           <h2 className="text-3xl font-bold text-center text-[#1c2b21] mb-6">Payment Summary</h2>
 
-       <DownloadableInvoice
-  fullName={buyerFullName}
-  total={invoiceTotal}
-  giftRecipient={
-    isGiftPayment
-      ? {
-          name: recipients[0]?.name,
-          message: recipients[0]?.message,
-          itemTitle: service?.title, // ✅ this is still correct
-          price: invoiceTotal,
-          type: recipients[0]?.type || "standard",
-        giftCode: recipients[0]?.code || "Generating...",  // ✅ use actual backend code
-        }
-      : undefined
-  }
-/>
+          <p className="text-center text-xl font-bold mb-4">Total: {displayAmount} {currency}</p>
 
+          <DownloadableInvoice
+            fullName={buyerFullName}
+            total={displayAmount}
+            giftRecipients={recipientsWithCodes.length > 0 ? recipientsWithCodes.map((r: { name: any; message: any; type: any; giftCode: any; }) => ({
+              name: r.name,
+              message: r.message,
+              itemTitle: service?.title,
+              price: displayAmount,
+              type: r.type || "standard",
+              giftCode: r.giftCode || "Generating...",
+            })) : []}
+          />
 
           {isGiftPayment && (
             <div className="mt-6">
-              {recipients[0]?.type === "vip" ? (
+              {recipientsWithCodes[0]?.type === "vip" ? (
                 <VipGiftCard
-                  recipientName={recipients[0]?.name || "Recipient"}
-                  code={giftCode || "Generating..."}
+                  recipientName={recipientsWithCodes[0]?.name || "Recipient"}
+                  code={recipientsWithCodes[0]?.giftCode || "Generating..."}
                   senderName={buyerFullName}
-                  serviceTitle={service?.title || "Unknown Service"}
-                  serviceCategory={service?.category || "Unknown Category"}
-                  serviceProvider={service?.provider?.name || "Unknown Provider"}
-                  serviceLocation={service?.location || "Unknown Location"}
-                  message={recipients[0]?.message || "No message"}
+                  serviceTitle={service?.title || "Service"}
+                  serviceCategory={service?.category || "Category"}
+                  serviceProvider={service?.provider?.name || "Not specified"}
+                  serviceLocation={service?.location || "Not specified"}
+                  message={recipientsWithCodes[0]?.message || ""}
+                  recipientEmail={recipientsWithCodes[0]?.email}
+                  photo={recipientsWithCodes[0]?.photo ? `${BASE_URL}/uploads/${recipientsWithCodes[0].photo}` : undefined}
                 />
               ) : (
                 <BasicGiftCard
-                  recipientName={recipients[0]?.name || "Recipient"}
+                  recipientName={recipientsWithCodes[0]?.name || "Recipient"}
                   code={giftCode || "Generating..."}
                   senderName={buyerFullName}
                   serviceTitle={service?.title}
                   serviceCategory={service?.category}
                   serviceProvider={service?.provider?.name || "Not specified"}
                   serviceLocation={service?.location || "Not specified"}
-                  message={recipients[0]?.message}
+                  message={recipientsWithCodes[0]?.message}
                 />
               )}
             </div>
           )}
         </div>
 
+
+        {/* Currency Selection */}
+        <div className="flex justify-center gap-4 mb-6">
+          <button
+            onClick={() => setCurrency("ETB")}
+            className={`px-4 py-2 rounded-lg font-semibold ${currency === "ETB" ? "bg-[#D4AF37] text-white" : "bg-gray-200 text-gray-800"}`}
+          >
+            Birr
+          </button>
+          <button
+            onClick={() => setCurrency("USD")}
+            className={`px-4 py-2 rounded-lg font-semibold ${currency === "USD" ? "bg-[#D4AF37] text-white" : "bg-gray-200 text-gray-800"}`}
+          >
+            USD
+          </button>
+        </div>
         {/* Payment Method Section */}
         <div className="bg-white rounded-3xl shadow-2xl p-8">
           <h2 className="text-2xl font-bold text-[#1c2b21] mb-4 text-center">Choose Payment Method</h2>
@@ -146,6 +160,7 @@ const PaymentOptions = () => {
             ))}
           </div>
         </div>
+
       </div>
     </div>
   );

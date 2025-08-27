@@ -12,6 +12,7 @@ interface VipGiftCardProps {
   recipientEmail?: string;
   recipientPhone?: string;
   providerName?: string;
+  photo?: string; // new
 }
 
 const VipGiftCard: React.FC<VipGiftCardProps> = ({
@@ -26,12 +27,22 @@ const VipGiftCard: React.FC<VipGiftCardProps> = ({
   recipientEmail,
   recipientPhone,
   providerName,
+  photo, // new
 }) => {
   return (
     <div className="w-full max-w-md mx-auto bg-gradient-to-br from-[#fff8f0] to-[#fff1e6] rounded-3xl shadow-2xl p-6 sm:p-8 flex flex-col items-center font-poppins relative overflow-hidden">
       {/* Decorative Brand Circles */}
       <div className="absolute -top-16 -left-16 w-36 h-36 bg-gradient-to-br from-[#D4AF37] to-[#1c2b21] rounded-full opacity-20 animate-spin-slow"></div>
       <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-gradient-to-tr from-[#D4AF37] to-[#1c2b21] rounded-full opacity-20 animate-pulse"></div>
+
+      {/* Recipient Photo */}
+      {photo && (
+        <img
+          src={photo}
+          alt={`${recipientName}'s photo`}
+          className="w-24 h-24 rounded-full object-cover mb-4 border-2 border-[#D4AF37]"
+        />
+      )}
 
       {/* Header */}
       <h2 className="text-3xl font-bold text-[#D4AF37] mb-4 tracking-wide">
@@ -77,5 +88,6 @@ const VipGiftCard: React.FC<VipGiftCardProps> = ({
 };
 
 export default VipGiftCard;
+
 
 
