@@ -43,7 +43,6 @@ const GiftListForProvider = () => {
         });
 
         const data = res.data || [];
-        console.log("Fetched purchases:", data);
 
         const normalized: Purchase[] = data.map((p: any) => ({
           ...p,
@@ -58,7 +57,6 @@ const GiftListForProvider = () => {
         setPurchases(normalized);
         setGiftCodes(initialGiftCodes);
       } catch (err: any) {
-        console.error("Failed to fetch purchases:", err.response?.data || err.message);
         setError("Failed to fetch purchases.");
       } finally {
         setLoading(false);
@@ -97,63 +95,65 @@ const GiftListForProvider = () => {
       );
       setMessages((prev) => ({ ...prev, [giftCode]: `✅ Status updated to ${statusLower}` }));
     } catch (err: any) {
-      setMessages((prev) => ({ ...prev, [giftCode]: err.response?.data?.msg || "❌ Update failed" }));
+      setMessages((prev) => ({ ...prev, [giftCode]: "❌ Update failed" }));
     }
   };
 
-  if (loading) return <p className="text-center py-6">Loading...</p>;
+  if (loading) return <p className="text-center py-6 text-gray-500">Loading...</p>;
   if (error) return <p className="text-red-600 text-center">{error}</p>;
 
   return (
-    <div className="px-4 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-center">Purchased Services & Gifts</h1>
+    <div className="px-4 py-6 max-w-7xl mx-auto">
+      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center text-[#1c2b21]">
+        Purchased Services & Gifts
+      </h1>
 
       <input
         type="text"
-        placeholder="Search purchases, gifts or recipients..."
-        className="w-full mb-6 p-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Search purchases, gifts, or recipients..."
+        className="w-full mb-6 p-2 md:p-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] text-sm md:text-base"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
       <div className="overflow-x-auto">
-        <table className="min-w-full border border-gray-200 shadow-sm rounded-lg bg-white">
-          <thead className="bg-blue-600 text-white">
+        <table className="min-w-full border border-gray-200 shadow-md rounded-lg bg-white text-sm md:text-base">
+          <thead className="bg-[#D4AF37] text-[#1c2b21] text-left">
             <tr>
-              <th className="px-4 py-2 text-left">Service</th>
-              <th className="px-4 py-2 text-left">Buyer</th>
-              <th className="px-4 py-2 text-left">Email</th>
-              <th className="px-4 py-2 text-left">Recipient</th>
-              <th className="px-4 py-2 text-left">Phone</th>
-              <th className="px-4 py-2 text-left">Gift Code</th>
-              <th className="px-4 py-2 text-left">Status</th>
+              <th className="px-3 md:px-4 py-2">Service</th>
+              <th className="px-3 md:px-4 py-2">Buyer</th>
+              <th className="px-3 md:px-4 py-2">Email</th>
+              <th className="px-3 md:px-4 py-2">Recipient</th>
+              <th className="px-3 md:px-4 py-2">Phone</th>
+              <th className="px-3 md:px-4 py-2">Gift Code</th>
+              <th className="px-3 md:px-4 py-2">Status</th>
             </tr>
           </thead>
           <tbody>
             {filteredPurchases.length === 0 ? (
               <tr>
-                <td colSpan={7} className="text-center py-4 text-gray-500">
+                <td colSpan={7} className="text-center py-6 text-gray-500">
                   No purchased services found.
                 </td>
               </tr>
             ) : (
               filteredPurchases.map((p) => (
                 <tr key={p.id} className="border-t hover:bg-gray-50 transition">
-                  <td className="px-4 py-2">{p.item?.title || "Untitled"}</td>
-                  <td className="px-4 py-2">{p.buyerName}</td>
-                  <td className="px-4 py-2">{p.buyerEmail}</td>
-                  <td className="px-4 py-2">
-                    {(p.gifts ?? []).map((g, idx) => (
-                      <p key={idx} className="text-sm mb-1">{g.recipient.name || "N/A"}</p>
+                  <td className="px-2 md:px-4 py-2">{p.item?.title || "Untitled"}</td>
+                  <td className="px-2 md:px-4 py-2">{p.buyerName}</td>
+                  <td className="px-2 md:px-4 py-2">{p.buyerEmail}</td>
+                  <td className="px-2 md:px-4 py-2">
+                    {p.gifts.map((g, idx) => (
+                      <p key={idx} className="mb-1 truncate">{g.recipient.name || "N/A"}</p>
                     ))}
                   </td>
-                  <td className="px-4 py-2">
-                    {(p.gifts ?? []).map((g, idx) => (
-                      <p key={idx} className="text-sm mb-1">{g.recipient.phone || "N/A"}</p>
+                  <td className="px-2 md:px-4 py-2">
+                    {p.gifts.map((g, idx) => (
+                      <p key={idx} className="mb-1 truncate">{g.recipient.phone || "N/A"}</p>
                     ))}
                   </td>
-                  <td className="px-4 py-2">
-                    {(p.gifts ?? []).map((g, idx) => {
+                  <td className="px-2 md:px-4 py-2">
+                    {p.gifts.map((g, idx) => {
                       const key = `${p.id}-${idx}`;
                       return (
                         <input
@@ -163,26 +163,26 @@ const GiftListForProvider = () => {
                           onChange={(e) =>
                             setGiftCodes((prev) => ({ ...prev, [key]: e.target.value }))
                           }
-                          className="px-2 py-1 border rounded text-sm w-28 mb-1"
-                          placeholder={g.recipient.name || "Recipient"}
+                          className="px-2 py-1 border rounded text-xs md:text-sm w-24 md:w-28 mb-1 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
+                          placeholder="Gift Code"
                         />
                       );
                     })}
                   </td>
-                  <td className="px-4 py-2">
-                    {(p.gifts ?? []).map((g, idx) => (
+                  <td className="px-2 md:px-4 py-2">
+                    {p.gifts.map((g, idx) => (
                       <div key={idx} className="mb-1">
                         <select
                           value={(g.deliveryStatus || "pending").toLowerCase()}
                           onChange={(e) => handleStatusChange(g.giftCode, e.target.value)}
-                          className="border rounded px-1 text-sm"
+                          className="border rounded px-1 text-xs md:text-sm w-full focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
                         >
                           <option value="pending">Pending</option>
                           <option value="delivered">Delivered</option>
                           <option value="canceled">Canceled</option>
                         </select>
                         {messages[g.giftCode] && (
-                          <p className="text-xs text-gray-600 mt-1">{messages[g.giftCode]}</p>
+                          <p className="text-xs text-gray-600 mt-1 truncate">{messages[g.giftCode]}</p>
                         )}
                       </div>
                     ))}
@@ -198,8 +198,6 @@ const GiftListForProvider = () => {
 };
 
 export default GiftListForProvider;
-
-
 
 
 

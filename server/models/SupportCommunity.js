@@ -59,6 +59,13 @@ const SupportCommunitySchema = new mongoose.Schema({
     default: null,
   },
   digitalCreatorRoles: [String],
+  // Digital Creator uploaded files
+  digitalCreatorFiles: {
+    photos: [{ type: String }],   // store file paths or URLs
+    videos: [{ type: String }],   // store file paths or URLs
+    docs: [{ type: String }],     // store file paths or URLs
+  },
+
 
   // Brand Ambassador fields
   brandAmbassadorTier: {

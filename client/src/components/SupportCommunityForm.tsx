@@ -27,6 +27,11 @@ const SupportCommunityForm = () => {
     influencerRoles: [] as string[],
     digitalCreatorLevel: "",
     digitalCreatorRoles: [] as string[],
+    digitalCreatorFiles: {
+    photos: [] as File[],
+    videos: [] as File[],
+    docs: [] as File[],
+  },
     brandAmbassadorLevel: "",
     brandAmbassadorRoles: [] as string[],
     serviceProviderLevel: "",
@@ -89,82 +94,86 @@ const handleRoleToggle = (role: keyof typeof formData.roles) => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (!formData.name || !formData.email) {
-      alert("Please fill your name and email.");
-      return;
+  // ✅ Basic validation
+  if (!formData.name || !formData.email) {
+    alert("Please fill your name and email.");
+    return;
+  }
+
+  if (!Object.values(formData.roles).some(Boolean)) {
+    alert("Please select at least one role.");
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem("token");
+
+    // Convert roles object to array
+    const rolesArray: string[] = [];
+    if (formData.roles.gifter) rolesArray.push("Gifter");
+    if (formData.roles.influencer) rolesArray.push("Influencer");
+    if (formData.roles.digitalCreator) rolesArray.push("Digital Creator");
+    if (formData.roles.brandAmbassador) rolesArray.push("Brand Ambassador");
+    if (formData.roles.serviceProvider) rolesArray.push("Service Provider");
+    if (formData.roles.volunteer) rolesArray.push("Volunteer");
+
+    // ✅ Use FormData for files + text
+    const formPayload = new FormData();
+    formPayload.append("name", formData.name);
+    formPayload.append("email", formData.email);
+    formPayload.append("phone", formData.phone || "");
+    formPayload.append("region", formData.region || "");
+    formPayload.append("whatsapp", formData.whatsapp || "");
+    formPayload.append("telegram", formData.telegram || "");
+    formPayload.append("userType", formData.userType);
+    formPayload.append("roles", JSON.stringify(rolesArray));
+    formPayload.append("digitalCreatorTier", formData.digitalCreatorLevel || "");
+    formPayload.append("digitalCreatorRoles", JSON.stringify(formData.digitalCreatorRoles));
+    formPayload.append("message", formData.message || "");
+
+    // ✅ Append files for Digital Creator
+    if (formData.roles.digitalCreator && formData.digitalCreatorFiles) {
+      const { photos = [], videos = [], docs = [] } = formData.digitalCreatorFiles;
+      photos.forEach((file) => formPayload.append("photos", file));
+      videos.forEach((file) => formPayload.append("videos", file));
+      docs.forEach((file) => formPayload.append("docs", file));
     }
 
-    if (!Object.values(formData.roles).some(Boolean)) {
-      alert("Please select at least one role.");
-      return;
-    }
+    // ✅ Send to backend
+    const res = await fetch(`${BASE_URL}/support-community`, {
+      method: "POST",
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: formPayload,
+    });
 
-    try {
-      const token = localStorage.getItem("token");
+    if (!res.ok) throw new Error("Submission failed");
 
-      const rolesArray: string[] = [];
-      if (formData.roles.gifter) rolesArray.push("Gifter");
-      if (formData.roles.influencer) rolesArray.push("Influencer");
-      if (formData.roles.digitalCreator) rolesArray.push("Digital Creator");
-      if (formData.roles.brandAmbassador) rolesArray.push("Brand Ambassador");
-      if (formData.roles.serviceProvider) rolesArray.push("Service Provider");
-      if (formData.roles.volunteer) rolesArray.push("Volunteer");
+    // ✅ Generate certificate after successful submission
+    generateCertificate({
+      name: formData.name,
+      role: rolesArray[0] || "Member",
+      level:
+        formData.gifterLevel ||
+        formData.influencerLevel ||
+        formData.digitalCreatorLevel ||
+        formData.brandAmbassadorLevel ||
+        formData.serviceProviderLevel ||
+        formData.volunteerLevel,
+    });
 
-      const serviceProviderLevelMap: Record<string, string> = {
-        primaryHealthcareProvider: "Primary Healthcare Provider",
-        specializedServiceProvider: "Specialized Service Provider",
-      };
+    alert("Thank you for joining the Support Community!");
+    navigate("/community/hemodialysis");
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong. Please try again.");
+  }
+};
 
-      const volunteerLevelMap: Record<string, string> = {
-        coreVolunteer: "coreVolunteer",
-        projectBasedVolunteer: "projectBasedVolunteer",
-        occasionalVolunteer: "occasionalVolunteer",
-        virtualVolunteer: "virtualVolunteer",
-        studentVolunteer: "studentVolunteer",
-      };
-
-      const payload = {
-        ...formData,
-        roles: rolesArray,
-        serviceProviderLevel: serviceProviderLevelMap[formData.serviceProviderLevel] || "",
-        volunteerLevel: volunteerLevelMap[formData.volunteerLevel] || "",
-      };
-
-      const res = await fetch(`${BASE_URL}/support-community`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) throw new Error("Submission failed");
-
-      localStorage.setItem("userRoles", JSON.stringify(formData.roles));
-
-      generateCertificate({
-        name: formData.name,
-        role: rolesArray[0] || "Member",
-        level:
-          formData.gifterLevel ||
-          formData.influencerLevel ||
-          formData.digitalCreatorLevel ||
-          formData.brandAmbassadorLevel ||
-          formData.serviceProviderLevel ||
-          formData.volunteerLevel,
-      });
-
-      alert("Thank you for joining the Support Community!");
-      navigate("/community/hemodialysis");
-    } catch (err) {
-      console.error(err);
-      alert("Something went wrong. Please try again.");
-    }
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white px-4 sm:px-6 lg:px-8 relative overflow-hidden">
@@ -243,23 +252,95 @@ const handleRoleToggle = (role: keyof typeof formData.roles) => {
             )}
 
             {role.key === "digitalCreator" && formData.roles.digitalCreator && (
-              <>
-                <select value={formData.digitalCreatorLevel} onChange={(e) => handleLevelChange("digitalCreatorLevel", e.target.value)} className="p-2 border rounded border-gray-300 w-full sm:w-auto mt-2">
-                  <option value="">Select Level</option>
-                  <option value="Professional Creator">Professional Creator</option>
-                  <option value="Community Creator">Community Creator</option>
-                  <option value="Casual Creator">Casual Creator</option>
-                </select>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-                  {["Video Content", "Blog/Articles", "Graphics/Designs", "Photography"].map((item) => (
-                    <label key={item} className="flex items-center gap-2">
-                      <input type="checkbox" checked={formData.digitalCreatorRoles.includes(item)} onChange={(e) => handleMultiRoleChange("digitalCreatorRoles", item, e.target.checked)} />
-                      <span className="text-sm sm:text-base">{item}</span>
-                    </label>
-                  ))}
-                </div>
-              </>
-            )}
+  <>
+    <select
+      value={formData.digitalCreatorLevel}
+      onChange={(e) => handleLevelChange("digitalCreatorLevel", e.target.value)}
+      className="p-2 border rounded border-gray-300 w-full sm:w-auto mt-2"
+    >
+      <option value="">Select Level</option>
+      <option value="Professional Creator">Professional Creator</option>
+      <option value="Community Creator">Community Creator</option>
+      <option value="Casual Creator">Casual Creator</option>
+    </select>
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+      {["Video Content", "Blog/Articles", "Graphics/Designs", "Photography"].map((item) => (
+        <label key={item} className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={formData.digitalCreatorRoles.includes(item)}
+            onChange={(e) =>
+              handleMultiRoleChange("digitalCreatorRoles", item, e.target.checked)
+            }
+          />
+          <span className="text-sm sm:text-base">{item}</span>
+        </label>
+      ))}
+    </div>
+
+    {/* File Uploads */}
+    <div className="mt-3 space-y-2">
+      <label className="block text-sm font-semibold text-[#1c2b21]">
+        Upload Photos
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={(e) =>
+            setFormData((prev) => ({
+              ...prev,
+              digitalCreatorFiles: {
+                ...prev.digitalCreatorFiles,
+                photos: e.target.files ? Array.from(e.target.files) : [],
+              },
+            }))
+          }
+          className="mt-1 block w-full text-sm border rounded p-2"
+        />
+      </label>
+
+      <label className="block text-sm font-semibold text-[#1c2b21]">
+        Upload Videos
+        <input
+          type="file"
+          accept="video/*"
+          multiple
+          onChange={(e) =>
+            setFormData((prev) => ({
+              ...prev,
+              digitalCreatorFiles: {
+                ...prev.digitalCreatorFiles,
+                videos: e.target.files ? Array.from(e.target.files) : [],
+              },
+            }))
+          }
+          className="mt-1 block w-full text-sm border rounded p-2"
+        />
+      </label>
+
+      <label className="block text-sm font-semibold text-[#1c2b21]">
+        Upload Documents
+        <input
+          type="file"
+          accept=".pdf,.doc,.docx,.txt"
+          multiple
+          onChange={(e) =>
+            setFormData((prev) => ({
+              ...prev,
+              digitalCreatorFiles: {
+                ...prev.digitalCreatorFiles,
+                docs: e.target.files ? Array.from(e.target.files) : [],
+              },
+            }))
+          }
+          className="mt-1 block w-full text-sm border rounded p-2"
+        />
+      </label>
+    </div>
+  </>
+)}
+
 
             {role.key === "brandAmbassador" && formData.roles.brandAmbassador && (
               <>

@@ -3,6 +3,8 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { sendMultiChannel } = require("../utils/notification");
+const crypto = require("crypto");
+const { sendEmail } = require("../utils/notification");
 
 /* ────── role sets ────── */
 const allowedRoles = ["individual", "provider", "corporate", "diaspora", "admin", "super_admin", "marketing_admin", "customer_support_admin"];
@@ -244,8 +246,14 @@ exports.forgotPassword = async (req, res) => {
     user.resetToken = token;
     user.tokenExpire = Date.now() + 1000 * 60 * 15; // valid for 15 minutes
     await user.save();
+    const frontendUrl =
+      process.env.NODE_ENV === "production"
+        ? process.env.FRONTEND_URL.replace(/\/$/, "") // remove trailing slash if any
+        : "http://localhost:5173";
 
-    const resetLink = `http://localhost:5173/reset-password?token=${token}`;
+    const resetLink = `${frontendUrl}/reset-password?token=${token}`;
+
+
 
     await sendEmail({
       to: user.email,

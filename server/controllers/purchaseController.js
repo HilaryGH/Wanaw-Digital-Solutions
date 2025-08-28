@@ -143,32 +143,35 @@ exports.updateGiftStatus = async (req, res) => {
     await gift.save();
 
     // Prepare notification content
-    const subject = `🎁 Gift Status Update: Your gift is now ${status}`;
+    // Prepare notification content
+    const subject = ` Gift Status Update: Your gift is now ${status}`;
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-        <div style="background-color:#1c2b21; padding: 20px; text-align: center;">
-          <h2 style="margin: 0; color: #D4AF37;">Wanaw Health and Wellness Digital Solution</h2>
-        </div>
-        <div style="padding: 30px; background-color: #fff; color: #333;">
-          <p>Hello ${gift.recipient.name || "there"},</p>
-          <p>The status of your gift with code <strong>${giftCode}</strong> has been updated to <strong>${status}</strong>.</p>
-          <p>Enjoy your experience!</p>
-          <div style="text-align:center; margin-top: 25px;">
-            <a href="https://wanawhealthandwellness.netlify.app/" style="display:inline-block; padding:12px 24px; background-color:#D4AF37; color:#1c2b21; text-decoration:none; border-radius:4px; font-weight:bold;">
-              Redeem Your Gift
-            </a>
-          </div>
-        </div>
-        <div style="background-color: #1c2b21; padding: 15px; text-align: center; font-size: 13px; color: #D4AF37;">
-          &copy; ${new Date().getFullYear()} Wanaw Health & Wellness. All rights reserved.
-        </div>
+  <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin:auto; border-radius: 8px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.08);">
+    <div style="background-color:#1c2b21; padding: 20px; text-align:center;">
+      <h2 style="margin:0; color:#D4AF37; font-size:20px;">Wanaw Health & Wellness</h2>
+    </div>
+    <div style="padding: 25px; background-color:#fff; color:#333; line-height:1.5;">
+      <p style="font-size:14px;">Hello <strong>${gift.recipient.name || 'there'}</strong>,</p>
+      <p style="font-size:14px;">The status of your gift with code <strong>${giftCode}</strong> has been updated to <strong>${status}</strong>.</p>
+      <p style="font-size:14px;">Enjoy your experience with Wanaw Health & Wellness!</p>
+      <div style="text-align:center; margin-top:20px;">
+        <a href="https://wanawhealthandwellness.netlify.app/"
+          style="display:inline-block; padding:12px 24px; background-color:#D4AF37; color:#1c2b21; text-decoration:none; font-weight:bold; border-radius:4px; font-size:14px;">
+          Redeem Your Gift
+        </a>
       </div>
-    `;
+    </div>
+    <div style="background-color:#1c2b21; padding: 15px; text-align:center; font-size:12px; color:#D4AF37;">
+      &copy; ${new Date().getFullYear()} Wanaw Health & Wellness. All rights reserved.
+    </div>
+  </div>
+`;
+
     const text = `Hello ${gift.recipient.name || "there"}!
 Gift code ${giftCode} status is now: ${status}
 Redeem at: https://wanawhealthandwellness.netlify.app/`;
 
-    // ✅ Send multi-channel notification
+    // Send multi-channel notification
     await sendMultiChannel({
       email: gift.recipient.email,
       phone: gift.recipient.phone,
@@ -178,6 +181,8 @@ Redeem at: https://wanawhealthandwellness.netlify.app/`;
       html,
       text,
     });
+
+
 
     res.status(200).json({
       msg: `✅ Gift status updated to ${status} and recipient notified via all available channels`,

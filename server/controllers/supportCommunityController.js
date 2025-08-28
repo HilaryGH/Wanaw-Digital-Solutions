@@ -1,15 +1,21 @@
 const SupportCommunity = require("../models/SupportCommunity");
 const { sendEmail } = require("../utils/notification"); // adjust path if needed
+const multer = require("multer");
+
+// Setup multer for memory storage
+const upload = multer();
 
 // Helper to generate membership ID
 function generateMembershipId() {
   const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
   const timestampPart = Date.now().toString().slice(-6);
-  return `SUP${randomPart}${timestampPart}`; // 'SUP' prefix for support community
+  return `SUP${randomPart}${timestampPart}`;
 }
 
+// ✅ Controller
 exports.submitSupport = async (req, res) => {
   try {
+    // Text fields come from FormData
     const {
       name,
       email,
@@ -20,58 +26,42 @@ exports.submitSupport = async (req, res) => {
       supportTypes,
       message,
       userType,
-      role, // single role (optional)
-      roles, // multiple roles
+      role, // single role optional
+      roles, // multiple roles sent as JSON string
       influencerTier,
       influencerRoles,
       brandAmbassadorTier,
       brandAmbassadorRoles,
       serviceProviderTier,
       volunteerTier,
+      digitalCreatorTier,
+      digitalCreatorRoles,
     } = req.body;
 
-    // Convert roles object { gifter: true, influencer: false, ... } to array of selected roles
+    if (!name || !email) {
+      return res.status(400).json({ success: false, message: "Name and email are required." });
+    }
+
+    // Parse roles if sent as string
     let finalRoles = [];
-    if (Array.isArray(roles)) {
-      finalRoles = roles;
-    } else if (roles && typeof roles === "object") {
-      finalRoles = Object.keys(roles).filter((r) => roles[r] === true);
+    if (roles) {
+      finalRoles = typeof roles === "string" ? JSON.parse(roles) : roles;
+    }
+    if (role && !finalRoles.includes(role)) finalRoles.push(role);
+
+    if (!finalRoles.length) {
+      return res.status(400).json({ success: false, message: "At least one role is required." });
     }
 
-    if (role && !finalRoles.includes(role)) {
-      finalRoles.push(role);
-    }
-
-    // Map roles to correct enum strings
-    const roleMap = {
-      gifter: "Gifter",
-      influencer: "Influencer",
-      "brandambassador": "Brand Ambassador",
-      "serviceprovider": "Service Provider",
-      volunteer: "Volunteer",
-    };
-
-    finalRoles = finalRoles
-      .map((r) => {
-        const key = r.toLowerCase().replace(/\s+/g, "");
-        return roleMap[key] || r; // fallback to original if no mapping
-      })
-      .filter((r) => r); // remove falsy values
-
-    if (finalRoles.length === 0) {
-      return res
-        .status(400)
-        .json({ success: false, message: "At least one valid role is required." });
-    }
-
-    // Clean tier fields: convert empty string to null
+    // Clean tier fields
     function cleanTier(tier) {
-      return tier === "" ? null : tier;
+      return tier === "" || tier === undefined ? null : tier;
     }
 
-    // Generate membership ID
+    // Membership ID
     const membershipId = generateMembershipId();
 
+    // Create new document
     const entry = new SupportCommunity({
       name,
       email,
@@ -79,18 +69,38 @@ exports.submitSupport = async (req, res) => {
       region,
       whatsapp,
       telegram,
-      supportTypes,
+      supportTypes: supportTypes ? JSON.parse(supportTypes) : [],
       message,
       userType,
       roles: finalRoles,
       influencerTier: cleanTier(influencerTier),
-      influencerRoles,
+      influencerRoles: influencerRoles ? JSON.parse(influencerRoles) : [],
       brandAmbassadorTier: cleanTier(brandAmbassadorTier),
-      brandAmbassadorRoles,
+      brandAmbassadorRoles: brandAmbassadorRoles ? JSON.parse(brandAmbassadorRoles) : [],
       serviceProviderTier: cleanTier(serviceProviderTier),
       volunteerTier: cleanTier(volunteerTier),
-      membershipId, // new field added here
+      digitalCreatorTier: cleanTier(digitalCreatorTier),
+      digitalCreatorRoles: digitalCreatorRoles ? JSON.parse(digitalCreatorRoles) : [],
+      membershipId,
     });
+
+    // Handle uploaded files
+    if (req.files && req.files.length) {
+      req.files.forEach(file => {
+        if (file.fieldname === "photos") {
+          entry.digitalCreatorPhotos = entry.digitalCreatorPhotos || [];
+          entry.digitalCreatorPhotos.push(file.buffer); // save buffer or process as needed
+        }
+        if (file.fieldname === "videos") {
+          entry.digitalCreatorVideos = entry.digitalCreatorVideos || [];
+          entry.digitalCreatorVideos.push(file.buffer);
+        }
+        if (file.fieldname === "docs") {
+          entry.digitalCreatorDocs = entry.digitalCreatorDocs || [];
+          entry.digitalCreatorDocs.push(file.buffer);
+        }
+      });
+    }
 
     await entry.save();
 

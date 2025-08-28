@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BASE_URL from "../../api/api";
 
+// Subcategory definitions
 const wellnessSubcategories = [
   { label: "Salon & Hairstyling", options: ["Hair Styling", "Haircut", "Hair Coloring", "Blow Dry"] },
   { label: "Gym & Fitness", options: ["Gym", "Personal Trainer", "Yoga Instructor", "Health Coach"] },
@@ -37,13 +38,14 @@ const hotelRoomSubcategories = [
   { label: "Pensions", options: ["Standard Pension Room"] },
 ];
 
+// Map category to its subcategories
 const subcategoriesMap: Record<string, typeof wellnessSubcategories> = {
   Wellness: wellnessSubcategories,
   Medical: medicalSubcategories,
-"Home Based/Mobile Services": homeBasedSubcategories, // ✅ match schema
-  Hotel: hotelRoomSubcategories, // ✅ match schema
-
+  "Home Based/Mobile Services": homeBasedSubcategories,
+  Hotel: hotelRoomSubcategories,
 };
+
 
 const AddServiceForm = () => {
   const navigate = useNavigate();
@@ -68,17 +70,9 @@ const AddServiceForm = () => {
     }
   }, [navigate, user]);
 
-  useEffect(() => {
-    setSubcategory(""); // reset subcategory when category changes
-  }, [category]);
-
   const handleSubmit = async () => {
     if (!title || !category || !price || !image) {
       alert("Title, Category, Price, and Image are required.");
-      return;
-    }
-    if (subcategoriesMap[category] && !subcategory) {
-      alert("Please select a subcategory.");
       return;
     }
 
@@ -96,26 +90,25 @@ const AddServiceForm = () => {
 
       const { imageUrl } = await uploadRes.json();
 
-    const serviceRes = await fetch(`${BASE_URL}/services`, {
-  method: "POST",
-  headers: {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    title,
-    description,
-    category,
-    subcategory,
-    price,
-    duration,
-    tags,
-    location,
-    imageUrl,
-    providerId: user._id, // ✅ add this
-  }),
-});
-
+      const serviceRes = await fetch(`${BASE_URL}/services`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          description,
+          category,
+          subcategory,
+          price,
+          duration,
+          tags,
+          location,
+          imageUrl,
+          providerId: user._id,
+        }),
+      });
 
       if (!serviceRes.ok) throw new Error("Failed to create service");
 
@@ -128,49 +121,104 @@ const AddServiceForm = () => {
   };
 
   return (
-    <div className="border border-gray-300 rounded-xl p-6 bg-white shadow w-full max-w-lg mx-auto mt-10">
-      <h2 className="text-2xl font-bold mb-4 text-center">Add a Service</h2>
+    <div className="max-w-lg mx-auto mt-10 p-8 bg-white rounded-2xl shadow-lg border border-gray-200">
+      <h2 className="text-3xl font-bold mb-6 text-center text-[#1c2b21]">Add a Service</h2>
 
-      <input type="text" placeholder="Title *" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full border rounded-xl p-2 mb-4" required />
-      <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} className="w-full border rounded-xl p-2 mb-4" />
+      <input
+        type="text"
+        placeholder="Title *"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className="w-full border border-gray-300 rounded-xl p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+      />
 
-  <select
-  value={category}
-  onChange={(e) => setCategory(e.target.value)}
-  className="w-full border rounded-xl p-2 mb-4"
-  required
->
-  <option value="">Select Category *</option>
-  <option value="Wellness">Wellness</option>
-  <option value="Medical">Medical</option>
-  <option value="Home Based/Mobile Services">Home Based/Mobile Services</option>
-  <option value="Hotel">Hotel</option>
-</select>
+      <textarea
+        placeholder="Description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        className="w-full border border-gray-300 rounded-xl p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] resize-none h-24"
+      />
 
+      <select
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+        className="w-full border border-gray-300 rounded-xl p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+      >
+        <option value="">Select Category *</option>
+        <option value="Wellness">Wellness</option>
+        <option value="Medical">Medical</option>
+        <option value="Home Based/Mobile Services">Home Based/Mobile Services</option>
+        <option value="Hotel">Hotel</option>
+      </select>
 
       {category && subcategoriesMap[category] && (
-        <select value={subcategory} onChange={(e) => setSubcategory(e.target.value)} className="w-full border rounded-xl p-2 mb-4" required>
+        <select
+          value={subcategory}
+          onChange={(e) => setSubcategory(e.target.value)}
+          className="w-full border border-gray-300 rounded-xl p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+        >
           <option value="">Select Subcategory *</option>
           {subcategoriesMap[category].map((group) => (
             <optgroup key={group.label} label={group.label}>
               {group.options.map((opt) => (
-                <option key={opt} value={opt}>{opt}</option>
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
               ))}
             </optgroup>
           ))}
         </select>
       )}
 
-      <input type="number" placeholder="Price *" value={price} onChange={(e) => setPrice(Number(e.target.value))} className="w-full border rounded-xl p-2 mb-4" required />
-      <input type="text" placeholder="Duration (e.g. 60 minutes)" value={duration} onChange={(e) => setDuration(e.target.value)} className="w-full border rounded-xl p-2 mb-4" />
-      <input type="text" placeholder="Location" value={location} onChange={(e) => setLocation(e.target.value)} className="w-full border rounded-xl p-2 mb-4" />
-      <input type="text" placeholder="Tags (comma-separated)" value={tags} onChange={(e) => setTags(e.target.value)} className="w-full border rounded-xl p-2 mb-4" />
-      <input type="file" accept="image/*" onChange={(e) => setImage(e.target.files?.[0] || null)} className="w-full border rounded-xl p-2 mb-4" />
+      <input
+        type="number"
+        placeholder="Price *"
+        value={price}
+        onChange={(e) => setPrice(Number(e.target.value))}
+        className="w-full border border-gray-300 rounded-xl p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+      />
 
-      <button onClick={handleSubmit} className="w-full bg-[#1c2b21] text-white font-semibold py-2 rounded">Add Service</button>
+      <input
+        type="text"
+        placeholder="Duration (e.g. 60 minutes)"
+        value={duration}
+        onChange={(e) => setDuration(e.target.value)}
+        className="w-full border border-gray-300 rounded-xl p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+      />
+
+      <input
+        type="text"
+        placeholder="Location"
+        value={location}
+        onChange={(e) => setLocation(e.target.value)}
+        className="w-full border border-gray-300 rounded-xl p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+      />
+
+      <input
+        type="text"
+        placeholder="Tags (comma-separated)"
+        value={tags}
+        onChange={(e) => setTags(e.target.value)}
+        className="w-full border border-gray-300 rounded-xl p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+      />
+
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => setImage(e.target.files?.[0] || null)}
+        className="w-full mb-6"
+      />
+
+      <button
+        onClick={handleSubmit}
+        className="w-full bg-[#1c2b21] hover:bg-[#16301b] text-[#D4AF37] font-bold py-3 rounded-xl shadow-md transition duration-300"
+      >
+        Add Service
+      </button>
     </div>
   );
 };
 
 export default AddServiceForm;
+
 
